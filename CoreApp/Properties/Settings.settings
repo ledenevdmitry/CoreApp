@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CoreApp.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="DDLSTM" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ALTER~COMMENT ON~CREATE~DROP~FLASHBACK~PURGE~TRUNCATE</Value>
+    </Setting>
+    <Setting Name="ORAOBJ" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CLUSTER~CONSTRAINT~DATABASE LINK~TRIGGER~DIMENSION~LIBRARY~TABLE~INDEX~INDEXTYPES~JAVA CLASS~JAVA RESOURCE~JAVA SOURCE~MATERIALIZED VIEW~MATERIALIZED VIEW LOG~TYPE~OPERATOR~PACKAGE~SEQUENCE~FUNCTION~PROCEDURE~SYNONYM~TABLE~VIEW~CONTEXT~DIRECTORY~PFILE~SPFILE~PROFILE~ROLE~ROLLBACK SEGMENT~TABLESPACE~USER</Value>
+    </Setting>
+    <Setting Name="DMLSTM" Type="System.String" Scope="User">
+      <Value Profile="(Default)">CALL~FROM~INTO~LOCK TABLE~MERGE~JOIN~INTO~UPDATE</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
