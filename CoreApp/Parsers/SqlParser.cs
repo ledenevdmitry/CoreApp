@@ -23,6 +23,7 @@ namespace CoreApp
         public static readonly string RegexIndexingTable;
         public static readonly string[] OraObjectTypes;
         public static readonly string[] DMLStatements;
+        public static readonly HashSet<string> ReservedWords;
         private static Regex IdentifierRegex;
 
         public SqlParser()
@@ -45,6 +46,7 @@ namespace CoreApp
                 "ON";
            OraObjectTypes = Regex.Replace(Properties.Settings.Default.ORAOBJ, RegexWhiteSpaces, RegexWhiteSpaces).Split('~');
            DMLStatements = Regex.Replace(Properties.Settings.Default.DMLSTM, RegexWhiteSpaces, RegexWhiteSpaces).Split('~');
+           ReservedWords = new HashSet<string>(Properties.Settings.Default.RSVDWRDS.Split('~'));
         }
 
 
@@ -83,7 +85,10 @@ namespace CoreApp
             {
                 int start = match.Index + match.Length;
                 Match obj = IdentifierRegex.Match(script, start);
-                InsertIntoDict(obj, type, file, dict);
+                if (!ReservedWords.Contains(obj.Value.ToUpper()))
+                {
+                    InsertIntoDict(obj, type, file, dict);
+                }
             }
         }
 
@@ -108,12 +113,13 @@ namespace CoreApp
             return files.Count(x => x.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        public void RetrieveObjectsFromFile(List<FileInfo> files, ObjectDict<OraObject> dict)
+        public void RetrieveObjectsFromFile(List<FileInfo> files, ObjectDict<OraObject> dict, bool UMEnabled)
         {
             StartOfCheck();
             foreach (FileInfo file in files)
             {
-                if (file.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase))
+                if (file.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase) &&
+                    (UMEnabled || !FileScUtils.IsUMFile(file)))
                 {
                     if (file.Exists)
                     {

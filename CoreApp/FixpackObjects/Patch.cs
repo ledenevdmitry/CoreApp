@@ -11,7 +11,8 @@ namespace CoreApp.FixpackObjects
     public class Patch
     {
         public string name { get; private set; }
-        FileInfo file;
+        public FileInfo file { get; private set; }
+        public string pathToPatch { get; private set; }
         private static Regex ATCPatchRegex = new Regex(@"\\((\d+\-){0,1}Z\d+.*?)\\");
         private static Regex BankPatchRegex = new Regex(@"\\(C(\d+).*?)\\");
 
@@ -25,6 +26,7 @@ namespace CoreApp.FixpackObjects
             if(match.Success)
             {
                 name = match.Groups[1].Value;
+                pathToPatch = file.FullName.Substring(0, match.Index + name.Length + 1);
             }
             this.file = file;
         }

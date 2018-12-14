@@ -36,6 +36,13 @@ namespace CoreApp
             return res;
         }
 
+
+        private static string umRegex = @"\\um@";
+        public static bool IsUMFile(FileInfo file)
+        {
+            return Regex.IsMatch(file.FullName, umRegex, RegexOptions.IgnoreCase);
+        }
+
         public static List<FileInfo> GetListOfFiles(List<FileInfo> fileScs)
         {
             List<FileInfo> files = new List<FileInfo>();

@@ -56,7 +56,7 @@ namespace CoreApp.FormUtils
                 OraObject oraObj = item.Key;
                 foreach(Patch patch in item.Value)
                 {
-                    dictDGV.Rows.Add(oraObj.objName, oraObj.type, patch.name);
+                    dictDGV.Rows.Add(oraObj.objName, oraObj.type, patch.pathToPatch);
                 }
             }
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
@@ -75,7 +75,7 @@ namespace CoreApp.FormUtils
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = oraObj.objName;
                     row.Cells[1].Value = oraObj.type;
-                    row.Cells[2].Value = patch.name;
+                    row.Cells[2].Value = patch.pathToPatch;
                     row.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                     dictDGV.Rows.Add(row);                    
                 }
@@ -96,7 +96,7 @@ namespace CoreApp.FormUtils
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = infaObj.objName;
                     row.Cells[1].Value = infaObj.GetType().Name;
-                    row.Cells[2].Value = patch.name;
+                    row.Cells[2].Value = patch.pathToPatch;
                     row.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                     dictDGV.Rows.Add(row);
                 }
@@ -167,7 +167,7 @@ namespace CoreApp.FormUtils
                 InfaBaseObject infaObj = item.Key;
                 foreach (Patch patch in item.Value)
                 {
-                    dictDGV.Rows.Add(infaObj.objName, infaObj.GetType().Name, patch.name);
+                    dictDGV.Rows.Add(infaObj.objName, infaObj.GetType().Name, patch.pathToPatch);
                 }
             }
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);

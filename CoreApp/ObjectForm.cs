@@ -33,7 +33,7 @@ namespace CoreApp
 
         private void OnIdle(object sender, EventArgs e)
         {
-            TSMICheckAllFixpacksInDir.Enabled = checkThread == null || !checkThread.IsAlive;
+            CheckAllFixpacksInDir.Enabled = checkThread == null || !checkThread.IsAlive;
             if(_checked)
             {
                 _checked = false;
@@ -145,11 +145,32 @@ namespace CoreApp
 
                 checkThread = new Thread(() =>
                 {
-                    sqlParser.RetrieveObjectsFromFile(files, oraDict);
+                    sqlParser.RetrieveObjectsFromFile(files, oraDict, UMEnabled);
                     infaParser.RetrieveObjectsFromFiles(files, infaDict);
                     _checked = true;
                 });
                 checkThread.Start();
+            }
+        }
+
+        private void TSMICheckScList_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private bool UMEnabled = false;
+        private void TSMIUmState_Click(object sender, EventArgs e)
+        {
+            if(UMEnabled)
+            {
+                UMEnabled = false;
+                TSMIUmState.Text = "Учитывать УМ";
+            }
+            else
+            {
+                UMEnabled = true;
+                TSMIUmState.Text = "Не учитывать УМ";
             }
         }
     }

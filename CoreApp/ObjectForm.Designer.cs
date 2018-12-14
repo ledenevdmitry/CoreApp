@@ -42,7 +42,9 @@
             this.dgvNotFound = new System.Windows.Forms.DataGridView();
             this.notFoundFiles = new System.Windows.Forms.TabPage();
             this.dgvNotFoundFiles = new System.Windows.Forms.DataGridView();
-            this.TSMICheckAllFixpacksInDir = new System.Windows.Forms.ToolStripMenuItem();
+            this.CheckAllFixpacksInDir = new System.Windows.Forms.ToolStripMenuItem();
+            this.настройкаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.TSMIUmState = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dgvObjects)).BeginInit();
             this.MainMenu.SuspendLayout();
             this.mainTabControl.SuspendLayout();
@@ -70,7 +72,8 @@
             // MainMenu
             // 
             this.MainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.файлToolStripMenuItem});
+            this.файлToolStripMenuItem,
+            this.настройкаToolStripMenuItem});
             this.MainMenu.Location = new System.Drawing.Point(0, 0);
             this.MainMenu.Name = "MainMenu";
             this.MainMenu.Size = new System.Drawing.Size(634, 24);
@@ -80,7 +83,7 @@
             // файлToolStripMenuItem
             // 
             this.файлToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.TSMICheckAllFixpacksInDir});
+            this.CheckAllFixpacksInDir});
             this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.файлToolStripMenuItem.Text = "Файл";
@@ -198,12 +201,27 @@
             this.dgvNotFoundFiles.Size = new System.Drawing.Size(626, 374);
             this.dgvNotFoundFiles.TabIndex = 2;
             // 
-            // TSMICheckAllFixpacksInDir
+            // CheckAllFixpacksInDir
             // 
-            this.TSMICheckAllFixpacksInDir.Name = "TSMICheckAllFixpacksInDir";
-            this.TSMICheckAllFixpacksInDir.Size = new System.Drawing.Size(285, 22);
-            this.TSMICheckAllFixpacksInDir.Text = "Проверить все поставки внутри папки";
-            this.TSMICheckAllFixpacksInDir.Click += new System.EventHandler(this.CheckAllFixpacksInDir_Click);
+            this.CheckAllFixpacksInDir.Name = "CheckAllFixpacksInDir";
+            this.CheckAllFixpacksInDir.Size = new System.Drawing.Size(285, 22);
+            this.CheckAllFixpacksInDir.Text = "Проверить все поставки внутри папки";
+            this.CheckAllFixpacksInDir.Click += new System.EventHandler(this.CheckAllFixpacksInDir_Click);
+            // 
+            // настройкаToolStripMenuItem
+            // 
+            this.настройкаToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TSMIUmState});
+            this.настройкаToolStripMenuItem.Name = "настройкаToolStripMenuItem";
+            this.настройкаToolStripMenuItem.Size = new System.Drawing.Size(78, 20);
+            this.настройкаToolStripMenuItem.Text = "Настройка";
+            // 
+            // TSMIUmState
+            // 
+            this.TSMIUmState.Name = "TSMIUmState";
+            this.TSMIUmState.Size = new System.Drawing.Size(180, 22);
+            this.TSMIUmState.Text = "Учитывать УМ";
+            this.TSMIUmState.Click += new System.EventHandler(this.TSMIUmState_Click);
             // 
             // ObjectForm
             // 
@@ -251,7 +269,9 @@
         private System.Windows.Forms.DataGridView dgvNotFound;
         private System.Windows.Forms.TabPage notFoundFiles;
         private System.Windows.Forms.DataGridView dgvNotFoundFiles;
-        private System.Windows.Forms.ToolStripMenuItem TSMICheckAllFixpacksInDir;
+        private System.Windows.Forms.ToolStripMenuItem CheckAllFixpacksInDir;
+        private System.Windows.Forms.ToolStripMenuItem настройкаToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem TSMIUmState;
     }
 }
 
