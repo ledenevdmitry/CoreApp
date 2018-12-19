@@ -59,6 +59,8 @@
     <Compile Include="Dicts\ObjectDict.cs" />
     <Compile Include="Dicts\OraObjectDict.cs" />
     <Compile Include="FileScUtils.cs" />
+    <Compile Include="FixpackObjects\Fixpack.cs" />
+    <Compile Include="FixpackObjects\InfaSchema.cs" />
     <Compile Include="FixpackObjects\Patch.cs" />
     <Compile Include="ObjectForm.cs">
       <SubType>Form</SubType>

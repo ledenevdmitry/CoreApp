@@ -11,7 +11,10 @@ namespace CoreApp.Comparers
     {
         public bool Equals(InfaBaseObject o1, InfaBaseObject o2)
         {
-            return o1.objName.Equals(o2.objName, StringComparison.CurrentCultureIgnoreCase) && o1.GetType() == o2.GetType();
+            return o1.objName.Equals(o2.objName, StringComparison.CurrentCultureIgnoreCase) && 
+                   o1.GetType() == o2.GetType() &&
+                   (o1.file == null || o2.file == null ||
+                    o1.file.FullName.Equals(o2.file.FullName, StringComparison.CurrentCultureIgnoreCase));
         }
 
         public int GetHashCode(InfaBaseObject o)

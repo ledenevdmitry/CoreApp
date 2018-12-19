@@ -113,7 +113,12 @@ namespace CoreApp
                     Patch p2 = new Patch(obj.file);
                     if (!p1.Equals(p2))
                     {
-                        dict.infaDependencies.Add(new KeyValuePair<InfaBaseObject, InfaBaseObject>(parent, obj));
+                        InfaSchema s1 = new InfaSchema(parent.file);
+                        InfaSchema s2 = new InfaSchema(obj.file);
+                        if (s1.Equals(s2))
+                        {
+                            dict.infaDependencies.Add(new KeyValuePair<InfaBaseObject, InfaBaseObject>(parent, obj));
+                        }
                     }
                 }
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CoreApp.FixpackObjects;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,14 +14,15 @@ namespace CoreApp
         private static Regex OraRegex = new Regex(@"ORA\|\|(.*)\|\|", RegexOptions.IgnoreCase);
         private static Regex InfaRegex = new Regex(@"IPC\|\|(.*)\Z", RegexOptions.IgnoreCase);
 
-        public static List<FileInfo> GetFilesFromMainDir(DirectoryInfo dir)
+        public static List<FileInfo> GetFilesFromMainDir(DirectoryInfo dir, out List<Fixpack> fixpacks)
         {
-            return GetListOfFiles(GetFileScsFromDir(dir));
+            return GetListOfFiles(GetFileScsFromDir(dir, out fixpacks));
         }
 
-        public static List<FileInfo> GetFileScsFromDir(DirectoryInfo dir)
+        public static List<FileInfo> GetFileScsFromDir(DirectoryInfo dir, out List<Fixpack> fixpacks)
         {
             List<FileInfo> res = new List<FileInfo>();
+            fixpacks = new List<Fixpack>();
             foreach(DirectoryInfo fixpackDir in dir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
             {
                 try
@@ -32,6 +34,19 @@ namespace CoreApp
                 {
                     throw new ArgumentException($"В папке {fixpackDir.FullName} отсутствует файл сценария");
                 }
+                Fixpack fp = null;
+                foreach (FileInfo excelFile in fixpackDir.GetFiles("*.xlsx"))
+                {
+                    try
+                    {
+                        fp = new Fixpack(excelFile);
+                        break;
+                    }
+                    catch
+                    { }
+                }
+                if (fp == null) throw new Exception($"Не найдена экселька в папке {fixpackDir.FullName}");
+                fixpacks.Add(fp);
             }
             return res;
         }
