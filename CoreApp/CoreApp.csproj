@@ -50,11 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Comparers\FileInfoEqualityComparer.cs" />
-    <Compile Include="Comparers\InfaObjectFileNameComparer.cs" />
-    <Compile Include="Comparers\InfaObjectNameComparer.cs" />
-    <Compile Include="Comparers\OraObjectNameComparer.cs" />
-    <Compile Include="Comparers\PatchEqualityComparer.cs" />
+    <Compile Include="Keys\ETLObject.cs" />
+    <Compile Include="Keys\Key.cs" />
+    <Compile Include="oldComparers\FileInfoEqualityComparer.cs" />
+    <Compile Include="oldComparers\InfaObjectFileNameComparer.cs" />
+    <Compile Include="oldComparers\InfaObjectNameComparer.cs" />
+    <Compile Include="oldComparers\PatchEqualityComparer.cs" />
     <Compile Include="Dicts\InfaObjectDict.cs" />
     <Compile Include="Dicts\ObjectDict.cs" />
     <Compile Include="Dicts\OraObjectDict.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="InfaObjects\InfaMapplet.cs" />
     <Compile Include="InfaObjects\InfaShortcut.cs" />
     <Compile Include="OraObjects\OraObject.cs" />
+    <Compile Include="Parsers\ETLParser.cs" />
     <Compile Include="Parsers\ExcelParser.cs" />
     <Compile Include="Parsers\InfaParser.cs" />
     <Compile Include="InfaObjects\InfaSession.cs" />

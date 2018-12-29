@@ -22,18 +22,18 @@ namespace CoreApp.FixpackObjects
         static string regexC = @"\\(C\d+)";
         static string regexFullName = @"\\(C[^\\]+)\\";
         static string regexFullPath = @".*C[^\\]+\\";
-        Dictionary<string, Patch> patches;
+        public Dictionary<string, Patch> patches { get; protected set; }
 
         static Fixpack()
         {
             excel = new Application();
         }
 
-        public Fixpack(FileInfo file)
+        public Fixpack(DirectoryInfo dir)
         {
-            C = Regex.Match(file.FullName, regexC).Groups[0].Value;
-            FullName = Regex.Match(file.FullName, regexFullName).Groups[0].Value;
-            FullPath = Regex.Match(file.FullName, regexFullPath).Groups[0].Value;
+            C = Regex.Match(dir.FullName, regexC).Groups[1].Value;
+            FullName = Regex.Match(dir.FullName, regexFullName).Groups[0].Value;
+            FullPath = Regex.Match(dir.FullName, regexFullPath).Groups[0].Value;
 
             patches = new Dictionary<string, Patch>();
             fixpackSheet = OpenExcelSheet();
@@ -47,17 +47,23 @@ namespace CoreApp.FixpackObjects
 
         private Worksheet OpenExcelSheet()
         {
-            string path = string.Join("\\", new DirectoryInfo(FullPath).Parent.FullName, $"{C}.xlsx");
+            string path = FullPath + $"{C}.xlsx";
             if (File.Exists(path))
             {
-                return excel.Workbooks.Open(path).Sheets[0];
+                return excel.Workbooks.Open(path).Sheets[1];
             }
-            path = string.Join("\\", new DirectoryInfo(FullPath).Parent.FullName, $"{C}.xls");
-            if(File.Exists(path))
+            else
             {
-                return excel.Workbooks.Open(path).Sheets[0];
+                path = FullPath + $"{C}.xls";
+                if (File.Exists(path))
+                {
+                    return excel.Workbooks.Open(path).Sheets[0];
+                }
+                else
+                {
+                    throw new Exception("Экселька не найдена");
+                }
             }
-            throw new Exception("Экселька не найдена");
         }
 
         private static string regexPatchName = @"(C|Z)[0-9]+";

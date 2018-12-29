@@ -1,4 +1,5 @@
 ﻿using CoreApp.Comparers;
+using CoreApp.Keys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,8 @@ namespace CoreApp.Dicts
     {
         public OraObjectDict()
         {
-            baseDict = new ObjFilePairs<OraObject>(new OraObjectNameComparer());
-            intersections = new ObjFilePairs<OraObject>(new OraObjectNameComparer());
+            baseDict = new ObjPatchPairs<OraObject>();
+            intersections = new ObjPatchPairs<OraObject>();
         }
     }
 }

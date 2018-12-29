@@ -1,4 +1,5 @@
 ﻿using CoreApp.Dicts;
+using CoreApp.FixpackObjects;
 using CoreApp.FormUtils;
 using System;
 using System.Collections.Generic;
@@ -49,7 +50,6 @@ namespace CoreApp
                 FormUtil.AddOraIntersectionsInDGV(dgvIntersections, oraDict);
                 FormUtil.AddInfaIntersectionsInDGV(dgvIntersections, infaDict);
                 FormUtil.AddInfaWrongOrderInDGV(dgvWrongOrder, infaDict);
-                FormUtil.AddInfaNotFoundObjectsInDGV(dgvNotFound, infaDict);
                 FormUtil.AddNotFoundFiles(dgvNotFoundFiles, oraDict);
                 FormUtil.AddNotFoundFiles(dgvNotFoundFiles, infaDict);
             }
@@ -131,11 +131,12 @@ namespace CoreApp
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             if(fbd.ShowDialog() == DialogResult.OK)
             {
-                List<FileInfo> files = FileScUtils.GetFilesFromMainDir(new DirectoryInfo(fbd.SelectedPath));
+                //List<Fixpack> fixpacks;
+                //List<FileInfo> files = FileScUtils.GetFilesFromMainDir(new DirectoryInfo(fbd.SelectedPath), out fixpacks);
                 infaDict = new InfaObjectDict();
                 oraDict = new OraObjectDict();
 
-                infaParser = new InfaParser(files, infaDict);
+                infaParser = new InfaParser(new DirectoryInfo(fbd.SelectedPath), infaDict);
                 sqlParser = new SqlParser();
 
                 PBChecks.Value = 0;

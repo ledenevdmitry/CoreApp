@@ -1,5 +1,6 @@
 ﻿using CoreApp.Comparers;
 using CoreApp.InfaObjects;
+using CoreApp.Keys;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,16 +12,14 @@ namespace CoreApp.Dicts
 {
     class InfaObjectDict : ObjectDict<InfaBaseObject>
     {
-        public Dictionary<InfaBaseObject, HashSet<InfaBaseObject>> notFoundObject { get; private set; }
-        public List<KeyValuePair<InfaBaseObject, InfaBaseObject>> infaDependencies;
+        public ObjObjsPairs<InfaBaseObject> infaDependencies;
         public InfaObjectDict()
         {
-            baseDict = new ObjFilePairs<InfaBaseObject>(new InfaObjectNameComparer());
-            intersections = new ObjFilePairs<InfaBaseObject>(new InfaObjectNameComparer());
-            infaDependencies  = new List<KeyValuePair<InfaBaseObject, InfaBaseObject>>();
-            notFoundObject = new Dictionary<InfaBaseObject, HashSet<InfaBaseObject>>(new InfaObjectNameComparer());
+            baseDict = new ObjPatchPairs<InfaBaseObject>();
+            intersections = new ObjPatchPairs<InfaBaseObject>();
+            infaDependencies = new ObjObjsPairs<InfaBaseObject>();
         }
 
-        //!!!!!!!!!!!!!!!!!Обязательная вторая проверка
-    }
+            //!!!!!!!!!!!!!!!!!Обязательная вторая проверка
+        }
 }

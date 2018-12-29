@@ -1,5 +1,6 @@
 ﻿using CoreApp.Dicts;
 using CoreApp.FixpackObjects;
+using CoreApp.Keys;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -95,10 +96,10 @@ namespace CoreApp
         private static void InsertIntoDict(Match obj, string type, FileInfo file, OraObjectDict dict)
         {
             string objName = obj.Value.Trim().ToUpper();
-            dict.AddObjectConsiderIntersections(new OraObject(objName, type, file), new Patch(file));
+            dict.AddObjectConsiderIntersections(new OraObject(objName, type, file));
         }
 
-        public void RetrieveObjectsFromFile(FileInfo file, ObjectDict<OraObject> dict)
+        public void RetrieveObjectsFromFile(FileInfo file, OraObjectDict dict)
         {
             StreamReader streamReader = new StreamReader(file.FullName, Encoding.GetEncoding("Windows-1251"));
             string script = streamReader.ReadToEnd();
@@ -113,7 +114,7 @@ namespace CoreApp
             return files.Count(x => x.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        public void RetrieveObjectsFromFile(List<FileInfo> files, ObjectDict<OraObject> dict, bool UMEnabled)
+        public void RetrieveObjectsFromFile(List<FileInfo> files, OraObjectDict dict, bool UMEnabled)
         {
             StartOfCheck();
             foreach (FileInfo file in files)

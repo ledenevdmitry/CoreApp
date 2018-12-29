@@ -13,13 +13,9 @@ namespace CoreApp
     {
         private static Regex OraRegex = new Regex(@"ORA\|\|(.*)\|\|", RegexOptions.IgnoreCase);
         private static Regex InfaRegex = new Regex(@"IPC\|\|(.*)\Z", RegexOptions.IgnoreCase);
+        
 
-        public static List<FileInfo> GetFilesFromMainDir(DirectoryInfo dir, out List<Fixpack> fixpacks)
-        {
-            return GetListOfFiles(GetFileScsFromDir(dir, out fixpacks));
-        }
-
-        public static List<FileInfo> GetFileScsFromDir(DirectoryInfo dir, out List<Fixpack> fixpacks)
+        public static void GetFixpacksFromDir(DirectoryInfo dir, out List<Fixpack> fixpacks)
         {
             List<FileInfo> res = new List<FileInfo>();
             fixpacks = new List<Fixpack>();
@@ -34,23 +30,10 @@ namespace CoreApp
                 {
                     throw new ArgumentException($"В папке {fixpackDir.FullName} отсутствует файл сценария");
                 }
-                Fixpack fp = null;
-                foreach (FileInfo excelFile in fixpackDir.GetFiles("*.xlsx"))
-                {
-                    try
-                    {
-                        fp = new Fixpack(excelFile);
-                        break;
-                    }
-                    catch
-                    { }
-                }
-                if (fp == null) throw new Exception($"Не найдена экселька в папке {fixpackDir.FullName}");
+                Fixpack fp = new Fixpack(fixpackDir);
                 fixpacks.Add(fp);
             }
-            return res;
         }
-
 
         private static string umRegex = @"\\um@";
         public static bool IsUMFile(FileInfo file)
@@ -58,6 +41,7 @@ namespace CoreApp
             return Regex.IsMatch(file.FullName, umRegex, RegexOptions.IgnoreCase);
         }
 
+        /*
         public static List<FileInfo> GetListOfFiles(List<FileInfo> fileScs)
         {
             List<FileInfo> files = new List<FileInfo>();
@@ -85,5 +69,6 @@ namespace CoreApp
             }
             return files;
         }
+        */
     }
 }

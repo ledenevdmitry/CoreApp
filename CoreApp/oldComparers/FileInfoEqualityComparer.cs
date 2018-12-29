@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CoreApp.Comparers
+namespace CoreApp.oldComparers
 {
     internal class FileInfoEqualityComparer : IEqualityComparer<FileInfo>
     {

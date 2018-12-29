@@ -1,5 +1,6 @@
 ﻿using CoreApp.Comparers;
 using CoreApp.FixpackObjects;
+using CoreApp.Keys;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,69 +11,85 @@ using System.Threading.Tasks;
 
 namespace CoreApp.Dicts
 {
-    public class ObjectDict<T>
+    public class ObjectDict<O> where O : ETLObject
     {
-        public ObjFilePairs<T> baseDict { get; protected set; }
-        public ObjFilePairs<T> intersections { get; protected set; }
+        public ObjPatchPairs<O> baseDict { get; protected set; }
+        public ObjPatchPairs<O> intersections { get; protected set; }
         public List<FileInfo> notFoundFiles { get; protected set; }
 
         public ObjectDict()
         {
-            baseDict = new ObjFilePairs<T>();
-            intersections = new ObjFilePairs<T>();
+            baseDict = new ObjPatchPairs<O>();
+            intersections = new ObjPatchPairs<O>();
             notFoundFiles = new List<FileInfo>();
         }   
 
-        public void AddObjectConsiderIntersections(T objName, Patch patch)
+        public void AddObjectConsiderIntersections(O obj)
         {
-            if (baseDict.objFilesPairs.ContainsKey(objName) && !baseDict.objFilesPairs[objName].Contains(patch)) //если объект уже был в таблице
+            if (baseDict.oneToManyPairs.ContainsKey(obj) && !baseDict.oneToManyPairs[obj].ContainsValue(obj.patch)) //если объект уже был в таблице
             {
-                if (!intersections.objFilesPairs.ContainsKey(objName)) //если его еще нет в пересечениях, добавляем тот, с кем он пересекся
+                if (!intersections.oneToManyPairs.ContainsKey(obj)) //если его еще нет в пересечениях, добавляем тот, с кем он пересекся
                 {
-                    intersections.Add(objName, baseDict.Value(objName));
+                    intersections.Add(obj, baseDict.SingleValue(obj));
                 }
-                intersections.Add(objName, patch);//добавляем новый в пересечение
+                intersections.Add(obj, obj.patch); //добавляем новый в пересечение
             }
-            baseDict.Add(objName, patch);
+            baseDict.Add(obj, obj.patch);
         }
     }
 
-
-    public class ObjFilePairs<T>
+    public class OneToManyPairs<O, M>
     {
-        public Dictionary<T, HashSet<Patch>> objFilesPairs { get; protected set; }
+        //внешний O - ключ, внутренний - все значения, удовл. этому ключу
+        public Dictionary<O, Dictionary<O, M>> oneToManyPairs { get; protected set; }
 
-        public ObjFilePairs()
+        public OneToManyPairs()
         {
-            objFilesPairs = new Dictionary<T, HashSet<Patch>>();
+            oneToManyPairs = new Dictionary<O, Dictionary<O, M>>();
         }
 
-        public ObjFilePairs(IEqualityComparer<T> comparer)
+        public IEnumerable<O> EnumerateOnes()
         {
-            objFilesPairs = new Dictionary<T, HashSet<Patch>>(comparer);
+            return oneToManyPairs.Keys;
         }
 
-        public Patch Value(T key)
+        public IEnumerable<KeyValuePair<O, M>> EnumeratePairs()
         {
-            if (objFilesPairs[key].Count != 1)
+            foreach (var keyToDictPair in oneToManyPairs.Values)
+            {
+                foreach (var kvp in keyToDictPair)
+                {
+                    yield return new KeyValuePair<O, M>(kvp.Key, kvp.Value);
+                }
+            }
+        }
+
+        public M SingleValue(O obj) 
+        {
+            if (oneToManyPairs[obj].Values.Count != 1)
             {
                 throw new ArgumentException("Хэш-таблица содержит не одно значение");
             }
             else
             {
-                return objFilesPairs[key].First();
+                return oneToManyPairs[obj].Values.First();
             }
         }
 
-        public void Add(T obj, Patch patch)
+        public void Add(O one, M many)
         {
-            if (!objFilesPairs.ContainsKey(obj))
+            if (!oneToManyPairs.ContainsKey(one))
             {
-                objFilesPairs.Add(obj, new HashSet<Patch>(new PatchEqualityComparer()));
+                oneToManyPairs.Add(one, new Dictionary<O, M>());
             }
-
-            objFilesPairs[obj].Add(patch);
+            
+            oneToManyPairs[one].Add(one, many);
         }
-        
     }
+
+    public class ObjObjsPairs<O> : OneToManyPairs<O, O>
+    { }
+
+    public class ObjPatchPairs<O> : OneToManyPairs<O, Patch>
+    { }
 }
