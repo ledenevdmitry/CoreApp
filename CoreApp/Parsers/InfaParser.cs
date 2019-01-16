@@ -121,35 +121,34 @@ namespace CoreApp
         public delegate void ResetProgress();
         public event ResetProgress StartOfCheck, ProgressChanged, EndOfCheck;
 
-        public void RetrieveObjectsFromFiles(List<FileInfo> files, InfaObjectDict dict)
+        public void RetrieveObjectsFromFiles(IEnumerable<FileInfo> files, InfaObjectDict dict)
         {
             StartOfCheck();
-            foreach (var kvp in dict.baseDict.oneToManyPairs)
+            foreach (InfaBaseObject infaObj in dict.baseDict.EnumerateOnes())
             {
-                kvp.Key.GenerateParentNames(dict);
+                infaObj.GenerateParentNames(dict);
                 ProgressChanged();
             }
             CheckInfaDependencies(files, dict);
             EndOfCheck();
         }
 
-        public void CheckInfaDependencies(List<FileInfo> files, InfaObjectDict dict)
+        public void CheckInfaDependencies(IEnumerable<FileInfo> files, InfaObjectDict dict)
         {
-            foreach (var kvp in dict.baseDict.oneToManyPairs)
+            foreach (InfaBaseObject infaObj in dict.baseDict.EnumerateOnes())
             {
                 ProgressChanged();
-                InfaBaseObject obj = kvp.Key;
-                foreach (InfaBaseObject parent in obj.parents)
+                foreach (InfaBaseObject parent in infaObj.parents)
                 {
                     Patch p1 = new Patch(parent.file.FullName);
-                    Patch p2 = new Patch(obj.file.FullName);
+                    Patch p2 = new Patch(infaObj.file.FullName);
                     if (!p1.Equals(p2))
                     {
                         InfaSchema s1 = new InfaSchema(parent.file);
-                        InfaSchema s2 = new InfaSchema(obj.file);
+                        InfaSchema s2 = new InfaSchema(infaObj.file);
                         if (s1.Equals(s2))
                         {
-                            dict.infaDependencies.Add(parent, obj);
+                            dict.infaDependencies.Add(parent, infaObj);
                         }
                     }
                 }

@@ -1,6 +1,7 @@
 ﻿using CoreApp.Dicts;
 using CoreApp.FixpackObjects;
 using CoreApp.FormUtils;
+using CoreApp.Parsers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,10 +28,7 @@ namespace CoreApp
 
         List<FileInfo> fileScs;
         Thread checkThread;
-        InfaParser infaParser;
-        SqlParser sqlParser;
-        InfaObjectDict infaDict;
-        OraObjectDict oraDict;
+        ETLParser etlparser;
 
         private void OnIdle(object sender, EventArgs e)
         {
@@ -45,13 +43,10 @@ namespace CoreApp
                 FormUtil.InitObjDGV(dgvNotFound);
                 FormUtil.InitNotFoundFilesDGV(dgvNotFoundFiles);
 
-                FormUtil.AddOraObjectsInDGV(dgvObjects, oraDict);
-                FormUtil.AddInfaObjectsInDGV(dgvObjects, infaDict);
-                FormUtil.AddOraIntersectionsInDGV(dgvIntersections, oraDict);
-                FormUtil.AddInfaIntersectionsInDGV(dgvIntersections, infaDict);
-                FormUtil.AddInfaWrongOrderInDGV(dgvWrongOrder, infaDict);
-                FormUtil.AddNotFoundFiles(dgvNotFoundFiles, oraDict);
-                FormUtil.AddNotFoundFiles(dgvNotFoundFiles, infaDict);
+                FormUtil.AddObjectsInDGV(dgvObjects, etlparser);
+                FormUtil.AddIntersectionsInDGV(dgvIntersections, etlparser);
+                FormUtil.AddWrongOrderInDGV(dgvWrongOrder, etlparser);
+                FormUtil.AddNotFoundFiles(dgvNotFoundFiles, etlparser);
             }
         }
 
@@ -59,16 +54,16 @@ namespace CoreApp
 
         private void PrepareInfaParser()
         {
-            infaParser.StartOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = true));            
-            infaParser.ProgressChanged += () => PBChecks.Invoke(new Action(() => PBChecks.Value++));            
-            infaParser.EndOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = false));
+            etlparser.infaParser.StartOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = true));
+            etlparser.infaParser.ProgressChanged += () => PBChecks.Invoke(new Action(() => PBChecks.Value++));
+            etlparser.infaParser.EndOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = false));
         }
 
         private void PrepareOraParser()
         {
-            sqlParser.StartOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = true));
-            sqlParser.ProgressChanged += () => PBChecks.Invoke(new Action(() => PBChecks.Value++));
-            sqlParser.EndOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = false));
+            etlparser.sqlParser.StartOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = true));
+            etlparser.sqlParser.ProgressChanged += () => PBChecks.Invoke(new Action(() => PBChecks.Value++));
+            etlparser.sqlParser.EndOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = false));
         }
 
         private void PrepareParsers()
@@ -133,21 +128,16 @@ namespace CoreApp
             {
                 //List<Fixpack> fixpacks;
                 //List<FileInfo> files = FileScUtils.GetFilesFromMainDir(new DirectoryInfo(fbd.SelectedPath), out fixpacks);
-                infaDict = new InfaObjectDict();
-                oraDict = new OraObjectDict();
-
-                infaParser = new InfaParser(new DirectoryInfo(fbd.SelectedPath), infaDict);
-                sqlParser = new SqlParser();
+                etlparser = new ETLParser(new DirectoryInfo(fbd.SelectedPath), UMEnabled);
 
                 PBChecks.Value = 0;
-                PBChecks.Maximum = infaParser.WorkAmount(infaDict) + sqlParser.WorkAmoumt(files);
+                PBChecks.Maximum = etlparser.infaParser.WorkAmount(etlparser.infaObjectDict) + etlparser.fileCount();
 
                 PrepareParsers();
 
                 checkThread = new Thread(() =>
                 {
-                    sqlParser.RetrieveObjectsFromFile(files, oraDict, UMEnabled);
-                    infaParser.RetrieveObjectsFromFiles(files, infaDict);
+                    etlparser.Check(UMEnabled);
                     _checked = true;
                 });
                 checkThread.Start();

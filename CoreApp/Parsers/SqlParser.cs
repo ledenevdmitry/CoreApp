@@ -114,7 +114,7 @@ namespace CoreApp
             return files.Count(x => x.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        public void RetrieveObjectsFromFile(List<FileInfo> files, OraObjectDict dict, bool UMEnabled)
+        public void RetrieveObjectsFromFile(IEnumerable<FileInfo> files, OraObjectDict dict, bool UMEnabled)
         {
             StartOfCheck();
             foreach (FileInfo file in files)

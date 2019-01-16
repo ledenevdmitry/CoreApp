@@ -15,6 +15,7 @@ namespace CoreApp.FixpackObjects
         public string pathToPatch { get; private set; }
         private static Regex ATCPatchRegex = new Regex(@"\\((\d+\-)?Z(\d+.*?))");
         private static Regex BankPatchRegex = new Regex(@"\\(C(\d+).*?)");
+        public bool IsATCPatch { get; private set; }
         public List<Patch> dependendFrom { get; private set; }
         public List<Patch> dependOn { get; private set; }
         public List<FileInfo> objs;
@@ -35,11 +36,13 @@ namespace CoreApp.FixpackObjects
             dependendFrom = new List<Patch>();
             dependOn = new List<Patch>();
             objs = new List<FileInfo>();
+            IsATCPatch = true;
 
             Match match = ATCPatchRegex.Match(dir.FullName);
             if(!match.Success)
             {
                 match = BankPatchRegex.Match(dir.FullName);
+                IsATCPatch = false;
             }
 
             //TODO: Проверять зависимости патча в эксельке
@@ -50,9 +53,6 @@ namespace CoreApp.FixpackObjects
                 pathToPatch = dir.FullName.Substring(0, match.Index + name.Length + 1);
             }
             this.dir = dir;
-
-
-
         }
 
         public override bool Equals(object obj)

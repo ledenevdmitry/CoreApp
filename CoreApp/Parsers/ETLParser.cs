@@ -13,34 +13,52 @@ namespace CoreApp.Parsers
     {
         List<Fixpack> fixpacks;
 
-        InfaParser infaParser;
-        InfaObjectDict infaObjectDict;
+        public InfaParser infaParser { get; protected set; }
+        public InfaObjectDict infaObjectDict { get; protected set; }
 
-        SqlParser sqlParser;
-        OraObjectDict oraObjectDict;
+        public SqlParser sqlParser { get; protected set; }
+        public OraObjectDict oraObjectDict { get; protected set; }
 
-        int workAmount;
-
-        public ETLParser(DirectoryInfo dir)
+        public int fileCount()
+        {
+            int res = 0;
+            foreach(Fixpack fp in fixpacks)
+            {
+                foreach(Patch p in fp.patches.Values)
+                {
+                    res += p.objs.Count;
+                }
+            }
+            return res;
+        }
+        
+        public ETLParser(DirectoryInfo dir, bool UMEnabled)
         {
             fixpacks = new List<Fixpack>();
-            foreach (DirectoryInfo fixpackDir in dir.EnumerateDirectories("*", SearchOption.AllDirectories))
+            foreach (DirectoryInfo fixpackDir in dir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
             {
                 Fixpack currFixpack = new Fixpack(fixpackDir);
                 fixpacks.Add(currFixpack);
             }
 
             infaObjectDict = new InfaObjectDict();
-            InfaParser infaParser = new InfaParser(fixpacks, infaObjectDict);
+            infaParser = new InfaParser(fixpacks, infaObjectDict);
 
             oraObjectDict = new OraObjectDict();
-            SqlParser sqlParser = new SqlParser();
+            sqlParser = new SqlParser();
+        }
 
-            foreach(Fixpack fixpack in fixpacks)
+        public void Check(bool UMEnabled)
+        {
+            foreach (Fixpack fixpack in fixpacks)
             {
-                infaParser.RetrieveObjectsFromFiles(fixpack.patches)
+                foreach (Patch patch in fixpack.patches.Values)
+                {
+                    infaParser.RetrieveObjectsFromFiles(patch.objs, infaObjectDict);
+                    infaParser.CheckInfaDependencies(patch.objs, infaObjectDict);
+                    sqlParser.RetrieveObjectsFromFile(patch.objs, oraObjectDict, UMEnabled);
+                }
             }
-
         }
 
     }

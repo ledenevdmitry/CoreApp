@@ -17,14 +17,5 @@ namespace CoreApp
         {
             this.file = file;
         }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            if (obj.GetType() != this.GetType()) return false;
-            OraObject other = (OraObject)obj;
-
-            return base.Equals(obj) && file.FullName.Equals(other.file.FullName, StringComparison.CurrentCultureIgnoreCase);
-        }
     }
 }

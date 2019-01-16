@@ -26,15 +26,6 @@ namespace CoreApp.InfaObjects
             this.objName = objName;
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            if (obj.GetType() != this.GetType()) return false;
-            InfaBaseObject other = (InfaBaseObject)obj;
-
-            return file.FullName.Equals(other.file.FullName, StringComparison.CurrentCultureIgnoreCase);
-        }
-
         public HashSet<InfaBaseObject> parents { get; set; }
         public HashSet<string> infaParentTypes;
         public FileInfo file { get; set; }
@@ -56,7 +47,7 @@ namespace CoreApp.InfaObjects
                     {
                         if(attr.Name == "TYPE" && infaParentTypes.Contains(attr.Value))
                         {
-                            InfaBaseObject parentPattern = InfaParser.CreateInfaObject(subNode.Attributes.GetNamedItem("TYPE").Value, subNode.Attributes.GetNamedItem("NAME").Value, subNode, null, null);
+                            Key parentPattern = (Key)InfaParser.CreateInfaObject(subNode.Attributes.GetNamedItem("TYPE").Value, subNode.Attributes.GetNamedItem("NAME").Value, subNode, null, null);
                             if (dict.baseDict.oneToManyPairs.ContainsKey(parentPattern))
                             {
                                 HashSet<InfaBaseObject> newParents = new HashSet<InfaBaseObject>(dict.baseDict.oneToManyPairs[parentPattern].Keys);

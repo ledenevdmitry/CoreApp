@@ -1,6 +1,7 @@
 ﻿using CoreApp.Dicts;
 using CoreApp.FixpackObjects;
 using CoreApp.InfaObjects;
+using CoreApp.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -31,43 +32,48 @@ namespace CoreApp.FormUtils
             dictDGV.Columns.Add("NotFoundFiles", "Ненайденные файлы");
         }
 
-        public static void AddNotFoundFiles(DataGridView dictDGV, OraObjectDict dict)
+        public static void AddNotFoundFiles(DataGridView dictDGV, ETLParser parser)
         {
-            foreach(FileInfo file in dict.notFoundFiles)
+            foreach(FileInfo file in parser.oraObjectDict.notFoundFiles)
+            {
+                dictDGV.Rows.Add(file.FullName);
+            }
+
+            foreach(FileInfo file in parser.infaObjectDict.notFoundFiles)
             {
                 dictDGV.Rows.Add(file.FullName);
             }
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
 
-        public static void AddNotFoundFiles(DataGridView dictDGV, InfaObjectDict dict)
+        public static void AddObjectsInDGV(DataGridView dictDGV, ETLParser parser)
         {
-            foreach(FileInfo file in dict.notFoundFiles)
-            {
-                dictDGV.Rows.Add(file.FullName);
-            }
-            dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-        }
-
-        public static void AddOraObjectsInDGV(DataGridView dictDGV, OraObjectDict dict)
-        {
-            foreach(KeyValuePair<OraObject, Patch> item in dict.baseDict.EnumeratePairs())
+            foreach(KeyValuePair<OraObject, Patch> item in parser.oraObjectDict.baseDict.EnumeratePairs())
             {
                 OraObject oraObj = item.Key;
                 Patch patch = item.Value;
                 dictDGV.Rows.Add(oraObj.objName, oraObj.objType, patch.pathToPatch);
             }
+
+            foreach (KeyValuePair<InfaBaseObject, Patch> item in parser.infaObjectDict.baseDict.EnumeratePairs())
+            {
+                InfaBaseObject infaObj = item.Key;
+                Patch patch = item.Value;
+                dictDGV.Rows.Add(infaObj.objName, infaObj.objType, patch.pathToPatch);
+            }
+
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
 
-        public static void AddOraIntersectionsInDGV(DataGridView dictDGV, OraObjectDict dict)
+        public static void AddIntersectionsInDGV(DataGridView dictDGV, ETLParser parser)
         {
             bool colorDeterminator = false;
-            foreach (KeyValuePair<OraObject, Dictionary<OraObject, Patch>> item in dict.intersections.oneToManyPairs)
+            foreach (var pairs in  parser.oraObjectDict.intersections.EnumerateByDistinctKeys())
             {
-                OraObject oraObj = item.Key;
-                foreach (Patch patch in item.Value.Values)
+                foreach (var pair in pairs)
                 {
+                    OraObject oraObj = pair.Key;
+                    Patch patch = pair.Value;
                     DataGridViewRow row = new DataGridViewRow();
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = oraObj.objName;
@@ -78,17 +84,13 @@ namespace CoreApp.FormUtils
                 }
                 colorDeterminator = !colorDeterminator;
             }
-            dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-        }
 
-        public static void AddInfaIntersectionsInDGV(DataGridView dictDGV, InfaObjectDict dict)
-        {
-            bool colorDeterminator = false;
-            foreach (KeyValuePair<InfaBaseObject, Dictionary<InfaBaseObject, Patch>> item in dict.intersections.oneToManyPairs)
+            foreach (var pairs in parser.infaObjectDict.intersections.EnumerateByDistinctKeys())
             {
-                InfaBaseObject infaObj = item.Key;
-                foreach (Patch patch in item.Value.Values)
+                foreach (var pair in pairs)
                 {
+                    InfaBaseObject infaObj = pair.Key;
+                    Patch patch = pair.Value;
                     DataGridViewRow row = new DataGridViewRow();
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = infaObj.objName;
@@ -102,10 +104,10 @@ namespace CoreApp.FormUtils
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
         
-        public static void AddInfaWrongOrderInDGV(DataGridView dictDGV, InfaObjectDict dict)
+        public static void AddWrongOrderInDGV(DataGridView dictDGV, ETLParser parser)
         {
             bool colorDeterminator = false;
-            foreach (KeyValuePair<InfaBaseObject, InfaBaseObject> item in dict.infaDependencies.EnumeratePairs())
+            foreach (KeyValuePair<InfaBaseObject, InfaBaseObject> item in parser.infaObjectDict.infaDependencies.EnumeratePairs())
             {
                 InfaBaseObject infaObj1 = item.Key;
                 DataGridViewRow row1 = new DataGridViewRow();
@@ -129,20 +131,5 @@ namespace CoreApp.FormUtils
             }
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
-
-        public static void AddInfaObjectsInDGV(DataGridView dictDGV, InfaObjectDict dict)
-        {
-            foreach (KeyValuePair<InfaBaseObject, Dictionary<InfaBaseObject, Patch>> item in dict.baseDict.oneToManyPairs)
-            {
-                InfaBaseObject infaObj = item.Key;
-                foreach (Patch patch in item.Value.Values)
-                {
-                    dictDGV.Rows.Add(infaObj.objName, infaObj.GetType().Name, patch.pathToPatch);
-                }
-            }
-            dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-        }
-
-
     }
 }
