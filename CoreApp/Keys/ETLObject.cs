@@ -21,7 +21,7 @@ namespace CoreApp.Keys
             this.patch = patch;
         }
 
-        public new int GetHashCode()
+        public override int GetHashCode()
         {
             unchecked
             {
@@ -29,13 +29,13 @@ namespace CoreApp.Keys
             }
         }
 
-        public new bool Equals(object obj)
+        public override bool Equals(object obj)
         {
             if (obj == null) return false;
             if (obj.GetType() != this.GetType()) return false;
             ETLObject other = (ETLObject)obj;
 
-            return patch.pathToPatch.Equals(other.patch.pathToPatch, StringComparison.CurrentCultureIgnoreCase);
+            return patch.name.Equals(other.patch.name, StringComparison.CurrentCultureIgnoreCase);
         }
 
     }

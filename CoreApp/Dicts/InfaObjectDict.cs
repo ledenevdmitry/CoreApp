@@ -10,16 +10,18 @@ using System.Threading.Tasks;
 
 namespace CoreApp.Dicts
 {
-    class InfaObjectDict : ObjectDict<InfaBaseObject>
+    class InfaObjectDict : ObjectDict
     {
-        public ObjObjsPairs<InfaBaseObject> infaDependencies;
+        public ObjToParentsDict infaDependencies;
         public InfaObjectDict()
         {
-            baseDict = new ObjPatchPairs<InfaBaseObject>();
-            intersections = new ObjPatchPairs<InfaBaseObject>();
-            infaDependencies = new ObjObjsPairs<InfaBaseObject>();
+            baseDict = new ETLDict();
+            intersections = new ETLDict();
+            infaDependencies = new ObjToParentsDict();
         }
 
-            //!!!!!!!!!!!!!!!!!Обязательная вторая проверка
-        }
+        //!!!!!!!!!!!!!!!!!Обязательная вторая проверка
+    }
+
+
 }

@@ -1,6 +1,7 @@
 ﻿using CoreApp.Dicts;
 using CoreApp.FixpackObjects;
 using CoreApp.InfaObjects;
+using CoreApp.Keys;
 using CoreApp.Parsers;
 using System;
 using System.Collections.Generic;
@@ -48,16 +49,16 @@ namespace CoreApp.FormUtils
 
         public static void AddObjectsInDGV(DataGridView dictDGV, ETLParser parser)
         {
-            foreach(KeyValuePair<OraObject, Patch> item in parser.oraObjectDict.baseDict.EnumeratePairs())
+            foreach(KeyValuePair<ETLObject, Patch> item in parser.oraObjectDict.baseDict.EnumerateObjPatchPairs())
             {
-                OraObject oraObj = item.Key;
+                ETLObject oraObj = item.Key;
                 Patch patch = item.Value;
                 dictDGV.Rows.Add(oraObj.objName, oraObj.objType, patch.pathToPatch);
             }
 
-            foreach (KeyValuePair<InfaBaseObject, Patch> item in parser.infaObjectDict.baseDict.EnumeratePairs())
+            foreach (KeyValuePair<ETLObject, Patch> item in parser.infaObjectDict.baseDict.EnumerateObjPatchPairs())
             {
-                InfaBaseObject infaObj = item.Key;
+                ETLObject infaObj = item.Key;
                 Patch patch = item.Value;
                 dictDGV.Rows.Add(infaObj.objName, infaObj.objType, patch.pathToPatch);
             }
@@ -72,13 +73,13 @@ namespace CoreApp.FormUtils
             {
                 foreach (var pair in pairs)
                 {
-                    OraObject oraObj = pair.Key;
+                    ETLObject oraObj = pair.Key;
                     Patch patch = pair.Value;
                     DataGridViewRow row = new DataGridViewRow();
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = oraObj.objName;
                     row.Cells[1].Value = oraObj.objType;
-                    row.Cells[2].Value = patch.pathToPatch;
+                    row.Cells[2].Value = patch.name;
                     row.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                     dictDGV.Rows.Add(row);                    
                 }
@@ -89,7 +90,7 @@ namespace CoreApp.FormUtils
             {
                 foreach (var pair in pairs)
                 {
-                    InfaBaseObject infaObj = pair.Key;
+                    ETLObject infaObj = pair.Key;
                     Patch patch = pair.Value;
                     DataGridViewRow row = new DataGridViewRow();
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
@@ -107,23 +108,23 @@ namespace CoreApp.FormUtils
         public static void AddWrongOrderInDGV(DataGridView dictDGV, ETLParser parser)
         {
             bool colorDeterminator = false;
-            foreach (KeyValuePair<InfaBaseObject, InfaBaseObject> item in parser.infaObjectDict.infaDependencies.EnumeratePairs())
+            foreach (KeyValuePair<ETLObject, ETLObject> item in parser.infaObjectDict.infaDependencies.EnumeratePairs())
             {
-                InfaBaseObject infaObj1 = item.Key;
+                ETLObject infaObj1 = item.Key;
                 DataGridViewRow row1 = new DataGridViewRow();
                 row1.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                 row1.Cells[0].Value = infaObj1.objName;
                 row1.Cells[1].Value = infaObj1.GetType().Name;
-                row1.Cells[2].Value = infaObj1.file.FullName;
+                row1.Cells[2].Value = infaObj1.patch.name;
                 row1.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row1);
 
-                InfaBaseObject infaObj2 = item.Value;
+                ETLObject infaObj2 = item.Value;
                 DataGridViewRow row2 = new DataGridViewRow();
                 row2.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                 row2.Cells[0].Value = infaObj2.objName;
                 row2.Cells[1].Value = infaObj2.GetType().Name;
-                row2.Cells[2].Value = infaObj2.file.FullName;
+                row2.Cells[2].Value = infaObj2.patch.name;
                 row2.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row2);
 

@@ -11,74 +11,135 @@ using System.Threading.Tasks;
 
 namespace CoreApp.Dicts
 {
-    public class ObjectDict<O> where O : ETLObject
+    public class ObjectDict
     {
-        public ObjPatchPairs<O> baseDict { get; protected set; }
-        public ObjPatchPairs<O> intersections { get; protected set; }
+        public ETLDict baseDict { get; protected set; }
+        public ETLDict intersections { get; protected set; }
         public List<FileInfo> notFoundFiles { get; protected set; }
 
         public ObjectDict()
         {
-            baseDict = new ObjPatchPairs<O>();
-            intersections = new ObjPatchPairs<O>();
+            baseDict = new ETLDict();
+            intersections = new ETLDict();
             notFoundFiles = new List<FileInfo>();
         }   
 
-        public void AddObjectConsiderIntersections(O obj)
+        public void AddObjectConsiderIntersections(ETLObject obj)
         {
-            if (baseDict.oneToManyPairs.ContainsKey(obj) && !baseDict.oneToManyPairs[obj].ContainsValue(obj.patch)) //если объект уже был в таблице
+            Key key = new Key(obj.objName, obj.objType);           
+
+            if (baseDict.oneToManyPairs.ContainsKey(key)) //если объект уже был в таблице
             {
-                if (!intersections.oneToManyPairs.ContainsKey(obj)) //если его еще нет в пересечениях, добавляем тот, с кем он пересекся
+                if (!intersections.oneToManyPairs.ContainsKey(key)) //если его еще нет в пересечениях, добавляем тот, с кем он пересекся
                 {
-                    intersections.Add(obj, baseDict.SingleValue(obj));
+                    ETLObject oldObj = baseDict.SingleValue(key);
+                    intersections.Add(key, oldObj, oldObj.patch);
                 }
-                intersections.Add(obj, obj.patch); //добавляем новый в пересечение
+                intersections.Add(key, obj, obj.patch); //добавляем новый в пересечение
             }
-            baseDict.Add(obj, obj.patch);
+            baseDict.Add(key, obj, obj.patch);
         }
     }
 
-    public class OneToManyPairs<K, O, M> where O : K
+    public class ObjToParentsDict
+    {
+        public Dictionary<ETLObject, HashSet<ETLObject>> oneToManyPairs;
+
+        public ObjToParentsDict()
+        {
+            oneToManyPairs = new Dictionary<ETLObject, HashSet<ETLObject>>();
+        }
+
+        public IEnumerable<KeyValuePair<ETLObject, ETLObject>> EnumeratePairs()
+        {
+            foreach(var kvp in oneToManyPairs)
+            {
+                foreach(var parent in kvp.Value)
+                {
+                    yield return new KeyValuePair<ETLObject, ETLObject>(kvp.Key, parent);
+                }
+            }
+        }
+
+        public IEnumerable<ETLObject> EnumerateObjs()
+        {
+            foreach (var kvp in oneToManyPairs)
+            {
+                yield return kvp.Key;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<ETLObject, ETLObject>> EnumeratePairs(ETLObject obj)
+        {
+            foreach (var parent in oneToManyPairs[obj])
+            {
+                yield return new KeyValuePair<ETLObject, ETLObject>(obj, parent);
+            }
+        }
+
+        public IEnumerable<IEnumerable<KeyValuePair<ETLObject, ETLObject>>> EnumerateByDistinctKeys()
+        {
+            foreach (var obj in oneToManyPairs.Keys)
+            {
+                yield return EnumeratePairs(obj);
+            }
+        }
+        
+
+        public void Add(ETLObject obj, ETLObject parent)
+        {
+
+            if (!oneToManyPairs.ContainsKey(obj))
+            {
+                oneToManyPairs.Add(obj, new HashSet<ETLObject>());
+            }
+
+            oneToManyPairs[obj].Add(parent);
+        }
+
+    }
+
+    public class ETLDict
     {
         //внешний O - ключ, внутренний - все значения, удовл. этому ключу
-        public Dictionary<K, Dictionary<O, M>> oneToManyPairs { get; protected set; }
+        public Dictionary<Key, Dictionary<ETLObject, Patch>> oneToManyPairs { get; protected set; }
 
-        public OneToManyPairs()
+        public ETLDict()
         {
-            oneToManyPairs = new Dictionary<K, Dictionary<O, M>>();
+            oneToManyPairs = new Dictionary<Key, Dictionary<ETLObject, Patch>>();
         }        
 
-        public IEnumerable<KeyValuePair<O, M>> EnumeratePairs()
+        public IEnumerable<KeyValuePair<ETLObject, Patch>> EnumerateObjPatchPairs()
         {
             foreach (var keyToDictPair in oneToManyPairs.Values)
             {
                 foreach (var kvp in keyToDictPair)
                 {
-                    yield return new KeyValuePair<O, M>(kvp.Key, kvp.Value);
+                    yield return new KeyValuePair<ETLObject, Patch>(kvp.Key, kvp.Value);
                 }
             }
         }
 
-        public IEnumerable<O> EnumerateOnes()
+        public IEnumerable<ETLObject> EnumerateObjs()
         {
             foreach(var kvp in oneToManyPairs.Values)
             {
-                foreach(O o in kvp.Keys)
+                foreach(ETLObject o in kvp.Keys)
                 {
                     yield return o;
                 }
             }
         }
         
-        private IEnumerable<KeyValuePair<O, M>> EnumeratePairs(K key)
+        public IEnumerable<KeyValuePair<ETLObject, Patch>> EnumeratePairs(Key key)
         {
             foreach(var kvp in oneToManyPairs[key])
             {
-                yield return new KeyValuePair<O, M>(kvp.Key, kvp.Value);
+                yield return new KeyValuePair<ETLObject, Patch>(kvp.Key, kvp.Value);
             }
         }
 
-        public IEnumerable<IEnumerable<KeyValuePair<O, M>>> EnumerateByDistinctKeys()
+        public IEnumerable<IEnumerable<KeyValuePair<ETLObject, Patch>>> EnumerateByDistinctKeys()
         {
             foreach(var key in oneToManyPairs.Keys)
             {
@@ -86,36 +147,32 @@ namespace CoreApp.Dicts
             }
         }
 
-        public M SingleValue(O obj) 
+        public ETLObject SingleValue(Key key) 
         {
-            if (oneToManyPairs[obj].Values.Count != 1)
+            if (oneToManyPairs[key].Keys.Count != 1)
             {
                 throw new ArgumentException("Хэш-таблица содержит не одно значение");
             }
             else
             {
-                return oneToManyPairs[obj].Values.First();
+                return oneToManyPairs[key].Keys.First();
             }
         }
 
-        public void Add(O one, M many)
+        public void Add(Key key, ETLObject one, Patch many)
         {
-            if (!oneToManyPairs.ContainsKey(one))
+
+            if (!oneToManyPairs.ContainsKey(key))
             {
-                oneToManyPairs.Add(one, new Dictionary<O, M>());
+                oneToManyPairs.Add(key, new Dictionary<ETLObject, Patch>());
             }
 
             //пересечения будем смотреть только по разным патчам
-            if (oneToManyPairs[one].ContainsValue(many))
+            if (!oneToManyPairs[key].ContainsValue(many))
             {
-                oneToManyPairs[one].Add(one, many);
+                oneToManyPairs[key].Add(one, many);
             }
         }
     }
-
-    public class ObjObjsPairs<O> : OneToManyPairs<Key, O, O> where O : Key
-    { }
-
-    public class ObjPatchPairs<O> : OneToManyPairs<Key, O, Patch> where O : Key
-    { }
+    
 }

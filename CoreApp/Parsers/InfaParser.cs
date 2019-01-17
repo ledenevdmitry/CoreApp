@@ -123,25 +123,25 @@ namespace CoreApp
 
         public void RetrieveObjectsFromFiles(IEnumerable<FileInfo> files, InfaObjectDict dict)
         {
-            StartOfCheck();
-            foreach (InfaBaseObject infaObj in dict.baseDict.EnumerateOnes())
+            //StartOfCheck();
+            foreach (InfaBaseObject infaObj in dict.baseDict.EnumerateObjs())
             {
                 infaObj.GenerateParentNames(dict);
-                ProgressChanged();
+                //ProgressChanged();
             }
             CheckInfaDependencies(files, dict);
-            EndOfCheck();
+            //EndOfCheck();
         }
 
         public void CheckInfaDependencies(IEnumerable<FileInfo> files, InfaObjectDict dict)
         {
-            foreach (InfaBaseObject infaObj in dict.baseDict.EnumerateOnes())
+            foreach (InfaBaseObject infaObj in dict.baseDict.EnumerateObjs())
             {
-                ProgressChanged();
+                //ProgressChanged();
                 foreach (InfaBaseObject parent in infaObj.parents)
                 {
-                    Patch p1 = new Patch(parent.file.FullName);
-                    Patch p2 = new Patch(infaObj.file.FullName);
+                    Patch p1 = parent.patch;
+                    Patch p2 = infaObj.patch;
                     if (!p1.Equals(p2))
                     {
                         InfaSchema s1 = new InfaSchema(parent.file);

@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace CoreApp.Dicts
 {
-    class OraObjectDict : ObjectDict<OraObject>
+    class OraObjectDict : ObjectDict
     {
         public OraObjectDict()
         {
-            baseDict = new ObjPatchPairs<OraObject>();
-            intersections = new ObjPatchPairs<OraObject>();
+            baseDict = new ETLDict();
+            intersections = new ETLDict();
         }
+
     }
 }

@@ -116,7 +116,7 @@ namespace CoreApp
 
         public void RetrieveObjectsFromFile(IEnumerable<FileInfo> files, OraObjectDict dict, bool UMEnabled)
         {
-            StartOfCheck();
+            //StartOfCheck();
             foreach (FileInfo file in files)
             {
                 if (file.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase) &&
@@ -125,7 +125,7 @@ namespace CoreApp
                     if (file.Exists)
                     {
                         RetrieveObjectsFromFile(file, dict);
-                        ProgressChanged();
+                        //ProgressChanged();
                     }
                     else
                     {
@@ -133,7 +133,7 @@ namespace CoreApp
                     }
                 }
             }
-            EndOfCheck();
+            //EndOfCheck();
         }
     }
 }

@@ -54,16 +54,20 @@ namespace CoreApp
 
         private void PrepareInfaParser()
         {
+            /*
             etlparser.infaParser.StartOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = true));
             etlparser.infaParser.ProgressChanged += () => PBChecks.Invoke(new Action(() => PBChecks.Value++));
             etlparser.infaParser.EndOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = false));
+            */
         }
 
         private void PrepareOraParser()
         {
+            /*
             etlparser.sqlParser.StartOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = true));
             etlparser.sqlParser.ProgressChanged += () => PBChecks.Invoke(new Action(() => PBChecks.Value++));
             etlparser.sqlParser.EndOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = false));
+            */
         }
 
         private void PrepareParsers()

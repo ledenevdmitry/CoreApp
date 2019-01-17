@@ -65,7 +65,7 @@ namespace CoreApp.FixpackObjects
             {
                 return false;
             }
-            return ((Patch)obj).dir.FullName.Equals(dir.FullName, StringComparison.CurrentCultureIgnoreCase);
+            return ((Patch)obj).name.Equals(name, StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
