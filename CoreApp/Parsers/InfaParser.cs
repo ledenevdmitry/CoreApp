@@ -149,6 +149,10 @@ namespace CoreApp
                         if (s1.Equals(s2))
                         {
                             dict.infaDependencies.Add(parent, infaObj);
+                            if(!parent.patch.dependOn.Contains(infaObj.patch) && !infaObj.patch.dependendFrom.Contains(parent.patch))
+                            {
+                                dict.infaLostDependencies.Add(parent, infaObj);
+                            }
                         }
                     }
                 }

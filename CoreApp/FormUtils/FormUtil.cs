@@ -105,10 +105,38 @@ namespace CoreApp.FormUtils
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }
         
-        public static void AddWrongOrderInDGV(DataGridView dictDGV, ETLParser parser)
+        public static void AddAllDependenciesInDGV(DataGridView dictDGV, ETLParser parser)
         {
             bool colorDeterminator = false;
             foreach (KeyValuePair<ETLObject, ETLObject> item in parser.infaObjectDict.infaDependencies.EnumeratePairs())
+            {
+                ETLObject infaObj1 = item.Key;
+                DataGridViewRow row1 = new DataGridViewRow();
+                row1.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
+                row1.Cells[0].Value = infaObj1.objName;
+                row1.Cells[1].Value = infaObj1.GetType().Name;
+                row1.Cells[2].Value = infaObj1.patch.name;
+                row1.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
+                dictDGV.Rows.Add(row1);
+
+                ETLObject infaObj2 = item.Value;
+                DataGridViewRow row2 = new DataGridViewRow();
+                row2.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
+                row2.Cells[0].Value = infaObj2.objName;
+                row2.Cells[1].Value = infaObj2.GetType().Name;
+                row2.Cells[2].Value = infaObj2.patch.name;
+                row2.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
+                dictDGV.Rows.Add(row2);
+
+                colorDeterminator = !colorDeterminator;
+            }
+            dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
+        }
+
+        public static void AddLostDependenciesInDGV(DataGridView dictDGV, ETLParser parser)
+        {
+            bool colorDeterminator = false;
+            foreach (KeyValuePair<ETLObject, ETLObject> item in parser.infaObjectDict.infaLostDependencies.EnumeratePairs())
             {
                 ETLObject infaObj1 = item.Key;
                 DataGridViewRow row1 = new DataGridViewRow();

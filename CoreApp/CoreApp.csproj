@@ -50,12 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Keys\ETLObject.cs" />
-    <Compile Include="Keys\Key.cs" />
-    <Compile Include="oldComparers\FileInfoEqualityComparer.cs" />
-    <Compile Include="oldComparers\InfaObjectFileNameComparer.cs" />
-    <Compile Include="oldComparers\InfaObjectNameComparer.cs" />
-    <Compile Include="oldComparers\PatchEqualityComparer.cs" />
+    <Compile Include="ETLObjects\ETLObject.cs" />
+    <Compile Include="ETLObjects\Key.cs" />
     <Compile Include="Dicts\InfaObjectDict.cs" />
     <Compile Include="Dicts\ObjectDict.cs" />
     <Compile Include="Dicts\OraObjectDict.cs" />
@@ -70,22 +66,21 @@
       <DependentUpon>ObjectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FormUtils\FormUtil.cs" />
-    <Compile Include="InfaObjects\InfaBaseObject.cs" />
-    <Compile Include="InfaObjects\InfaConfiguration.cs" />
-    <Compile Include="InfaObjects\InfaMapping.cs" />
-    <Compile Include="InfaObjects\InfaMapplet.cs" />
-    <Compile Include="InfaObjects\InfaShortcut.cs" />
-    <Compile Include="OraObjects\OraObject.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaBaseObject.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaConfiguration.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaMapping.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaMapplet.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaShortcut.cs" />
+    <Compile Include="ETLObjects\OraObjects\OraObject.cs" />
     <Compile Include="Parsers\ETLParser.cs" />
-    <Compile Include="Parsers\ExcelParser.cs" />
     <Compile Include="Parsers\InfaParser.cs" />
-    <Compile Include="InfaObjects\InfaSession.cs" />
-    <Compile Include="InfaObjects\InfaSource.cs" />
-    <Compile Include="InfaObjects\InfaTarget.cs" />
-    <Compile Include="InfaObjects\InfaTask.cs" />
-    <Compile Include="InfaObjects\InfaTransformation.cs" />
-    <Compile Include="InfaObjects\InfaWorkflow.cs" />
-    <Compile Include="InfaObjects\InfaWorklet.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaSession.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaSource.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaTarget.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaTask.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaTransformation.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaWorkflow.cs" />
+    <Compile Include="ETLObjects\InfaObjects\InfaWorklet.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parsers\SqlParser.cs" />

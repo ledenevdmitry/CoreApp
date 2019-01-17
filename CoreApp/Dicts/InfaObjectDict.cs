@@ -1,5 +1,4 @@
-﻿using CoreApp.Comparers;
-using CoreApp.InfaObjects;
+﻿using CoreApp.InfaObjects;
 using CoreApp.Keys;
 using System;
 using System.Collections.Generic;
@@ -13,11 +12,14 @@ namespace CoreApp.Dicts
     class InfaObjectDict : ObjectDict
     {
         public ObjToParentsDict infaDependencies;
+        public ObjToParentsDict infaLostDependencies;
+
         public InfaObjectDict()
         {
             baseDict = new ETLDict();
             intersections = new ETLDict();
             infaDependencies = new ObjToParentsDict();
+            infaLostDependencies = new ObjToParentsDict();
         }
 
         //!!!!!!!!!!!!!!!!!Обязательная вторая проверка

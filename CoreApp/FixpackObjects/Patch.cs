@@ -16,8 +16,8 @@ namespace CoreApp.FixpackObjects
         private static Regex ATCPatchRegex = new Regex(@"\\((\d+\-)?Z(\d+.*?))");
         private static Regex BankPatchRegex = new Regex(@"\\(C(\d+).*?)");
         public bool IsATCPatch { get; private set; }
-        public List<Patch> dependendFrom { get; private set; }
-        public List<Patch> dependOn { get; private set; }
+        public HashSet<Patch> dependendFrom { get; private set; }
+        public HashSet<Patch> dependOn { get; private set; }
         public List<FileInfo> objs;
 
         public Patch(string patchName)
@@ -33,8 +33,8 @@ namespace CoreApp.FixpackObjects
 
         public Patch(DirectoryInfo dir)
         {
-            dependendFrom = new List<Patch>();
-            dependOn = new List<Patch>();
+            dependendFrom = new HashSet<Patch>();
+            dependOn = new HashSet<Patch>();
             objs = new List<FileInfo>();
             IsATCPatch = true;
 

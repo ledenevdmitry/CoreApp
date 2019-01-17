@@ -31,20 +31,20 @@
             this.dgvObjects = new System.Windows.Forms.DataGridView();
             this.MainMenu = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CheckAllFixpacksInDir = new System.Windows.Forms.ToolStripMenuItem();
+            this.настройкаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.TSMIUmState = new System.Windows.Forms.ToolStripMenuItem();
             this.PBChecks = new System.Windows.Forms.ProgressBar();
             this.mainTabControl = new System.Windows.Forms.TabControl();
             this.objPage = new System.Windows.Forms.TabPage();
             this.intersectionsPage = new System.Windows.Forms.TabPage();
             this.dgvIntersections = new System.Windows.Forms.DataGridView();
             this.allPrereq = new System.Windows.Forms.TabPage();
-            this.dgvWrongOrder = new System.Windows.Forms.DataGridView();
+            this.dgvAllDependencies = new System.Windows.Forms.DataGridView();
             this.notFoundObjPage = new System.Windows.Forms.TabPage();
-            this.dgvNotFound = new System.Windows.Forms.DataGridView();
+            this.dgvLostDependencies = new System.Windows.Forms.DataGridView();
             this.notFoundFiles = new System.Windows.Forms.TabPage();
             this.dgvNotFoundFiles = new System.Windows.Forms.DataGridView();
-            this.CheckAllFixpacksInDir = new System.Windows.Forms.ToolStripMenuItem();
-            this.настройкаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.TSMIUmState = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dgvObjects)).BeginInit();
             this.MainMenu.SuspendLayout();
             this.mainTabControl.SuspendLayout();
@@ -52,9 +52,9 @@
             this.intersectionsPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvIntersections)).BeginInit();
             this.allPrereq.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvWrongOrder)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvAllDependencies)).BeginInit();
             this.notFoundObjPage.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvNotFound)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvLostDependencies)).BeginInit();
             this.notFoundFiles.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvNotFoundFiles)).BeginInit();
             this.SuspendLayout();
@@ -87,6 +87,28 @@
             this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
             this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
             this.файлToolStripMenuItem.Text = "Файл";
+            // 
+            // CheckAllFixpacksInDir
+            // 
+            this.CheckAllFixpacksInDir.Name = "CheckAllFixpacksInDir";
+            this.CheckAllFixpacksInDir.Size = new System.Drawing.Size(285, 22);
+            this.CheckAllFixpacksInDir.Text = "Проверить все поставки внутри папки";
+            this.CheckAllFixpacksInDir.Click += new System.EventHandler(this.CheckAllFixpacksInDir_Click);
+            // 
+            // настройкаToolStripMenuItem
+            // 
+            this.настройкаToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TSMIUmState});
+            this.настройкаToolStripMenuItem.Name = "настройкаToolStripMenuItem";
+            this.настройкаToolStripMenuItem.Size = new System.Drawing.Size(78, 20);
+            this.настройкаToolStripMenuItem.Text = "Настройка";
+            // 
+            // TSMIUmState
+            // 
+            this.TSMIUmState.Name = "TSMIUmState";
+            this.TSMIUmState.Size = new System.Drawing.Size(153, 22);
+            this.TSMIUmState.Text = "Учитывать УМ";
+            this.TSMIUmState.Click += new System.EventHandler(this.TSMIUmState_Click);
             // 
             // PBChecks
             // 
@@ -143,7 +165,7 @@
             // 
             // allPrereq
             // 
-            this.allPrereq.Controls.Add(this.dgvWrongOrder);
+            this.allPrereq.Controls.Add(this.dgvAllDependencies);
             this.allPrereq.Location = new System.Drawing.Point(4, 22);
             this.allPrereq.Name = "allPrereq";
             this.allPrereq.Size = new System.Drawing.Size(626, 374);
@@ -153,17 +175,17 @@
             // 
             // dgvWrongOrder
             // 
-            this.dgvWrongOrder.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvWrongOrder.Location = new System.Drawing.Point(0, 0);
-            this.dgvWrongOrder.Name = "dgvWrongOrder";
-            this.dgvWrongOrder.RowHeadersVisible = false;
-            this.dgvWrongOrder.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dgvWrongOrder.Size = new System.Drawing.Size(626, 374);
-            this.dgvWrongOrder.TabIndex = 1;
+            this.dgvAllDependencies.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvAllDependencies.Location = new System.Drawing.Point(0, 0);
+            this.dgvAllDependencies.Name = "dgvWrongOrder";
+            this.dgvAllDependencies.RowHeadersVisible = false;
+            this.dgvAllDependencies.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.dgvAllDependencies.Size = new System.Drawing.Size(626, 374);
+            this.dgvAllDependencies.TabIndex = 1;
             // 
             // notFoundObjPage
             // 
-            this.notFoundObjPage.Controls.Add(this.dgvNotFound);
+            this.notFoundObjPage.Controls.Add(this.dgvLostDependencies);
             this.notFoundObjPage.Location = new System.Drawing.Point(4, 22);
             this.notFoundObjPage.Name = "notFoundObjPage";
             this.notFoundObjPage.Size = new System.Drawing.Size(626, 374);
@@ -173,13 +195,13 @@
             // 
             // dgvNotFound
             // 
-            this.dgvNotFound.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvNotFound.Location = new System.Drawing.Point(0, 0);
-            this.dgvNotFound.Name = "dgvNotFound";
-            this.dgvNotFound.RowHeadersVisible = false;
-            this.dgvNotFound.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dgvNotFound.Size = new System.Drawing.Size(626, 374);
-            this.dgvNotFound.TabIndex = 1;
+            this.dgvLostDependencies.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvLostDependencies.Location = new System.Drawing.Point(0, 0);
+            this.dgvLostDependencies.Name = "dgvNotFound";
+            this.dgvLostDependencies.RowHeadersVisible = false;
+            this.dgvLostDependencies.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.dgvLostDependencies.Size = new System.Drawing.Size(626, 374);
+            this.dgvLostDependencies.TabIndex = 1;
             // 
             // notFoundFiles
             // 
@@ -201,28 +223,6 @@
             this.dgvNotFoundFiles.Size = new System.Drawing.Size(626, 374);
             this.dgvNotFoundFiles.TabIndex = 2;
             // 
-            // CheckAllFixpacksInDir
-            // 
-            this.CheckAllFixpacksInDir.Name = "CheckAllFixpacksInDir";
-            this.CheckAllFixpacksInDir.Size = new System.Drawing.Size(285, 22);
-            this.CheckAllFixpacksInDir.Text = "Проверить все поставки внутри папки";
-            this.CheckAllFixpacksInDir.Click += new System.EventHandler(this.CheckAllFixpacksInDir_Click);
-            // 
-            // настройкаToolStripMenuItem
-            // 
-            this.настройкаToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.TSMIUmState});
-            this.настройкаToolStripMenuItem.Name = "настройкаToolStripMenuItem";
-            this.настройкаToolStripMenuItem.Size = new System.Drawing.Size(78, 20);
-            this.настройкаToolStripMenuItem.Text = "Настройка";
-            // 
-            // TSMIUmState
-            // 
-            this.TSMIUmState.Name = "TSMIUmState";
-            this.TSMIUmState.Size = new System.Drawing.Size(180, 22);
-            this.TSMIUmState.Text = "Учитывать УМ";
-            this.TSMIUmState.Click += new System.EventHandler(this.TSMIUmState_Click);
-            // 
             // ObjectForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -234,6 +234,7 @@
             this.MainMenuStrip = this.MainMenu;
             this.Name = "ObjectForm";
             this.Text = "Объекты поставки";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ObjectForm_FormClosed);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.dgvObjects)).EndInit();
             this.MainMenu.ResumeLayout(false);
@@ -243,9 +244,9 @@
             this.intersectionsPage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvIntersections)).EndInit();
             this.allPrereq.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvWrongOrder)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvAllDependencies)).EndInit();
             this.notFoundObjPage.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dgvNotFound)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvLostDependencies)).EndInit();
             this.notFoundFiles.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvNotFoundFiles)).EndInit();
             this.ResumeLayout(false);
@@ -264,9 +265,9 @@
         private System.Windows.Forms.TabPage intersectionsPage;
         private System.Windows.Forms.DataGridView dgvIntersections;
         private System.Windows.Forms.TabPage allPrereq;
-        private System.Windows.Forms.DataGridView dgvWrongOrder;
+        private System.Windows.Forms.DataGridView dgvAllDependencies;
         private System.Windows.Forms.TabPage notFoundObjPage;
-        private System.Windows.Forms.DataGridView dgvNotFound;
+        private System.Windows.Forms.DataGridView dgvLostDependencies;
         private System.Windows.Forms.TabPage notFoundFiles;
         private System.Windows.Forms.DataGridView dgvNotFoundFiles;
         private System.Windows.Forms.ToolStripMenuItem CheckAllFixpacksInDir;

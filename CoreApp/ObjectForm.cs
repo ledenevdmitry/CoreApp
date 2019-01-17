@@ -9,6 +9,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,8 +25,11 @@ namespace CoreApp
             Application.Idle += OnIdle;
             FormResize();
             fileScs = new List<FileInfo>();
+            excelApp = new Microsoft.Office.Interop.Excel.Application();
+            Fixpack.excel = excelApp;
         }
 
+        Microsoft.Office.Interop.Excel.Application excelApp;
         List<FileInfo> fileScs;
         Thread checkThread;
         ETLParser etlparser;
@@ -39,13 +43,14 @@ namespace CoreApp
 
                 FormUtil.InitObjDGV(dgvObjects);
                 FormUtil.InitObjDGV(dgvIntersections);
-                FormUtil.InitObjDGV(dgvWrongOrder);
-                FormUtil.InitObjDGV(dgvNotFound);
+                FormUtil.InitObjDGV(dgvAllDependencies);
+                FormUtil.InitObjDGV(dgvLostDependencies);
                 FormUtil.InitNotFoundFilesDGV(dgvNotFoundFiles);
 
                 FormUtil.AddObjectsInDGV(dgvObjects, etlparser);
                 FormUtil.AddIntersectionsInDGV(dgvIntersections, etlparser);
-                FormUtil.AddWrongOrderInDGV(dgvWrongOrder, etlparser);
+                FormUtil.AddAllDependenciesInDGV(dgvAllDependencies, etlparser);
+                FormUtil.AddLostDependenciesInDGV(dgvLostDependencies, etlparser);
                 FormUtil.AddNotFoundFiles(dgvNotFoundFiles, etlparser);
             }
         }
@@ -95,11 +100,11 @@ namespace CoreApp
             dgvIntersections.Width = mainTabControl.DisplayRectangle.Width  - BORDER;
             dgvIntersections.Height = mainTabControl.DisplayRectangle.Height - BORDER;
 
-            dgvWrongOrder.Width = mainTabControl.DisplayRectangle.Width  - BORDER;
-            dgvWrongOrder.Height = mainTabControl.DisplayRectangle.Height - BORDER;
+            dgvAllDependencies.Width = mainTabControl.DisplayRectangle.Width  - BORDER;
+            dgvAllDependencies.Height = mainTabControl.DisplayRectangle.Height - BORDER;
 
-            dgvNotFound.Width = mainTabControl.DisplayRectangle.Width  - BORDER;
-            dgvNotFound.Height = mainTabControl.DisplayRectangle.Height - BORDER;
+            dgvLostDependencies.Width = mainTabControl.DisplayRectangle.Width  - BORDER;
+            dgvLostDependencies.Height = mainTabControl.DisplayRectangle.Height - BORDER;
 
             dgvNotFoundFiles.Width = mainTabControl.DisplayRectangle.Width - BORDER;
             dgvNotFoundFiles.Height = mainTabControl.DisplayRectangle.Height - BORDER;
@@ -167,6 +172,12 @@ namespace CoreApp
                 UMEnabled = true;
                 TSMIUmState.Text = "Не учитывать УМ";
             }
+        }
+
+        private void ObjectForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            excelApp.Quit();
+            Marshal.FinalReleaseComObject(excelApp);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using CoreApp.Comparers;
-using CoreApp.Keys;
+﻿using CoreApp.Keys;
 using System;
 using System.Collections.Generic;
 using System.Linq;
