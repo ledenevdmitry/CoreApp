@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 
@@ -26,7 +27,9 @@ namespace CoreApp.CVS
         abstract public void Move(string destination, IEnumerable<string> items);
         abstract public void Rename(string oldName, string newName);
         abstract public void Download(string dir, string destination);
-        abstract public string FindInEntireBase(string partOfName, ref string shortName);
+
+        abstract public string FirstInEntireBase(ref string match, Regex pattern);
+        abstract public IEnumerable<string> AllInEntireBase(List<string> matches, Regex pattern);
 
         abstract public void Close();
 

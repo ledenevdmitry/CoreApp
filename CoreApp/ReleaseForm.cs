@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -22,12 +23,12 @@ namespace CoreApp
 
         Microsoft.Office.Interop.Excel.Application excelApp;
         Release currRelease;
+        SortedList<string, Release> releases;
 
         public ReleaseForm()
         {
             InitializeComponent();
             releases = new SortedList<string, Release>();
-            fixpacks = new SortedList<string, Fixpack>();
 
             home = IniUtils.IniUtils.GetConfig("Credentials", "Home");
             CVSDBName = IniUtils.IniUtils.GetConfig("Credentials", "CVSDBName");
@@ -36,13 +37,125 @@ namespace CoreApp
             Application.Idle += OnIdle;
         }
 
+        private bool CheckHomeDir()
+        {
+            return Directory.Exists(home);
+        }
+
+        private bool CheckCVSDBName()
+        {
+            try
+            {
+                cvs = new CVS.VSS(CVSDBName, Environment.UserName);
+                cvs.Connect();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool InitHomeDir()
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.Description = "Задать домашнюю папку";
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                home = fbd.SelectedPath;
+                return AutoInitHomeDir();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool AutoInitHomeDir()
+        {
+            if (CheckHomeDir())
+            {
+                IniUtils.IniUtils.SetConfig("Credentials", "Home", home);
+                return true;
+            }
+            else
+            {
+                return InitHomeDir();
+            }
+        }
+
+        private bool InitCVSDBName()
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.Description = "Задать адрес базы всс";
+            if (fbd.ShowDialog() == DialogResult.OK)
+            {
+                CVSDBName = fbd.SelectedPath;
+                return AutoInitCVSDBName();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private bool AutoInitCVSDBName()
+        {
+            if (CheckCVSDBName())
+            {
+                IniUtils.IniUtils.SetConfig("Credentials", "CVSDBName", home);
+                return true;
+            }
+            else
+            {
+                return InitCVSDBName();
+            }
+        }
+
+        private void UpdateReleasesBox()
+        {
+            LBoxFixpacks.Items.Clear();
+            LBoxReleases.Items.Clear();
+
+            foreach (string releaseName in releases.Keys)
+            {
+                LBoxReleases.Items.Add(releaseName);
+            }
+        }
+
+        private void UpdateFixpacksBox()
+        {
+            LBoxFixpacks.Items.Clear();
+            if (LBoxReleases.SelectedIndex != -1)
+            {
+                currRelease = releases[(string)LBoxReleases.SelectedItem];
+                foreach (string fpName in currRelease.fixpacks.Keys)
+                {
+                    LBoxFixpacks.Items.Add(fpName);
+                }
+            }
+        }
+
+        private void InitFromLocal()
+        {
+            if (AutoInitHomeDir())
+            {
+                DirectoryInfo homeDir = new DirectoryInfo(home);
+                foreach(var subdir in homeDir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
+                {
+                    Release currRelease = new Release(subdir);
+                    releases.Add(currRelease.name, currRelease);
+                }
+                UpdateReleasesBox();
+            }
+        }
+
         private void OnIdle(object sender, EventArgs args)
         {
             BtAddFixpack.Enabled = LBoxReleases.SelectedIndex != -1;
         }
 
-        SortedList<string, Release> releases;
-        SortedList<string, Fixpack> fixpacks;
 
         private void AddRelease(string name)
         {
@@ -57,10 +170,7 @@ namespace CoreApp
                 releases.Add(release.name, release);
 
                 LBoxReleases.Items.Clear();
-                foreach (string releaseName in releases.Keys)
-                {
-                    LBoxReleases.Items.Add(releaseName);
-                }
+
             }
 
             else
@@ -86,24 +196,9 @@ namespace CoreApp
             }
         }
 
-        private void ReleaseForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            excelApp.Quit();
-            Marshal.FinalReleaseComObject(excelApp);
-            cvs.Close();
-        }
-
         private void LBoxReleases_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LBoxFixpacks.Items.Clear();
-            if (LBoxReleases.SelectedIndex != -1)
-            {
-                currRelease = releases[(string)LBoxReleases.SelectedItem];                
-                foreach (string fpName in currRelease.fixpacks.Keys)
-                {
-                    LBoxFixpacks.Items.Add(fpName);
-                }
-            }
+            UpdateFixpacksBox();
         }
 
         private void ConnectToCVS()
@@ -136,8 +231,57 @@ namespace CoreApp
             {
                 ConnectToCVS();
                 currRelease.SetCVS(cvs);
-                currRelease.AddFixpack(addFixpackForm.Value);
+                currRelease.LoadFixpackFromCVS(addFixpackForm.Value);
+                UpdateFixpacksBox();
             }
+        }
+
+
+        private void ReleaseForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            excelApp.Quit();
+            Marshal.FinalReleaseComObject(excelApp);
+            cvs.Close();
+        }
+
+        private const int BORDER = 5;
+
+        private void ReleaseForm_Resize(object sender, EventArgs e)
+        {
+            LBoxReleases.Height = ClientSize.Height - LBoxReleases.Top - BORDER;
+
+            LBoxFixpacks.Width = ClientSize.Width - LBoxFixpacks.Left - BORDER;
+            LBoxFixpacks.Height = ClientSize.Height - LBoxFixpacks.Top - BORDER;
+        }
+
+        private void BtLoadFromCVS_Click(object sender, EventArgs e)
+        {
+            AddForm releasePatternForm = new AddForm();
+            releasePatternForm.Text = "Скачать релиз по регулярному выражению";
+            if(releasePatternForm.ShowDialog() == DialogResult.OK)
+            {
+                Regex regex = new Regex(releasePatternForm.Value);
+                AddForm releaseNameForm = new AddForm();
+                releaseNameForm.Text = "Введите название релиза";
+                if (releaseNameForm.ShowDialog() == DialogResult.OK)
+                {
+                    ConnectToCVS();
+                    DirectoryInfo releaseDir = Directory.CreateDirectory(string.Join("\\", home, releaseNameForm.Value));
+                    Release release = new Release(releaseNameForm.Value, releaseDir, cvs, regex);
+                    releases.Add(release.name, release);
+                    UpdateReleasesBox();
+                }
+            }
+        }
+
+        private void BtSetHomePath_Click(object sender, EventArgs e)
+        {
+            InitHomeDir();
+        }
+
+        private void BtSetCVSPath_Click(object sender, EventArgs e)
+        {
+            InitCVSDBName();
         }
     }
 }

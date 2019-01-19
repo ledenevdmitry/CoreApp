@@ -13,7 +13,7 @@ namespace CoreApp.FixpackObjects
     class Fixpack
     {
         public string C { get; private set; }
-        string FullName;
+        public string FullName { get; private set; }
         public string LocalPath { get; private set; }
         string CVSPath;
 

@@ -9,6 +9,8 @@ using CoreApp.CVS;
 using Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Security.AccessControl;
+using System.Security.Principal;
 
 namespace CoreApp.ReleaseObjects
 {
@@ -17,17 +19,63 @@ namespace CoreApp.ReleaseObjects
         public static Application excel;
 
         public SortedList<string, Fixpack> fixpacks { get; private set; }
-        public Dictionary<string, Patch> allPatches { get; protected set; }
 
         public string name { get; private set; }
 
         DirectoryInfo localDir;
         CVS.CVS cvs;
 
+        private void setAttributesNormal(DirectoryInfo dir)
+        {
+            foreach (var subDir in dir.GetDirectories())
+                setAttributesNormal(subDir);
+            foreach (var file in dir.GetFiles())
+            {
+                file.Attributes = FileAttributes.Normal;
+            }
+        }
+
+        //из системы контроля версий
+        public Release(string name, DirectoryInfo dir, CVS.CVS cvs, Regex pattern) : this(name)
+        {
+            if(dir.Exists)
+            {
+                setAttributesNormal(dir);
+                dir.Delete(true);
+            }
+            dir.Create();
+
+            SetLocalDir(dir);
+
+            List<string> fpNames = new List<string>();
+
+            var cvsPaths = cvs.AllInEntireBase(fpNames, pattern);
+
+            int i = 0;
+            foreach(var cvsPath in cvsPaths)
+            {
+                string localPath = string.Join("\\", localDir.FullName, fpNames[i++]);
+                cvs.Download(cvsPath, localPath);
+
+                Fixpack fp = new Fixpack(new DirectoryInfo(localPath));
+                fixpacks.Add(fp.FullName, fp);
+            }
+        }
+
+        //загрузиться локально
+        public Release(DirectoryInfo dir) : this(dir.Name)
+        {
+            SetLocalDir(dir);
+            foreach(var subdir in dir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
+            {
+                Fixpack currFixpack = new Fixpack(subdir);
+                fixpacks.Add(currFixpack.FullName, currFixpack);
+            }
+        }
+
         public Release(string name)
         {
             fixpacks = new SortedList<string, Fixpack>();
-            allPatches = new Dictionary<string, Patch>();
 
             this.name = name;
         }
@@ -42,14 +90,15 @@ namespace CoreApp.ReleaseObjects
             this.cvs = cvs;
         }
 
-        public void AddFixpack(string code)
+        public void LoadFixpackFromCVS(string code)
         {
             string shortName = "";
-            string fixpackCVSPath = cvs.FindInEntireBase(code, ref shortName);
+            string fixpackCVSPath = cvs.FirstInEntireBase(ref shortName, new Regex($".*{code}.*"));
             string fpPath = string.Join("\\", localDir.FullName, shortName);
             cvs.Download(fixpackCVSPath, fpPath);
 
             Fixpack fp = new Fixpack(new DirectoryInfo(fpPath));
+            fixpacks.Add(fp.FullName, fp);
         }
 
         public void SetAllDependencies()

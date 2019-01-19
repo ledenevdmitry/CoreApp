@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -57,9 +58,49 @@ namespace CoreApp.CVS
             Move(destination, items);
         }
 
-        public override string FindInEntireBase(string partOfName, ref string shortName)
+        private string SpecToCorrectPath(string spec)
         {
-            string res = FindInEntireBase(partOfName, vssDatabase.get_VSSItem("$", false), ref shortName);
+            return spec.Insert(1, "/");
+        }
+
+        public override IEnumerable<string> AllInEntireBase(List<string> matches, Regex pattern)
+        {
+            IEnumerable<string> res = AllInEntireBase(pattern, vssDatabase.get_VSSItem("$", false), matches);
+            if (res.Count() == 0)
+            {
+                throw new ArgumentException("File Not Found");
+            }
+            else
+            {
+                return res;
+            }
+        }
+
+        private IEnumerable<string> AllInEntireBase(Regex pattern, VSSItem currItem, List<string> matches)
+        {
+            if (IsMatch(pattern, currItem))
+            {
+                matches.Add(currItem.Name);
+                yield return SpecToCorrectPath(currItem.Spec);
+            }
+            else
+            {
+                foreach (VSSItem subItem in currItem.Items)
+                {
+                    if ((VSSItemType)subItem.Type == VSSItemType.VSSITEM_PROJECT)
+                    {
+                        foreach(var item in AllInEntireBase(pattern, subItem, matches))
+                        {
+                            yield return item;
+                        }
+                    }
+                }
+            }
+        }
+
+        public override string FirstInEntireBase(ref string match, Regex pattern)
+        {
+            string res = FindInEntireBase(pattern, vssDatabase.get_VSSItem("$", false), ref match);
             if(res == null)
             {
                 throw new ArgumentException("File Not Found");
@@ -70,14 +111,9 @@ namespace CoreApp.CVS
             }
         }
 
-        private string SpecToCorrectPath(string spec)
+        private string FindInEntireBase(Regex pattern, VSSItem currItem, ref string shortName)
         {
-            return spec.Insert(1, "/");
-        }
-
-        private string FindInEntireBase(string partOfName, VSSItem currItem, ref string shortName)
-        {
-            if(MatchPart(partOfName, currItem))
+            if(IsMatch(pattern, currItem))
             {
                 shortName = currItem.Name;
                 return SpecToCorrectPath(currItem.Spec);
@@ -88,7 +124,7 @@ namespace CoreApp.CVS
                 {
                     if ((VSSItemType)subItem.Type == VSSItemType.VSSITEM_PROJECT)
                     {
-                        string res = FindInEntireBase(partOfName, subItem, ref shortName);
+                        string res = FindInEntireBase(pattern, subItem, ref shortName);
                         if(res != null)
                         {
                             return res;
@@ -99,9 +135,9 @@ namespace CoreApp.CVS
             return null;
         }
 
-        private bool MatchPart(string partOfName, VSSItem item)
+        private bool IsMatch(Regex pattern, VSSItem item)
         {
-            return item.Name.IndexOf(partOfName) != -1;
+            return pattern.IsMatch(item.Name);
         }
 
         public delegate void MoveDelegate(string movingFolderName, VSSItem movingFolder);
