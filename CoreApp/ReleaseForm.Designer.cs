@@ -161,6 +161,7 @@
             this.BtLoadFromLocal.Name = "BtLoadFromLocal";
             this.BtLoadFromLocal.Size = new System.Drawing.Size(294, 22);
             this.BtLoadFromLocal.Text = "Инициализировать из локальной папки";
+            this.BtLoadFromLocal.Click += new System.EventHandler(this.BtLoadFromLocal_Click);
             // 
             // BtSetHomePath
             // 

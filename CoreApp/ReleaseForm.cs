@@ -283,5 +283,10 @@ namespace CoreApp
         {
             InitCVSDBName();
         }
+
+        private void BtLoadFromLocal_Click(object sender, EventArgs e)
+        {
+            InitFromLocal();
+        }
     }
 }

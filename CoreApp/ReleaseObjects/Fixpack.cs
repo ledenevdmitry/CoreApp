@@ -15,7 +15,6 @@ namespace CoreApp.FixpackObjects
         public string C { get; private set; }
         public string FullName { get; private set; }
         public string LocalPath { get; private set; }
-        string CVSPath;
 
         static string regexC = @"\\(C\d+)";
         static string regexFullName = @"\\(C[^\\]+)";

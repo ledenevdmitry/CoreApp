@@ -80,6 +80,7 @@ namespace CoreApp.ReleaseObjects
             this.name = name;
         }
 
+
         public void SetLocalDir(DirectoryInfo localDir)
         {
             this.localDir = localDir;
