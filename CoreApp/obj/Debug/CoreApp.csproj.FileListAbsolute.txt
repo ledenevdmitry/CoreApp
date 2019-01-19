@@ -28,3 +28,13 @@ C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.exe
 C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.pdb
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ObjectForm.resources
 C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ObjectForm.resources
+C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.AddReleaseForm.resources
+C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseForm.resources
+C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\INIFileParser.dll
+C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\INIFileParser.xml
+C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CopyComplete
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\INIFileParser.dll
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\INIFileParser.xml
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.AddForm.resources
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseForm.resources
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CopyComplete

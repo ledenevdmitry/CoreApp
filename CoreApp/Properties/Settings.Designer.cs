@@ -70,5 +70,17 @@ namespace CoreApp.Properties {
                 this["RSVDWRDS"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ConfigName {
+            get {
+                return ((string)(this["ConfigName"]));
+            }
+            set {
+                this["ConfigName"] = value;
+            }
+        }
     }
 }

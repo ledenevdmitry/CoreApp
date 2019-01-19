@@ -234,7 +234,6 @@
             this.MainMenuStrip = this.MainMenu;
             this.Name = "ObjectForm";
             this.Text = "Объекты поставки";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ObjectForm_FormClosed);
             this.Resize += new System.EventHandler(this.Form1_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.dgvObjects)).EndInit();
             this.MainMenu.ResumeLayout(false);

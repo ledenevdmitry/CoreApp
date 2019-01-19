@@ -24,13 +24,10 @@ namespace CoreApp
             InitializeComponent();
             Application.Idle += OnIdle;
             FormResize();
-            fileScs = new List<FileInfo>();
-            excelApp = new Microsoft.Office.Interop.Excel.Application();
-            Fixpack.excel = excelApp;
+            //fileScs = new List<FileInfo>();
         }
-
-        Microsoft.Office.Interop.Excel.Application excelApp;
-        List<FileInfo> fileScs;
+        
+        //List<FileInfo> fileScs;
         Thread checkThread;
         ETLParser etlparser;
 
@@ -118,17 +115,7 @@ namespace CoreApp
         private void mainTabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             ((sender as TabControl).SelectedTab.Controls[0] as DataGridView).AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
-        }
-
-        private void TSMIAddScIntoList_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Файлы сценария (*.txt)|*.txt|Все файлы (*.*)|*.*";
-            if (ofd.ShowDialog() == DialogResult.OK)
-            {
-                fileScs.Add(new FileInfo(ofd.FileName));
-            }
-        }
+        }       
 
         private void CheckAllFixpacksInDir_Click(object sender, EventArgs e)
         {
@@ -173,11 +160,6 @@ namespace CoreApp
                 TSMIUmState.Text = "Не учитывать УМ";
             }
         }
-
-        private void ObjectForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            excelApp.Quit();
-            Marshal.FinalReleaseComObject(excelApp);
-        }
+        
     }
 }
