@@ -2,6 +2,7 @@
 using CoreApp.FixpackObjects;
 using CoreApp.InfaObjects;
 using CoreApp.Keys;
+using CoreApp.ReleaseObjects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,7 @@ namespace CoreApp
         public static string extension { get => ".sql"; }
         public string objName { get; private set; }
         XmlDocument xDoc;
+        private InfaObjectDict dict;
 
         private XmlNode GetObjNode(XmlNode xRoot, ref Type type)
         {
@@ -56,12 +58,14 @@ namespace CoreApp
             return obj;
         }
 
+        /*
         public int WorkAmount(InfaObjectDict dict)
         {
             return 2 * dict.baseDict.oneToManyPairs.Count;
         }
-        
-        public InfaParser(List<Fixpack> fixpacks, InfaObjectDict dict)
+        */
+
+        public InfaParser(Release release, InfaObjectDict dict)
         {
             /*
             foreach (FileInfo file in files)
@@ -87,8 +91,8 @@ namespace CoreApp
                 }
             }
             */
-
-            foreach(Fixpack fixpack in fixpacks)
+            this.dict = dict;
+            foreach(Fixpack fixpack in release.fixpacks.Values)
             {
                 foreach(Patch patch in fixpack.patches.Values)
                 {
@@ -118,10 +122,10 @@ namespace CoreApp
             }
         }
 
-        public delegate void ResetProgress();
-        public event ResetProgress StartOfCheck, ProgressChanged, EndOfCheck;
+        //public delegate void ResetProgress();
+        //public event ResetProgress StartOfCheck, ProgressChanged, EndOfCheck;
 
-        public void RetrieveObjectsFromFiles(IEnumerable<FileInfo> files, InfaObjectDict dict)
+        public void Check()
         {
             //StartOfCheck();
             foreach (InfaBaseObject infaObj in dict.baseDict.EnumerateObjs())
@@ -129,11 +133,11 @@ namespace CoreApp
                 infaObj.GenerateParentNames(dict);
                 //ProgressChanged();
             }
-            CheckInfaDependencies(files, dict);
+            CheckInfaDependencies(dict);
             //EndOfCheck();
         }
 
-        public void CheckInfaDependencies(IEnumerable<FileInfo> files, InfaObjectDict dict)
+        public void CheckInfaDependencies(InfaObjectDict dict)
         {
             foreach (InfaBaseObject infaObj in dict.baseDict.EnumerateObjs())
             {

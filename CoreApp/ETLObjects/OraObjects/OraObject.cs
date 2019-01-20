@@ -11,11 +11,9 @@ namespace CoreApp
 {
     public class OraObject : ETLObject
     {
-        FileInfo file;
-
-        public OraObject(string objName, string objType, FileInfo file) : base(objName, objType, new Patch(file.FullName))
+        public OraObject(string objName, string objType, Patch patch) : base(objName, objType, patch)
         {
-            this.file = file;
+
         }
     }
 }

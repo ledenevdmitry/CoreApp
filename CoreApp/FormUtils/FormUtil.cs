@@ -22,7 +22,7 @@ namespace CoreApp.FormUtils
             dictDGV.Columns.Clear();
             dictDGV.Columns.Add("Object", "Объект");
             dictDGV.Columns.Add("Type", "Тип/команда");
-            dictDGV.Columns.Add("FileName", "Файл");
+            dictDGV.Columns.Add("PatchName", "Патч");
 
         }
 
@@ -53,14 +53,14 @@ namespace CoreApp.FormUtils
             {
                 ETLObject oraObj = item.Key;
                 Patch patch = item.Value;
-                dictDGV.Rows.Add(oraObj.objName, oraObj.objType, patch.pathToPatch);
+                dictDGV.Rows.Add(oraObj.objName, oraObj.objType, patch.name);
             }
 
             foreach (KeyValuePair<ETLObject, Patch> item in parser.infaObjectDict.baseDict.EnumerateObjPatchPairs())
             {
                 ETLObject infaObj = item.Key;
                 Patch patch = item.Value;
-                dictDGV.Rows.Add(infaObj.objName, infaObj.objType, patch.pathToPatch);
+                dictDGV.Rows.Add(infaObj.objName, infaObj.objType, patch.name);
             }
 
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
@@ -96,7 +96,7 @@ namespace CoreApp.FormUtils
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = infaObj.objName;
                     row.Cells[1].Value = infaObj.GetType().Name;
-                    row.Cells[2].Value = patch.pathToPatch;
+                    row.Cells[2].Value = patch.name;
                     row.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                     dictDGV.Rows.Add(row);
                 }

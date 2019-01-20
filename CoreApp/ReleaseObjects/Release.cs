@@ -14,7 +14,7 @@ using System.Security.Principal;
 
 namespace CoreApp.ReleaseObjects
 {
-    class Release
+    public class Release
     {
         public static Application excel;
 
@@ -35,17 +35,23 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
+        public void DeleteLocal()
+        {
+            if (localDir.Exists)
+            {
+                setAttributesNormal(localDir);
+                localDir.Delete(true);
+            }
+        }
+
         //из системы контроля версий
         public Release(string name, DirectoryInfo dir, CVS.CVS cvs, Regex pattern) : this(name)
         {
-            if(dir.Exists)
-            {
-                setAttributesNormal(dir);
-                dir.Delete(true);
-            }
+            SetLocalDir(dir);
+            DeleteLocal();
             dir.Create();
 
-            SetLocalDir(dir);
+            this.cvs = cvs;
 
             List<string> fpNames = new List<string>();
 
@@ -157,8 +163,8 @@ namespace CoreApp.ReleaseObjects
 
         private static string regexPatchName = @"(C|Z)[0-9]+";
 
-        private static string regexFrom = "зависит.*ALFAM.*?([0-9]+)";
-        private static string regexTo = "влияет.*ALFAM.*?([0-9]+)";
+        private static string regexFrom = "зависит.*?ALFAM.*?([0-9]+)";
+        private static string regexTo = "влияет.*?ALFAM.*?([0-9]+)";
 
         private IEnumerable<Patch> DependedFrom(string rawString)
         {

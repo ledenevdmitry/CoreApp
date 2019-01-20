@@ -1,5 +1,6 @@
 ﻿using CoreApp.Dicts;
 using CoreApp.FixpackObjects;
+using CoreApp.ReleaseObjects;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,14 +12,15 @@ namespace CoreApp.Parsers
 {
     class ETLParser
     {
-        List<Fixpack> fixpacks;
-
         public InfaParser infaParser { get; protected set; }
         public InfaObjectDict infaObjectDict { get; protected set; }
 
         public SqlParser sqlParser { get; protected set; }
         public OraObjectDict oraObjectDict { get; protected set; }
 
+        private Release release;
+
+        /*
         public int fileCount()
         {
             int res = 0;
@@ -31,34 +33,23 @@ namespace CoreApp.Parsers
             }
             return res;
         }
+        */
         
-        public ETLParser(DirectoryInfo dir, bool UMEnabled)
+        public ETLParser(Release release, bool UMEnabled)
         {
-            fixpacks = new List<Fixpack>();
-            foreach (DirectoryInfo fixpackDir in dir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
-            {
-                Fixpack currFixpack = new Fixpack(fixpackDir);
-                fixpacks.Add(currFixpack);
-            }
+            this.release = release;
 
             infaObjectDict = new InfaObjectDict();
-            infaParser = new InfaParser(fixpacks, infaObjectDict);
+            infaParser = new InfaParser(release, infaObjectDict);
 
             oraObjectDict = new OraObjectDict();
-            sqlParser = new SqlParser();
+            sqlParser = new SqlParser(release, oraObjectDict);
         }
 
         public void Check(bool UMEnabled)
         {
-            foreach (Fixpack fixpack in fixpacks)
-            {
-                foreach (Patch patch in fixpack.patches.Values)
-                {
-                    infaParser.RetrieveObjectsFromFiles(patch.objs, infaObjectDict);
-                    infaParser.CheckInfaDependencies(patch.objs, infaObjectDict);
-                    sqlParser.RetrieveObjectsFromFile(patch.objs, oraObjectDict, UMEnabled);
-                }
-            }
+            infaParser.Check();
+            sqlParser.Check(UMEnabled);
         }
 
     }

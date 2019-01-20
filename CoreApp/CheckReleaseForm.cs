@@ -2,6 +2,7 @@
 using CoreApp.FixpackObjects;
 using CoreApp.FormUtils;
 using CoreApp.Parsers;
+using CoreApp.ReleaseObjects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,19 +18,22 @@ using System.Windows.Forms;
 
 namespace CoreApp
 {
-    public partial class ObjectForm : Form
+    public partial class CheckReleaseForm : Form
     {
-        public ObjectForm()
+        public CheckReleaseForm(Release release)
         {
             InitializeComponent();
             Application.Idle += OnIdle;
             FormResize();
+            this.release = release;
             //fileScs = new List<FileInfo>();
+            CheckRelease();
         }
         
         //List<FileInfo> fileScs;
         Thread checkThread;
         ETLParser etlparser;
+        Release release;
 
         private void OnIdle(object sender, EventArgs e)
         {
@@ -54,29 +58,31 @@ namespace CoreApp
 
         bool _checked = false;
 
+        /*
         private void PrepareInfaParser()
         {
-            /*
+            
             etlparser.infaParser.StartOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = true));
             etlparser.infaParser.ProgressChanged += () => PBChecks.Invoke(new Action(() => PBChecks.Value++));
             etlparser.infaParser.EndOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = false));
-            */
+            
         }
 
         private void PrepareOraParser()
         {
-            /*
+            
             etlparser.sqlParser.StartOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = true));
             etlparser.sqlParser.ProgressChanged += () => PBChecks.Invoke(new Action(() => PBChecks.Value++));
             etlparser.sqlParser.EndOfCheck += () => PBChecks.Invoke(new Action(() => PBChecks.Visible = false));
-            */
+            
         }
-
         private void PrepareParsers()
         {
             PrepareInfaParser();
             PrepareOraParser();
         }
+        
+        */
 
         private void TSMIFileScPrereq_Click(object sender, EventArgs e)
         {
@@ -87,7 +93,7 @@ namespace CoreApp
 
         private void FormResize()
         {
-            PBChecks.Left = Width - PBChecks.Width;
+            //PBChecks.Left = Width - PBChecks.Width;
             mainTabControl.Width = DisplayRectangle.Width;
             mainTabControl.Height = DisplayRectangle.Height - MainMenu.Height;
 
@@ -117,34 +123,29 @@ namespace CoreApp
             ((sender as TabControl).SelectedTab.Controls[0] as DataGridView).AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
         }       
 
-        private void CheckAllFixpacksInDir_Click(object sender, EventArgs e)
+        private void CheckRelease()
         {
-            FolderBrowserDialog fbd = new FolderBrowserDialog();
-            if(fbd.ShowDialog() == DialogResult.OK)
+            //FolderBrowserDialog fbd = new FolderBrowserDialog();
+            //if(fbd.ShowDialog() == DialogResult.OK)
+            //{
+            //List<Fixpack> fixpacks;
+            //List<FileInfo> files = FileScUtils.GetFilesFromMainDir(new DirectoryInfo(fbd.SelectedPath), out fixpacks);
+            etlparser = new ETLParser(release, UMEnabled);
+
+            //PBChecks.Value = 0;
+            //PBChecks.Maximum = etlparser.infaParser.WorkAmount(etlparser.infaObjectDict) + etlparser.fileCount();
+
+            //PrepareParsers();
+
+            checkThread = new Thread(() =>
             {
-                //List<Fixpack> fixpacks;
-                //List<FileInfo> files = FileScUtils.GetFilesFromMainDir(new DirectoryInfo(fbd.SelectedPath), out fixpacks);
-                etlparser = new ETLParser(new DirectoryInfo(fbd.SelectedPath), UMEnabled);
-
-                PBChecks.Value = 0;
-                PBChecks.Maximum = etlparser.infaParser.WorkAmount(etlparser.infaObjectDict) + etlparser.fileCount();
-
-                PrepareParsers();
-
-                checkThread = new Thread(() =>
-                {
-                    etlparser.Check(UMEnabled);
-                    _checked = true;
-                });
-                checkThread.Start();
-            }
-        }
-
-        private void TSMICheckScList_Click(object sender, EventArgs e)
-        {
+                etlparser.Check(UMEnabled);
+                _checked = true;
+            });
+            checkThread.Start();
+            //}
 
         }
-
 
         private bool UMEnabled = false;
         private void TSMIUmState_Click(object sender, EventArgs e)
@@ -160,6 +161,10 @@ namespace CoreApp
                 TSMIUmState.Text = "Не учитывать УМ";
             }
         }
-        
+
+        private void CheckAllFixpacksInDir_Click(object sender, EventArgs e)
+        {
+            CheckRelease();
+        }
     }
 }

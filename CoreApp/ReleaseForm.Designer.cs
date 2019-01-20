@@ -29,6 +29,11 @@
         private void InitializeComponent()
         {
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.BtFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtLoadFromCVS = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtLoadFromLocal = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtSetCVSPath = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtSetHomePath = new System.Windows.Forms.ToolStripMenuItem();
             this.BtRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtAddRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCheckRelease = new System.Windows.Forms.ToolStripMenuItem();
@@ -39,11 +44,6 @@
             this.LBoxFixpacks = new System.Windows.Forms.ListBox();
             this.LbReleases = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.BtFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtLoadFromCVS = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtLoadFromLocal = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtSetHomePath = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtSetCVSPath = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -58,6 +58,45 @@
             this.menuStrip1.Size = new System.Drawing.Size(456, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "releaseMenu";
+            // 
+            // BtFile
+            // 
+            this.BtFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.BtLoadFromCVS,
+            this.BtLoadFromLocal,
+            this.BtSetCVSPath,
+            this.BtSetHomePath});
+            this.BtFile.Name = "BtFile";
+            this.BtFile.Size = new System.Drawing.Size(48, 20);
+            this.BtFile.Text = "Файл";
+            // 
+            // BtLoadFromCVS
+            // 
+            this.BtLoadFromCVS.Name = "BtLoadFromCVS";
+            this.BtLoadFromCVS.Size = new System.Drawing.Size(294, 22);
+            this.BtLoadFromCVS.Text = "Скачать релиз из СКВ";
+            this.BtLoadFromCVS.Click += new System.EventHandler(this.BtLoadFromCVS_Click);
+            // 
+            // BtLoadFromLocal
+            // 
+            this.BtLoadFromLocal.Name = "BtLoadFromLocal";
+            this.BtLoadFromLocal.Size = new System.Drawing.Size(294, 22);
+            this.BtLoadFromLocal.Text = "Инициализировать из локальной папки";
+            this.BtLoadFromLocal.Click += new System.EventHandler(this.BtLoadFromLocal_Click);
+            // 
+            // BtSetCVSPath
+            // 
+            this.BtSetCVSPath.Name = "BtSetCVSPath";
+            this.BtSetCVSPath.Size = new System.Drawing.Size(294, 22);
+            this.BtSetCVSPath.Text = "Задать адрес СКВ";
+            this.BtSetCVSPath.Click += new System.EventHandler(this.BtSetCVSPath_Click);
+            // 
+            // BtSetHomePath
+            // 
+            this.BtSetHomePath.Name = "BtSetHomePath";
+            this.BtSetHomePath.Size = new System.Drawing.Size(294, 22);
+            this.BtSetHomePath.Text = "Задать домашнюю папку";
+            this.BtSetHomePath.Click += new System.EventHandler(this.BtSetHomePath_Click);
             // 
             // BtRelease
             // 
@@ -81,12 +120,14 @@
             this.BtCheckRelease.Name = "BtCheckRelease";
             this.BtCheckRelease.Size = new System.Drawing.Size(180, 22);
             this.BtCheckRelease.Text = "Проверить";
+            this.BtCheckRelease.Click += new System.EventHandler(this.BtCheckRelease_Click);
             // 
             // BtDeleteRelease
             // 
             this.BtDeleteRelease.Name = "BtDeleteRelease";
             this.BtDeleteRelease.Size = new System.Drawing.Size(180, 22);
-            this.BtDeleteRelease.Text = "Удалить";
+            this.BtDeleteRelease.Text = "Удалить локально";
+            this.BtDeleteRelease.Click += new System.EventHandler(this.BtDeleteRelease_Click);
             // 
             // BtFixpack
             // 
@@ -99,7 +140,7 @@
             // BtAddFixpack
             // 
             this.BtAddFixpack.Name = "BtAddFixpack";
-            this.BtAddFixpack.Size = new System.Drawing.Size(180, 22);
+            this.BtAddFixpack.Size = new System.Drawing.Size(170, 22);
             this.BtAddFixpack.Text = "Добавить ОП/ФП";
             this.BtAddFixpack.Click += new System.EventHandler(this.BtAddFixpack_Click);
             // 
@@ -137,45 +178,6 @@
             this.label1.Size = new System.Drawing.Size(112, 13);
             this.label1.TabIndex = 4;
             this.label1.Text = "Фикспаки/поставки";
-            // 
-            // BtFile
-            // 
-            this.BtFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.BtLoadFromCVS,
-            this.BtLoadFromLocal,
-            this.BtSetCVSPath,
-            this.BtSetHomePath});
-            this.BtFile.Name = "BtFile";
-            this.BtFile.Size = new System.Drawing.Size(48, 20);
-            this.BtFile.Text = "Файл";
-            // 
-            // BtLoadFromCVS
-            // 
-            this.BtLoadFromCVS.Name = "BtLoadFromCVS";
-            this.BtLoadFromCVS.Size = new System.Drawing.Size(294, 22);
-            this.BtLoadFromCVS.Text = "Скачать релиз из СКВ";
-            this.BtLoadFromCVS.Click += new System.EventHandler(this.BtLoadFromCVS_Click);
-            // 
-            // BtLoadFromLocal
-            // 
-            this.BtLoadFromLocal.Name = "BtLoadFromLocal";
-            this.BtLoadFromLocal.Size = new System.Drawing.Size(294, 22);
-            this.BtLoadFromLocal.Text = "Инициализировать из локальной папки";
-            this.BtLoadFromLocal.Click += new System.EventHandler(this.BtLoadFromLocal_Click);
-            // 
-            // BtSetHomePath
-            // 
-            this.BtSetHomePath.Name = "BtSetHomePath";
-            this.BtSetHomePath.Size = new System.Drawing.Size(294, 22);
-            this.BtSetHomePath.Text = "Задать домашнюю папку";
-            this.BtSetHomePath.Click += new System.EventHandler(this.BtSetHomePath_Click);
-            // 
-            // BtSetCVSPath
-            // 
-            this.BtSetCVSPath.Name = "BtSetCVSPath";
-            this.BtSetCVSPath.Size = new System.Drawing.Size(294, 22);
-            this.BtSetCVSPath.Text = "Задать адрес СКВ";
-            this.BtSetCVSPath.Click += new System.EventHandler(this.BtSetCVSPath_Click);
             // 
             // ReleaseForm
             // 

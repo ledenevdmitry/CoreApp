@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CoreApp.FixpackObjects
 {
-    class Fixpack
+    public class Fixpack
     {
         public string C { get; private set; }
         public string FullName { get; private set; }

@@ -153,7 +153,9 @@ namespace CoreApp
 
         private void OnIdle(object sender, EventArgs args)
         {
-            BtAddFixpack.Enabled = LBoxReleases.SelectedIndex != -1;
+            BtDeleteRelease.Enabled =
+            BtCheckRelease.Enabled = 
+            BtAddFixpack.Enabled = LBoxReleases.SelectedIndex != -1;            
         }
 
 
@@ -256,21 +258,17 @@ namespace CoreApp
 
         private void BtLoadFromCVS_Click(object sender, EventArgs e)
         {
-            AddForm releasePatternForm = new AddForm();
-            releasePatternForm.Text = "Скачать релиз по регулярному выражению";
-            if(releasePatternForm.ShowDialog() == DialogResult.OK)
+            AddForm releaseNameForm = new AddForm();
+            releaseNameForm.Text = "Введите название релиза";
+            if (releaseNameForm.ShowDialog() == DialogResult.OK)
             {
-                Regex regex = new Regex(releasePatternForm.Value);
-                AddForm releaseNameForm = new AddForm();
-                releaseNameForm.Text = "Введите название релиза";
-                if (releaseNameForm.ShowDialog() == DialogResult.OK)
-                {
-                    ConnectToCVS();
-                    DirectoryInfo releaseDir = Directory.CreateDirectory(string.Join("\\", home, releaseNameForm.Value));
-                    Release release = new Release(releaseNameForm.Value, releaseDir, cvs, regex);
-                    releases.Add(release.name, release);
-                    UpdateReleasesBox();
-                }
+                string strRegex = string.Concat(".*", Regex.Escape(releaseNameForm.Value), ".*");
+                Regex regex = new Regex(strRegex);
+                ConnectToCVS();
+                DirectoryInfo releaseDir = Directory.CreateDirectory(string.Join("\\", home, releaseNameForm.Value));
+                Release release = new Release(releaseNameForm.Value, releaseDir, cvs, regex);
+                releases.Add(release.name, release);
+                UpdateReleasesBox();
             }
         }
 
@@ -287,6 +285,26 @@ namespace CoreApp
         private void BtLoadFromLocal_Click(object sender, EventArgs e)
         {
             InitFromLocal();
+        }
+
+        private void BtCheckRelease_Click(object sender, EventArgs e)
+        {
+            if(excelApp == null)
+            { 
+                excelApp = new Microsoft.Office.Interop.Excel.Application();
+                Release.excel = excelApp;
+            }
+
+            CheckReleaseForm checkReleaseForm = new CheckReleaseForm(currRelease);
+            currRelease.SetAllDependencies();
+            checkReleaseForm.ShowDialog();
+        }
+
+        private void BtDeleteRelease_Click(object sender, EventArgs e)
+        {
+            currRelease.DeleteLocal();
+            releases.Remove(currRelease.name);
+            UpdateReleasesBox();
         }
     }
 }

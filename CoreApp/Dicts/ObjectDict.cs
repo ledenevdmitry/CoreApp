@@ -27,7 +27,8 @@ namespace CoreApp.Dicts
         {
             Key key = new Key(obj.objName, obj.objType);           
 
-            if (baseDict.oneToManyPairs.ContainsKey(key)) //если объект уже был в таблице
+            if (baseDict.oneToManyPairs.ContainsKey(key) && //если объект уже был в таблице
+               !baseDict.oneToManyPairs[key].ContainsValue(obj.patch)) //а добавляется из другого патча
             {
                 if (!intersections.oneToManyPairs.ContainsKey(key)) //если его еще нет в пересечениях, добавляем тот, с кем он пересекся
                 {
