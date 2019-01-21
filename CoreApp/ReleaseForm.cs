@@ -87,11 +87,11 @@ namespace CoreApp
 
         private bool InitCVSDBName()
         {
-            FolderBrowserDialog fbd = new FolderBrowserDialog();
-            fbd.Description = "Задать адрес базы всс";
-            if (fbd.ShowDialog() == DialogResult.OK)
+            AddForm setCVSPath = new AddForm();
+            setCVSPath.Text = "Задать адрес базы всс";
+            if (setCVSPath.ShowDialog() == DialogResult.OK)
             {
-                CVSDBName = fbd.SelectedPath;
+                CVSDBName = setCVSPath.Value;
                 return AutoInitCVSDBName();
             }
             else
@@ -104,7 +104,7 @@ namespace CoreApp
         {
             if (CheckCVSDBName())
             {
-                IniUtils.IniUtils.SetConfig("Credentials", "CVSDBName", home);
+                IniUtils.IniUtils.SetConfig("Credentials", "CVSDBName", CVSDBName);
                 return true;
             }
             else
@@ -241,9 +241,15 @@ namespace CoreApp
 
         private void ReleaseForm_FormClosed(object sender, FormClosedEventArgs e)
         {
-            excelApp.Quit();
-            Marshal.FinalReleaseComObject(excelApp);
-            cvs.Close();
+            if (excelApp != null)
+            {
+                excelApp.Quit();
+                Marshal.FinalReleaseComObject(excelApp);
+            }
+            if (cvs != null)
+            {
+                cvs.Close();
+            }
         }
 
         private const int BORDER = 5;
