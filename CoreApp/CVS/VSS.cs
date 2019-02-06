@@ -63,78 +63,62 @@ namespace CoreApp.CVS
             return spec.Insert(1, "/");
         }
 
-        public override IEnumerable<string> AllInEntireBase(List<string> matches, Regex pattern)
-        {
-            IEnumerable<string> res = AllInEntireBase(pattern, vssDatabase.get_VSSItem("$", false), matches);
-            if (res.Count() == 0)
-            {
-                throw new ArgumentException("File Not Found");
-            }
-            else
-            {
-                return res;
-            }
-        }
 
-        private IEnumerable<string> AllInEntireBase(Regex pattern, VSSItem currItem, List<string> matches)
+        public override IEnumerable<string> AllInEntireBase(string root, List<string> matches, Regex pattern, int depth)
         {
-            if (IsMatch(pattern, currItem))
+            Queue<Tuple<VSSItem, int>> queue = new Queue<Tuple<VSSItem, int>>();
+            queue.Enqueue(new Tuple<VSSItem, int>(vssDatabase.get_VSSItem(root, false), 0));
+            while (queue.Count > 0)
             {
-                matches.Add(currItem.Name);
-                yield return SpecToCorrectPath(currItem.Spec);
-            }
-            else
-            {
-                foreach (VSSItem subItem in currItem.Items)
+                Tuple<VSSItem, int> currItem = queue.Dequeue();
+                if (IsMatch(pattern, currItem.Item1))
                 {
-                    if ((VSSItemType)subItem.Type == VSSItemType.VSSITEM_PROJECT)
+                    matches.Add(currItem.Item1.Name);
+                    yield return SpecToCorrectPath(currItem.Item1.Spec);
+                }
+
+                if (currItem.Item2 < depth)
+                {
+                    foreach (VSSItem subItem in currItem.Item1.Items)
                     {
-                        foreach(var item in AllInEntireBase(pattern, subItem, matches))
+                        if ((VSSItemType)subItem.Type == VSSItemType.VSSITEM_PROJECT)
                         {
-                            yield return item;
+                            queue.Enqueue(new Tuple<VSSItem, int>(subItem, depth + 1));
                         }
                     }
                 }
             }
+            throw new ArgumentException("File Not Found");
         }
 
-        public override string FirstInEntireBase(ref string match, Regex pattern)
+        public override string FirstInEntireBase(string root, ref string match, Regex pattern, int depth)
         {
-            string res = FindInEntireBase(pattern, vssDatabase.get_VSSItem("$", false), ref match);
-            if(res == null)
+            Queue<Tuple<VSSItem, int>> queue = new Queue<Tuple<VSSItem, int>>();
+            queue.Enqueue(new Tuple<VSSItem, int>(vssDatabase.get_VSSItem(root, false), 0));
+            while(queue.Count > 0)
             {
-                throw new ArgumentException("File Not Found");
-            }
-            else
-            {
-                return res;
-            }
-        }
-
-        private string FindInEntireBase(Regex pattern, VSSItem currItem, ref string shortName)
-        {
-            if(IsMatch(pattern, currItem))
-            {
-                shortName = currItem.Name;
-                return SpecToCorrectPath(currItem.Spec);
-            }
-            else
-            {
-                foreach(VSSItem subItem in currItem.Items)
+                Tuple<VSSItem, int> currItem = queue.Dequeue();
+                
+                if (IsMatch(pattern, currItem.Item1))
                 {
-                    if ((VSSItemType)subItem.Type == VSSItemType.VSSITEM_PROJECT)
+                    match = currItem.Item1.Name;
+                    return SpecToCorrectPath(currItem.Item1.Spec);
+                }
+
+                if (currItem.Item2 < depth)
+                {
+                    foreach (VSSItem subItem in currItem.Item1.Items)
                     {
-                        string res = FindInEntireBase(pattern, subItem, ref shortName);
-                        if(res != null)
+                        if ((VSSItemType)subItem.Type == VSSItemType.VSSITEM_PROJECT)
                         {
-                            return res;
+                            queue.Enqueue(new Tuple<VSSItem, int>(subItem, depth + 1));
                         }
                     }
                 }
             }
-            return null;
+            throw new ArgumentException("File Not Found");
         }
-
+        
         private bool IsMatch(Regex pattern, VSSItem item)
         {
             return pattern.IsMatch(item.Name);

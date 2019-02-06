@@ -28,8 +28,8 @@ namespace CoreApp.CVS
         abstract public void Rename(string oldName, string newName);
         abstract public void Download(string dir, string destination);
 
-        abstract public string FirstInEntireBase(ref string match, Regex pattern);
-        abstract public IEnumerable<string> AllInEntireBase(List<string> matches, Regex pattern);
+        abstract public string FirstInEntireBase(string root, ref string match, Regex pattern, int depth);
+        abstract public IEnumerable<string> AllInEntireBase(string root, List<string> matches, Regex pattern, int depth);
 
         abstract public void Close();
 

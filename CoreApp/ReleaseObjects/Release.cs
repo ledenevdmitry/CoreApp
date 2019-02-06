@@ -112,7 +112,11 @@ namespace CoreApp.ReleaseObjects
         {
             foreach(Fixpack fp in fixpacks.Values)
             {
-                ReadMetaFromExcel(fp);
+                try
+                {
+                    ReadMetaFromExcel(fp);
+                }
+                catch { }
             }
         }
 
@@ -225,18 +229,21 @@ namespace CoreApp.ReleaseObjects
             for (int i = 2; i <= columns.Rows.Count; ++i)
             {
                 string patchCell = ((Range)columns.Cells[i, patchNameIndex]).Value2 ?? "";
-                string dependenciesCell = ((Range)columns.Cells[i, linkIndex]).Value2 ?? "";
-
-                string patchName = Regex.Match(patchCell, regexPatchName).Value;
-
-                try
+                if (linkIndex != -1)
                 {
-                    Patch currPatch = findPatchByShortName(patchName);
+                    string dependenciesCell = ((Range)columns.Cells[i, linkIndex]).Value2 ?? "";
 
-                    currPatch.dependendFrom.UnionWith(DependedFrom(dependenciesCell));
-                    currPatch.dependOn.UnionWith(DependOn(dependenciesCell));
+                    string patchName = Regex.Match(patchCell, regexPatchName).Value;
+
+                    try
+                    {
+                        Patch currPatch = findPatchByShortName(patchName);
+
+                        currPatch.dependendFrom.UnionWith(DependedFrom(dependenciesCell));
+                        currPatch.dependOn.UnionWith(DependOn(dependenciesCell));
+                    }
+                    catch (System.InvalidOperationException) { }
                 }
-                catch (System.InvalidOperationException) { }
             }
         }
     }

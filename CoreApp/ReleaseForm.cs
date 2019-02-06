@@ -171,13 +171,14 @@ namespace CoreApp
 
                 releases.Add(release.name, release);
 
-                LBoxReleases.Items.Clear();
+                UpdateReleasesBox();
 
             }
 
             else
             {
                 FolderBrowserDialog fbd = new FolderBrowserDialog();
+                fbd.Description = "Домашняя папка";
                 if (fbd.ShowDialog() == DialogResult.OK)
                 {
                     home = fbd.SelectedPath;
