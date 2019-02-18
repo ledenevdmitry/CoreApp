@@ -64,7 +64,6 @@ namespace CoreApp.FixpackObjects
             }
 
             return list;
-
         }
 
         private void SetRanks(Patch currPatch)
