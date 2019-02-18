@@ -44,6 +44,9 @@
       <HintPath>..\packages\Microsoft.VisualStudio.SourceSafe.Interop.5.2.0.0\lib\Microsoft.VisualStudio.SourceSafe.Interop.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.122.18.3, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\packages\Oracle.ManagedDataAccess.18.3.0\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -73,6 +76,7 @@
     <Compile Include="Dicts\OraObjectDict.cs" />
     <Compile Include="FileScUtils.cs" />
     <Compile Include="IniUtils\IniUtils.cs" />
+    <Compile Include="OraUtils\DBManager.cs" />
     <Compile Include="ReleaseForm.cs">
       <SubType>Form</SubType>
     </Compile>

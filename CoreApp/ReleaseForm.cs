@@ -31,7 +31,8 @@ namespace CoreApp
             releases = new SortedList<string, Release>();
 
             home = IniUtils.IniUtils.GetConfig("Credentials", "Home");
-            CVSDBName = IniUtils.IniUtils.GetConfig("Credentials", "CVSDBName");
+
+            //CVSDBName = IniUtils.IniUtils.GetConfig("Credentials", "CVSDBName");
 
             Release.excel = excelApp;
             Application.Idle += OnIdle;

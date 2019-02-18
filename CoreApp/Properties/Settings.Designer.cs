@@ -12,7 +12,7 @@ namespace CoreApp.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,7 +25,7 @@ namespace CoreApp.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ALTER~COMMENT ON~CREATE~DROP~FLASHBACK~PURGE~TRUNCATE")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ALTER|COMMENT ON|CREATE|DROP|FLASHBACK|PURGE|TRUNCATE")]
         public string DDLSTM {
             get {
                 return ((string)(this["DDLSTM"]));
@@ -37,7 +37,7 @@ namespace CoreApp.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"CLUSTER~CONSTRAINT~DATABASE LINK~TRIGGER~DIMENSION~LIBRARY~TABLE~INDEX~INDEXTYPES~JAVA CLASS~JAVA RESOURCE~JAVA SOURCE~MATERIALIZED VIEW~MATERIALIZED VIEW LOG~TYPE~OPERATOR~PACKAGE~SEQUENCE~FUNCTION~PROCEDURE~SYNONYM~TABLE~VIEW~CONTEXT~DIRECTORY~PFILE~SPFILE~PROFILE~ROLE~ROLLBACK SEGMENT~TABLESPACE~USER")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"CLUSTER|CONSTRAINT|DATABASE LINK|TRIGGER|DIMENSION|LIBRARY|TABLE|INDEX|INDEXTYPES|JAVA CLASS|JAVA RESOURCE|JAVA SOURCE|MATERIALIZED VIEW|MATERIALIZED VIEW LOG|TYPE|OPERATOR|PACKAGE|SEQUENCE|FUNCTION|PROCEDURE|SYNONYM|TABLE|VIEW|CONTEXT|DIRECTORY|PFILE|SPFILE|PROFILE|ROLE|ROLLBACK SEGMENT|TABLESPACE|USER")]
         public string ORAOBJ {
             get {
                 return ((string)(this["ORAOBJ"]));
@@ -49,7 +49,7 @@ namespace CoreApp.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("CALL~FROM~INTO~LOCK TABLE~MERGE~JOIN~INTO~UPDATE")]
+        [global::System.Configuration.DefaultSettingValueAttribute("CALL|FROM|INTO|LOCK TABLE|MERGE|JOIN|INTO|UPDATE")]
         public string DMLSTM {
             get {
                 return ((string)(this["DMLSTM"]));
@@ -61,7 +61,7 @@ namespace CoreApp.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"ACCESS~ADD~ALL~ALTER~AND~ANY~AS~ASC~AUDIT~BETWEEN~BY~CHAR~CHECK~CLUSTER~COLUMN~COMMENT~COMPRESS~CONNECT~CREATE~CURRENT~DATE~DECIMAL~DEFAULT~DELETE~DESC~DISTINCT~DROP~ELSE~EXCLUSIVE~EXISTS~FILE~FLOAT~FOR~FROM~GRANT~GROUP~HAVING~IDENTIFIED~IMMEDIATE~IN~INCREMENT~INDEX~INITIAL~INSERT~INTEGER~INTERSECT~INTO~IS~LEVEL~LIKE~LOCK~LONG~MAXEXTENTS~MINUS~MLSLABEL~MODE~MODIFY~NOAUDIT~NOCOMPRESS~NOT~NOWAIT~NULL~NUMBER~OF~OFFLINE~ON~ONLINE~OPTION~OR~ORDER~PCTFREE~PRIOR~PRIVILEGES~PUBLIC~RAW~RENAME~RESOURCE~REVOKE~ROW~ROWID~ROWNUM~ROWS~SELECT~SESSION~SET~SHARE~SIZE~SMALLINT~START~SUCCESSFUL~SYNONYM~SYSDATE~TABLE~THEN~TO~TRIGGER~UID~UNION~UNIQUE~UPDATE~USER~VALIDATE~VALUES~VARCHAR~VARCHAR2~VIEW~WHENEVER~WHERE~WITH")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"ACCESS|ADD|ALL|ALTER|AND|ANY|AS|ASC|AUDIT|BETWEEN|BY|CHAR|CHECK|CLUSTER|COLUMN|COMMENT|COMPRESS|CONNECT|CREATE|CURRENT|DATE|DECIMAL|DEFAULT|DELETE|DESC|DISTINCT|DROP|ELSE|EXCLUSIVE|EXISTS|FILE|FLOAT|FOR|FROM|GRANT|GROUP|HAVING|IDENTIFIED|IMMEDIATE|IN|INCREMENT|INDEX|INITIAL|INSERT|INTEGER|INTERSECT|INTO|IS|LEVEL|LIKE|LOCK|LONG|MAXEXTENTS|MINUS|MLSLABEL|MODE|MODIFY|NOAUDIT|NOCOMPRESS|NOT|NOWAIT|NULL|NUMBER|OF|OFFLINE|ON|ONLINE|OPTION|OR|ORDER|PCTFREE|PRIOR|PRIVILEGES|PUBLIC|RAW|RENAME|RESOURCE|REVOKE|ROW|ROWID|ROWNUM|ROWS|SELECT|SESSION|SET|SHARE|SIZE|SMALLINT|START|SUCCESSFUL|SYNONYM|SYSDATE|TABLE|THEN|TO|TRIGGER|UID|UNION|UNIQUE|UPDATE|USER|VALIDATE|VALUES|VARCHAR|VARCHAR2|VIEW|WHENEVER|WHERE|WITH")]
         public string RSVDWRDS {
             get {
                 return ((string)(this["RSVDWRDS"]));
