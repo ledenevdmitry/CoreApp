@@ -19,6 +19,7 @@ namespace CoreApp.FixpackObjects
         public HashSet<Patch> dependendFrom { get; private set; }
         public HashSet<Patch> dependOn { get; private set; }
         public List<FileInfo> objs;
+        public int rank;
 
         public Patch(string patchName)
         {
