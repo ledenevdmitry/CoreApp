@@ -18,8 +18,6 @@ namespace CoreApp.ReleaseObjects
     {
         public static Application excel;
 
-        public bool dependenciesSet;
-
         public SortedList<string, Fixpack> fixpacks { get; private set; }
 
         public string name { get; private set; }

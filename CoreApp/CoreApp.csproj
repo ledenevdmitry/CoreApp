@@ -76,6 +76,7 @@
     <Compile Include="Dicts\OraObjectDict.cs" />
     <Compile Include="FileScUtils.cs" />
     <Compile Include="IniUtils\IniUtils.cs" />
+    <Compile Include="OraUtils\CPatchDAL.cs" />
     <Compile Include="OraUtils\DBManager.cs" />
     <Compile Include="ReleaseForm.cs">
       <SubType>Form</SubType>

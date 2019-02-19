@@ -17,7 +17,7 @@ namespace CoreApp.OraUtils
         }
 
         //создание менеджера с переданным логином и паролем
-        public static void CreateConn(string TNS)
+        private static void CreateConn(string TNS)
         {
             conn = new OracleConnection(TNS);
             try
@@ -47,10 +47,15 @@ namespace CoreApp.OraUtils
             conn.Close();
         }
 
+        public static OracleTransaction BeginTransaction()
+        {
+            return conn.BeginTransaction();
+        }
+
         //static object locker = new object();
 
         //выполнить выражение, возвращающее результат
-        public OracleDataReader ExecuteQuery(string sql, params OracleParameter[] parameters)
+        public static OracleDataReader ExecuteQuery(string sql, params OracleParameter[] parameters)
         {
             Test();
             using (OracleCommand cmd = new OracleCommand(sql, conn))
@@ -63,7 +68,7 @@ namespace CoreApp.OraUtils
                 }
                 OracleDataReader res = cmd.ExecuteReader();
                 return res;
-                }
+            }
         }
 
         //выполнить выражение, не возвращающее результат
