@@ -79,6 +79,7 @@
     <Compile Include="OraUtils\CPatchDAL.cs" />
     <Compile Include="OraUtils\DBManager.cs" />
     <Compile Include="OraUtils\ZPatchDAL.cs" />
+    <Compile Include="OraUtils\ZPatchOrderDAL.cs" />
     <Compile Include="ReleaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
