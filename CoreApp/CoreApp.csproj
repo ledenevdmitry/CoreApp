@@ -78,6 +78,7 @@
     <Compile Include="IniUtils\IniUtils.cs" />
     <Compile Include="OraUtils\CPatchDAL.cs" />
     <Compile Include="OraUtils\DBManager.cs" />
+    <Compile Include="OraUtils\ReleaseDAL.cs" />
     <Compile Include="OraUtils\ZPatchDAL.cs" />
     <Compile Include="OraUtils\ZPatchOrderDAL.cs" />
     <Compile Include="ReleaseForm.cs">

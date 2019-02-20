@@ -38,7 +38,7 @@ namespace CoreApp.OraUtils
             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, validfrom, validto, dwsact )" +
             "select" +
            $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, sysdate, {DBManager.PlusInf}, 'D')" +
-            "from cpatch" +
+            "from zpatch_hdim" +
             "where cpatch_id = :cpatch_id";
 
         private static string deleteZPatchScript =
