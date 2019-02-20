@@ -20,11 +20,10 @@ namespace CoreApp.OraUtils
         private static string updateScript =
             "update cpatch_hdim " +
             "set validto = sysdate" +
-           $"where cpatch_id = :cpatch_id and " +
-            "validto = {PlusInf}; and " +
+            "where cpatch_id = :cpatch_id and " +
+           $"validto = {PlusInf}; and " +
             "parent_id = :old_parent_id and " +
-            "release_id = old_release_id and " +
-            "cpatch_name = :old_cpatch_name" +
+            "release_id = old_release_id" +
 
             "insert into сpatch_hdim" +
             "( cpatch_id,  parent_id,  release_id,  cpatch_name, validfrom, validto, dwsact )" +
