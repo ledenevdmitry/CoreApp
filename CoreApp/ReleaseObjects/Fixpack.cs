@@ -15,6 +15,7 @@ namespace CoreApp.FixpackObjects
         public string C { get; private set; }
         public string FullName { get; private set; }
         public string LocalPath { get; private set; }
+        public static CVS.CVS cvs;
 
         static string regexC = @"\\(C\d+)";
         static string regexFullName = @"\\(C[^\\]+)";
@@ -36,6 +37,40 @@ namespace CoreApp.FixpackObjects
                 }
             }
 
+        }
+
+
+        public void LoadFixpackFromCVS(string code, string cvsRootName, DirectoryInfo localDir)
+        {
+            string shortName = "";
+            //TODO здесь нужно вытащить корень по названию
+
+            string fixpackCVSPath = cvs.FirstInEntireBase(ref shortName, new Regex($".*{code}.*"));
+            string fpPath = string.Join("\\", localDir.FullName, shortName);
+            cvs.Download(fixpackCVSPath, fpPath);
+
+            Fixpack fp = new Fixpack(new DirectoryInfo(fpPath));
+        }
+
+        private string FindLocalExcel(Fixpack fp)
+        {
+            string path = fp.LocalPath + $"\\{fp.C}.xlsx";
+            if (File.Exists(path))
+            {
+                return path;
+            }
+            else
+            {
+                path = fp.LocalPath + $"\\{fp.C}.xls";
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+                else
+                {
+                    throw new Exception("Экселька не найдена");
+                }
+            }
         }
 
 

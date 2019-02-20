@@ -20,7 +20,12 @@ namespace CoreApp.OraUtils
         private static string updateScript =
             "update cpatch_hdim " +
             "set validto = sysdate" +
-           $"where cpatch_id = :cpatch_id and validto = {PlusInf};" +
+           $"where cpatch_id = :cpatch_id and " +
+            "validto = {PlusInf}; and " +
+            "parent_id = :old_parent_id and " +
+            "release_id = old_release_id and " +
+            "cpatch_name = :old_cpatch_name" +
+
             "insert into сpatch_hdim" +
             "( cpatch_id,  parent_id,  release_id,  cpatch_name, validfrom, validto, dwsact )" +
             "values" +
@@ -42,7 +47,7 @@ namespace CoreApp.OraUtils
             "from cpatch" +
             "where cpatch_id = :cpatch_id and parent_id = :parent_id";
 
-        public static void Insert(int cpatch_id, int parent_id, int release_id, int cpatch_name)
+        public static void Insert(int cpatch_id, int parent_id, int release_id, string cpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
@@ -55,15 +60,18 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void Update(int cpatch_id, int parent_id, int release_id, int cpatch_name)
+        public static void Update(int cpatch_id, int old_parent_id, int parent_id, int old_release_id, int release_id, string old_cpatch_name, string cpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
                 updateScript,
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id),
+                new OracleParameter("old_parent_id", parent_id),
                 new OracleParameter("parent_id", parent_id),
+                new OracleParameter("old_release_id", release_id),
                 new OracleParameter("release_id", release_id),
+                new OracleParameter("old_cpatch_name", cpatch_name),
                 new OracleParameter("cpatch_name", cpatch_name));
             transaction.Commit();
         }

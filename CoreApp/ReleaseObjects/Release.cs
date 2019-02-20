@@ -55,34 +55,12 @@ namespace CoreApp.ReleaseObjects
 
             List<string> fpNames = new List<string>();
 
-            var cvsPaths = cvs.AllInEntireBase(fpNames, pattern);
-
-            int i = 0;
-            foreach(var cvsPath in cvsPaths)
-            {
-                string localPath = string.Join("\\", localDir.FullName, fpNames[i++]);
-                cvs.Download(cvsPath, localPath);
-
-                Fixpack fp = new Fixpack(new DirectoryInfo(localPath));
-                fixpacks.Add(fp.FullName, fp);
-            }
-        }
-
-        //загрузиться локально
-        public Release(DirectoryInfo dir) : this(dir.Name)
-        {
-            SetLocalDir(dir);
-            foreach(var subdir in dir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
-            {
-                Fixpack currFixpack = new Fixpack(subdir);
-                fixpacks.Add(currFixpack.FullName, currFixpack);
-            }
+            //TODO: прогрузить все фикспаки из оракла
         }
 
         public Release(string name)
         {
             fixpacks = new SortedList<string, Fixpack>();
-            dependenciesSet = false;
 
             this.name = name;
         }
