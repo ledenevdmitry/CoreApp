@@ -1,59 +1,46 @@
-﻿using System;
+﻿using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Oracle.ManagedDataAccess.Client;
 
 namespace CoreApp.OraUtils
 {
     class CPatchDAL
     {
+        private static string MinusInf = "to_date('01.01.1900', 'dd.mm.yyyy')";
+        private static string PlusInf  = "to_date('31.12.5999', 'dd.mm.yyyy')";
         private static string insertScript =
-            "insert into сpatch_log" +
-            "( cpatch_id,  parent_id,  release_id,  cpatch_name,    date,  dwsact)" +
+            "insert into сpatch_hdim" +
+            "( cpatch_id,  parent_id,  release_id,  cpatch_name, validfrom, validto, dwsact )" +
             "values" +
-            "(:cpatch_id, :parent_id, :release_id, :cpatch_name, sysdate, 'I');" +
-            "insert into сpatch" +
-            "( cpatch_id,  parent_id,  release_id,  cpatch_name)" +
-            "values" +
-            "(:cpatch_id, :parent_id, :release_id, :cpatch_name);" ;
+           $"(:cpatch_id, :parent_id, :release_id, :cpatch_name, {MinusInf}, {PlusInf}, 'I');" ;
 
         private static string updateScript =
-            "insert into сpatch_log" +
-            "( cpatch_id,  parent_id,  release_id,  cpatch_name,    date,  dwsact)" +
+            "update cpatch_hdim " +
+            "set validto = sysdate" +
+           $"where cpatch_id = :cpatch_id and validto = {PlusInf};" +
+            "insert into сpatch_hdim" +
+            "( cpatch_id,  parent_id,  release_id,  cpatch_name, validfrom, validto, dwsact )" +
             "values" +
-            "(:cpatch_id, :parent_id, :release_id, :cpatch_name, sysdate, 'U');" +
-            "update сpatch" +
-            "set " +
-            "parent_id = :parent_id," +
-            "release_id = :release_id" +
-            "cpatch_name = :cpatch_name)" +
-            "where" +
-            "cpatch_id = :cpatch_id;";
+           $"(:cpatch_id, :parent_id, :release_id, :cpatch_name, sysdate, {PlusInf}, 'U');";
 
         private static string deleteCPatchScript =
-            "insert into сpatch_log" +
-            "( cpatch_id,  parent_id,  release_id,  cpatch_name,    date,  dwsact)" +
-            "values" +
-            "select cpatch_id, parent_id, release_id, cpatch_name, sysdate, 'D'" +
-            "from cpatch " +
-            "where cpatch_id = :cpatch_id;" +
-            "delete from сpatch" +
-            "where " +
-            "cpatch_id = :cpatch_id;";
+            "insert into сpatch_hdim" +
+            "( cpatch_id,  parent_id,  release_id,  cpatch_name, validfrom, validto, dwsact )" +
+            "select" +
+           $"(:cpatch_id, :parent_id, :release_id, :cpatch_name, sysdate, {PlusInf}, 'D')" +
+            "from cpatch" +
+            "where cpatch_id = :cpatch_id";
 
         private static string deleteDependencyScript =
-            "insert into сpatch_log" +
-            "( cpatch_id,  parent_id,  release_id,  cpatch_name,    date,  dwsact)" +
-            "values" +
-            "(:cpatch_id, :parent_id, :release_id, :cpatch_name, sysdate, 'D');" +
-            "delete from сpatch" +
-            "where " +
-            "parent_id = :parent_id," +
-            "release_id = :release_id" +
-            "cpatch_name = :cpatch_name" +
-            "cpatch_id = :cpatch_id);";
+            "insert into сpatch_hdim" +
+            "( cpatch_id,  parent_id,  release_id,  cpatch_name, validfrom, validto, dwsact )" +
+            "select" +
+           $"(:cpatch_id, :parent_id, :release_id, :cpatch_name, sysdate, {PlusInf}, 'D')" +
+            "from cpatch" +
+            "where cpatch_id = :cpatch_id and parent_id = :parent_id";
 
         public static void Insert(int cpatch_id, int parent_id, int release_id, int cpatch_name)
         {
@@ -91,16 +78,14 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void DeleteDependency(int cpatch_id, int parent_id, int release_id, int cpatch_name)
+        public static void DeleteDependency(int cpatch_id, int parent_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
                 deleteDependencyScript,
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id),
-                new OracleParameter("parent_id", parent_id),
-                new OracleParameter("release_id", release_id),
-                new OracleParameter("cpatch_name", cpatch_name));
+                new OracleParameter("parent_id", parent_id));
             transaction.Commit();
         }
 
