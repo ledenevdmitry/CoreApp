@@ -11,6 +11,9 @@ namespace CoreApp.OraUtils
     {
         private static OracleConnection conn;
 
+        public const string MinusInf = "to_date('01.01.1900', 'dd.mm.yyyy')";
+        public const string PlusInf = "to_date('31.12.5999', 'dd.mm.yyyy')";
+
         static DBManager()
         {
             CreateConn(IniUtils.IniUtils.GetConfig("Oracle", "TNS"));

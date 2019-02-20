@@ -23,7 +23,7 @@ namespace CoreApp.ReleaseObjects
         public string name { get; private set; }
 
         DirectoryInfo localDir;
-        CVS.CVS cvs;
+        public static CVS.CVS cvs;
 
         private void setAttributesNormal(DirectoryInfo dir)
         {
@@ -45,15 +45,12 @@ namespace CoreApp.ReleaseObjects
         }
 
         //из системы контроля версий
-        public Release(string name, DirectoryInfo dir, CVS.CVS cvs, Regex pattern) : this(name)
+        public Release(string name, DirectoryInfo dir, Regex pattern) : this(name)
         {
             SetLocalDir(dir);
             DeleteLocal();
             dir.Create();
-
-            this.cvs = cvs;
-
-            List<string> fpNames = new List<string>();
+           
 
             //TODO: прогрузить все фикспаки из оракла
         }
@@ -62,6 +59,8 @@ namespace CoreApp.ReleaseObjects
         {
             fixpacks = new SortedList<string, Fixpack>();
 
+            //TODO: прогрузить все фикспаки из оракла
+
             this.name = name;
         }
 
@@ -69,22 +68,6 @@ namespace CoreApp.ReleaseObjects
         public void SetLocalDir(DirectoryInfo localDir)
         {
             this.localDir = localDir;
-        }
-
-        public void SetCVS(CVS.CVS cvs)
-        {
-            this.cvs = cvs;
-        }
-
-        public void LoadFixpackFromCVS(string code)
-        {
-            string shortName = "";
-            string fixpackCVSPath = cvs.FirstInEntireBase(ref shortName, new Regex($".*{code}.*"));
-            string fpPath = string.Join("\\", localDir.FullName, shortName);
-            cvs.Download(fixpackCVSPath, fpPath);
-
-            Fixpack fp = new Fixpack(new DirectoryInfo(fpPath));
-            fixpacks.Add(fp.FullName, fp);
         }
 
         public void SetAllDependencies()
@@ -99,27 +82,6 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
-
-        private string FindLocalExcel(Fixpack fp)
-        {
-            string path = fp.LocalPath + $"\\{fp.C}.xlsx";
-            if (File.Exists(path))
-            {
-                return path;
-            }
-            else
-            {
-                path = fp.LocalPath + $"\\{fp.C}.xls";
-                if (File.Exists(path))
-                {
-                    return path;
-                }
-                else
-                {
-                    throw new Exception("Экселька не найдена");
-                }
-            }
-        }
 
         public bool ReadMetaFromExcelFile(Fixpack fp, string newExcelFilePath)
         {
