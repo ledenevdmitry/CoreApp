@@ -10,63 +10,87 @@ namespace CoreApp.OraUtils
     class ZPatchDAL
     {
         private static string insertScript =
-            "insert into zpatch_hdim" +
-            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, validfrom, validto, dwsact )" +
-            "values" +
-           $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I');";
+            "insert into zpatch_hdim " +
+            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
+            "values " +
+           $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); ";
+
+        private static string insertionsNew(char dmlType, params string[] pars)
+        {
+            string res =
+             "insert into zpatch_hdim " +
+             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
+             "select " +
+             "zpatch_id, parent_id,  :new_cpatch_id,  :new_zpatch_name, :new_zpatchstatus, " +
+             "(select max(validto) from zpatch_hdim " +
+             "where zpatch_id = :zpatch_id and " +
+             "parent_id = :parent_id), " +
+            $"{DBManager.PlusInf}, '{dmlType}') " +
+             "from zpatch " +
+             "where " +
+            $"validto = {DBManager.PlusInf} ";
+            foreach (string par in pars)
+            {
+                res += $"and {par} = :{par} ";
+            }
+            res += "; ";
+            return res;
+        }
+
+        private static string closeOld(params string[] pars)
+        {
+            string res =
+            "update zpatch_hdim " +
+            "set validto = sysdate " +
+            "where " +
+            $"validto = {DBManager.PlusInf} ";
+            foreach (string par in pars)
+            {
+                res += $"and {par} = :{par} ";
+            }
+            res += "; ";
+            return res;
+        }
 
         private static string updateScript =
-            "update cpatch_hdim " +
-            "set validto = sysdate" +
-            "where zpatch_id = :zpatch_id and " +
-           $"validto = {DBManager.PlusInf} and " +
-            "parent_id = :old_parent_id and " +
-            "cpatch_id = old_cpatch_id" +
-
-            "insert into сpatch_hdim" +
-            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, validfrom, validto, dwsact )" +
-            "values" +
-           $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, sysdate, {DBManager.PlusInf}, 'U');";
-
-        public static string deleteByCPatch = 
-            "update zpatch_hdim " +
-            "set validto = sysdate" +
-            "where cpatch_id = :cpatch_id and " +
-           $"validto = {DBManager.PlusInf};" +
-
-            "insert into zpatch_hdim" +
-            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, validfrom, validto, dwsact )" +
-            "select" +
-           $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, sysdate, {DBManager.PlusInf}, 'D')" +
-            "from zpatch_hdim" +
-            "where cpatch_id = :cpatch_id";
+            closeOld("zpatch_id") +
+            insertionsNew('U', "zpatch_id");
 
         private static string deleteZPatchScript =
-            "update cpatch_hdim " +
-            "set validto = sysdate" +
-            "where zpatch_id = :zpatch_id and " +
-           $"validto = {DBManager.PlusInf};" +
+            closeOld("zpatch_id") +
+            insertionsNew('D', "zpatch_id");
 
-            "insert into сpatch_hdim" +
-            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, validfrom, validto, dwsact )" +
-            "select" +
-           $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, sysdate, {DBManager.PlusInf}, 'D')" +
-            "from cpatch" +
-            "where zpatch_id = :zpatch_id";
+
+        public static string deleteByCPatch =
+            closeOld("cpatch") +
+            insertionsNew('D', "cpatch");
+
+        public static string deleteByRelease =
+            "update zpatch_hdim z" +
+            "set validto = sysdate " +
+            "where " +
+            $"validto = {DBManager.PlusInf} " +
+            "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 or z1.cpatch_id = c1.cpatch_id " +
+                        "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)" +
+
+             "insert into zpatch_hdim " +
+             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
+             "select " +
+             "zpatch_id, parent_id,  :new_cpatch_id,  :new_zpatch_name, :new_zpatchstatus, " +
+             "(select max(validto) from zpatch_hdim " +
+             "where zpatch_id = :zpatch_id and " +
+             "parent_id = :parent_id), " +
+            $"{DBManager.PlusInf}, 'D') " +
+             "from zpatch z" +
+             "where " +
+            $"validto = {DBManager.PlusInf} " +
+             "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 or z1.cpatch_id = c1.cpatch_id " +
+                        "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)";
+
 
         private static string deleteDependencyScript =
-            "update cpatch_hdim " +
-            "set validto = sysdate" +
-            "where zpatch_id = :zpatch_id and " +
-           $"validto = {DBManager.PlusInf}" +
-            "and parent_id = :parent_id;" +
-
-            "insert into сpatch_hdim" +
-            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, validfrom, validto, dwsact )" +
-            "select" +
-           $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, sysdate, {DBManager.PlusInf}, 'D')" +
-            "from cpatch" +
-            "where zpatch_id = :zpatch_id and parent_id = :parent_id";
+            closeOld("zpatch_id", "parent_id") +
+            insertionsNew('D', "zpatch_id", "parent_id");
 
         public static void Insert(int zpatch_id, int parent_id, int cpatch_id, int zpatch_name)
         {
@@ -81,7 +105,7 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void Update(int zpatch_id, int parent_id, int cpatch_id, int zpatch_name)
+        public static void Update(int zpatch_id, int parent_id, int new_cpatch_id, int new_zpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
@@ -89,8 +113,8 @@ namespace CoreApp.OraUtils
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("parent_id", parent_id),
-                new OracleParameter("cpatch_id", cpatch_id),
-                new OracleParameter("zpatch_name", zpatch_name));
+                new OracleParameter("new_cpatch_id", new_cpatch_id),
+                new OracleParameter("new_zpatch_name", new_zpatch_name));
             transaction.Commit();
         }
 
@@ -104,16 +128,14 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void DeleteDependency(int zpatch_id, int parent_id, int cpatch_id, int zpatch_name)
+        public static void DeleteDependency(int zpatch_id, int parent_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
                 deleteDependencyScript,
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
-                new OracleParameter("parent_id", parent_id),
-                new OracleParameter("cpatch_id", cpatch_id),
-                new OracleParameter("zpatch_name", zpatch_name));
+                new OracleParameter("parent_id", parent_id));
             transaction.Commit();
         }
 

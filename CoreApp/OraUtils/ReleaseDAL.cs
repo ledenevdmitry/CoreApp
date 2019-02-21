@@ -9,57 +9,57 @@ namespace CoreApp.OraUtils
 {
     class ReleaseDAL
     {
-        private static string insertScript = 
-            "insert into release_hdim" +
-            "( release_id,  release_name, validfrom, validto, dwsact )" +
-            "values" +
-           $"(:release_id, :release_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I');";
+        private static string insertionsNew(char dmlType, params string[] pars)
+        {
+            string res =
+             "insert into release_hdim " +
+             "( release_id,  release_name, validfrom, validto, dwsact ) " +
+             "select " +
+             "release_id, :new_release_name" +
+             "(select max(validto) from release_hdim " +
+             "where release_id = :release_id and " +
+            $"{DBManager.PlusInf}, '{dmlType}') " +
+             "from release_hdim " +
+             "where " +
+            $"validto = {DBManager.PlusInf} ";
+            foreach (string par in pars)
+            {
+                res += $"and {par} = :{par} ";
+            }
+            res += "; ";
+            return res;
+        }
+
+        private static string closeOld(params string[] pars)
+        {
+            string res =
+            "update release_hdim " +
+            "set validto = sysdate " +
+            "where " +
+            $"validto = {DBManager.PlusInf} ";
+            foreach (string par in pars)
+            {
+                res += $"and {par} = :{par} ";
+            }
+            res += "; ";
+            return res;
+        }
+
+        private static string insertScript =
+            "insert into release_hdim " +
+            "( release_id,  release_name, validfrom, validto, dwsact) " +
+            "values " +
+           $"(:release_id, :release_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); ";
 
         private static string updateScript =
-            "update release_hdim " +
-            "set validto = sysdate" +
-            "where release_id = :release_id and " +
-           $"validto = {DBManager.PlusInf};" +
+            closeOld("release_id") +
+            insertionsNew('U', "release_id");
 
-            "insert into release_hdim" +
-            "( release_id,  release_name, validfrom, validto, dwsact )" +
-            "values" +
-           $"(:release_id, :release_name, (select max(validfrom) from release_hdim where release_id = :release_id) , {DBManager.PlusInf}, 'I');";
+        private static string deleteScript =
+            closeOld("release_id") +
+            insertionsNew('D', "release_id") +
+            CPatchDAL.deleteByRelease;
 
-        private static string deleteReleaseScript =
-            "update release_hdim " +
-            "set validto = sysdate " +
-            "where release_id = :release_id and " +
-           $"validto = {DBManager.PlusInf};" +
-
-            "insert into release_hdim" +
-            "( release_id, release_name, validfrom, validto, dwsact )" +
-            "select" +
-           $"(:release_id, :release_name, (select max(validfrom) from release_hdim where release_id = :release_id), {DBManager.PlusInf}, 'D')" +
-            "from release_hdim" +
-            "where release_id = :release_id"
-
-            + CPatchDAL.deleteByRelease + 
-            
-            "update zpatch_hdim z " +
-            "set validto = sysdate " +
-            "where exists " +
-            "(select 1 from cpatch c1 join zpatch z1 on c1.cpatch = z1.cpatch " +
-            " where c.release_id = :release_id); " +
-            
-            "insert into z_patch z" +
-             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, validfrom, validto, dwsact )" +
-            $"select zpatch_id, parent_id, cpatch_id, zpatch_name, " +
-             "(select max(validfrom) from release_hdim where exists " +
-                "(select 1 from cpatch c1 join zpatch z1 on c1.cpatch = z1.cpatch " +
-                " where c.release_id = :release_id)), " +
-            $"{DBManager.PlusInf}, 'D' " +
-                 "from zpatch_id " +
-             "where exists " +
-             "(select 1 from cpatch c1 join zpatch z1 on c1.cpatch = z1.cpatch " +
-             " where c.release_id = :release_id); ";
-
-       
         public static void Insert(int release_id, string release_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
@@ -71,14 +71,14 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void Update(int release_id, string release_name)
+        public static void Update(int release_id, string new_release_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
                 updateScript,
                 transaction,
                 new OracleParameter("release_id", release_id),
-                new OracleParameter("release_name", release_name));
+                new OracleParameter("new_release_name", new_release_name));
             transaction.Commit();
         }
 
@@ -86,7 +86,7 @@ namespace CoreApp.OraUtils
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
-                deleteReleaseScript,
+                deleteScript,
                 transaction,
                 new OracleParameter("release_id", release_id));
             transaction.Commit();
