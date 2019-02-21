@@ -49,17 +49,17 @@ namespace CoreApp.FormUtils
 
         public static void AddObjectsInDGV(DataGridView dictDGV, ETLParser parser)
         {
-            foreach(KeyValuePair<ETLObject, Patch> item in parser.oraObjectDict.baseDict.EnumerateObjPatchPairs())
+            foreach(KeyValuePair<ETLObject, ZPatch> item in parser.oraObjectDict.baseDict.EnumerateObjPatchPairs())
             {
                 ETLObject oraObj = item.Key;
-                Patch patch = item.Value;
+                ZPatch patch = item.Value;
                 dictDGV.Rows.Add(oraObj.objName, oraObj.objType, patch.name);
             }
 
-            foreach (KeyValuePair<ETLObject, Patch> item in parser.infaObjectDict.baseDict.EnumerateObjPatchPairs())
+            foreach (KeyValuePair<ETLObject, ZPatch> item in parser.infaObjectDict.baseDict.EnumerateObjPatchPairs())
             {
                 ETLObject infaObj = item.Key;
-                Patch patch = item.Value;
+                ZPatch patch = item.Value;
                 dictDGV.Rows.Add(infaObj.objName, infaObj.objType, patch.name);
             }
 
@@ -74,7 +74,7 @@ namespace CoreApp.FormUtils
                 foreach (var pair in pairs)
                 {
                     ETLObject oraObj = pair.Key;
-                    Patch patch = pair.Value;
+                    ZPatch patch = pair.Value;
                     DataGridViewRow row = new DataGridViewRow();
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = oraObj.objName;
@@ -91,7 +91,7 @@ namespace CoreApp.FormUtils
                 foreach (var pair in pairs)
                 {
                     ETLObject infaObj = pair.Key;
-                    Patch patch = pair.Value;
+                    ZPatch patch = pair.Value;
                     DataGridViewRow row = new DataGridViewRow();
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = infaObj.objName;

@@ -76,20 +76,23 @@
     <Compile Include="Dicts\OraObjectDict.cs" />
     <Compile Include="FileScUtils.cs" />
     <Compile Include="IniUtils\IniUtils.cs" />
-    <Compile Include="OraUtils\CPatchDAL.cs" />
+    <Compile Include="OraUtils\DAL\CPatchDAL.cs" />
     <Compile Include="OraUtils\DBManager.cs" />
-    <Compile Include="OraUtils\ReleaseDAL.cs" />
-    <Compile Include="OraUtils\ZPatchDAL.cs" />
-    <Compile Include="OraUtils\ZPatchOrderDAL.cs" />
+    <Compile Include="OraUtils\DAL\ReleaseDAL.cs" />
+    <Compile Include="OraUtils\DAL\ZPatchDAL.cs" />
+    <Compile Include="OraUtils\DAL\ZPatchOrderDAL.cs" />
+    <Compile Include="OraUtils\Model\CPatchRecord.cs" />
+    <Compile Include="OraUtils\Model\ReleaseRecord.cs" />
+    <Compile Include="OraUtils\Model\ZPatchRecord.cs" />
     <Compile Include="ReleaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="ReleaseForm.Designer.cs">
       <DependentUpon>ReleaseForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ReleaseObjects\Fixpack.cs" />
+    <Compile Include="ReleaseObjects\CPatch.cs" />
     <Compile Include="ReleaseObjects\InfaSchema.cs" />
-    <Compile Include="ReleaseObjects\Patch.cs" />
+    <Compile Include="ReleaseObjects\ZPatch.cs" />
     <Compile Include="CheckReleaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -116,6 +119,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Parsers\SqlParser.cs" />
     <Compile Include="ReleaseObjects\Release.cs" />
+    <Compile Include="ReleaseObjects\ReleaseManager.cs" />
     <EmbeddedResource Include="AddForm.resx">
       <DependentUpon>AddForm.cs</DependentUpon>
     </EmbeddedResource>

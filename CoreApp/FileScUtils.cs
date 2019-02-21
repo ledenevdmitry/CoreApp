@@ -15,10 +15,10 @@ namespace CoreApp
         private static Regex InfaRegex = new Regex(@"IPC\|\|(.*)\Z", RegexOptions.IgnoreCase);
         
 
-        public static void GetFixpacksFromDir(DirectoryInfo dir, out List<Fixpack> fixpacks)
+        public static void GetFixpacksFromDir(DirectoryInfo dir, out List<CPatch> fixpacks)
         {
             List<FileInfo> res = new List<FileInfo>();
-            fixpacks = new List<Fixpack>();
+            fixpacks = new List<CPatch>();
             foreach(DirectoryInfo fixpackDir in dir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
             {
                 try
@@ -30,7 +30,7 @@ namespace CoreApp
                 {
                     throw new ArgumentException($"В папке {fixpackDir.FullName} отсутствует файл сценария");
                 }
-                Fixpack fp = new Fixpack(fixpackDir);
+                CPatch fp = new CPatch(fixpackDir);
                 fixpacks.Add(fp);
             }
         }

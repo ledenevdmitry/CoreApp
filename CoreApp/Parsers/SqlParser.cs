@@ -65,7 +65,7 @@ namespace CoreApp
         }
 
         //список должен быть создан до запуска
-        public static void RetrieveObjectsFromSQL(string script, FileInfo file, OraObjectDict dict, Patch patch)
+        public static void RetrieveObjectsFromSQL(string script, FileInfo file, OraObjectDict dict, ZPatch patch)
         {
             RemoveComments(ref script);
             //проверка всех DDL 
@@ -84,7 +84,7 @@ namespace CoreApp
             InsertionsByRegex(script, "INDEX", file, dict, new Regex(RegexWhiteSpacesStart + RegexIndexingTable + RegexWhiteSpacesEnd), patch);
         }
 
-        private static void InsertionsByRegex(string script, string type, FileInfo file, OraObjectDict dict, Regex regex, Patch patch)
+        private static void InsertionsByRegex(string script, string type, FileInfo file, OraObjectDict dict, Regex regex, ZPatch patch)
         {
             MatchCollection matchCollection = regex.Matches(script);
             foreach (Match match in matchCollection)
@@ -98,13 +98,13 @@ namespace CoreApp
             }
         }
 
-        private static void InsertIntoDict(Match obj, string type, FileInfo file, OraObjectDict dict, Patch patch)
+        private static void InsertIntoDict(Match obj, string type, FileInfo file, OraObjectDict dict, ZPatch patch)
         {
             string objName = obj.Value.Trim().ToUpper();
             dict.AddObjectConsiderIntersections(new OraObject(objName, type, patch));
         }
 
-        public void RetrieveObjectsFromFile(FileInfo file, OraObjectDict dict, Patch patch)
+        public void RetrieveObjectsFromFile(FileInfo file, OraObjectDict dict, ZPatch patch)
         {
             StreamReader streamReader = new StreamReader(file.FullName, Encoding.GetEncoding("Windows-1251"));
             string script = streamReader.ReadToEnd();

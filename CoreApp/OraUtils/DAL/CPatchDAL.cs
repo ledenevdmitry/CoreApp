@@ -1,4 +1,5 @@
-﻿using Oracle.ManagedDataAccess.Client;
+﻿using CoreApp.OraUtils.Model;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,6 +118,32 @@ namespace CoreApp.OraUtils
                 new OracleParameter("cpatch_id", cpatch_id),
                 new OracleParameter("parent_id", parent_id));
             transaction.Commit();
+        }
+
+        static string allCPatchesScript = $"select cpatch_id, cpatch_name, parent_id, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
+        static string CPatchesByRelease = $"select cpatch_id, cpatch_name, parent_id, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> and release_id = :release_id 'D' order by release_name ";
+
+
+        public static IEnumerable<CPatchRecord> getCPatches()
+        {
+            return getByScript(allCPatchesScript);
+        }
+
+        public static IEnumerable<CPatchRecord> getCPatchesByRelease(int release_id)
+        {
+            return getByScript(CPatchesByRelease, new OracleParameter("release_id", release_id));
+        }
+
+
+        public static IEnumerable<CPatchRecord> getByScript(string script, params OracleParameter [] parameters)
+        {
+            using (var reader = DBManager.ExecuteQuery(script))
+            {
+                while (reader.Read())
+                {
+                    yield return new CPatchRecord(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4));
+                }
+            }
         }
 
     }

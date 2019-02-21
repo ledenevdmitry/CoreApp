@@ -11,14 +11,25 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using CoreApp.OraUtils;
 
 namespace CoreApp.ReleaseObjects
 {
+
     public class Release
     {
         public static Application excel;
 
-        public SortedList<string, Fixpack> fixpacks { get; private set; }
+        public List<CPatch> fixpacks { get; private set; }
+
+        public Release(int oraId)
+        {
+            var oraCPatches = CPatchDAL.getCPatchesByRelease(oraId);
+            foreach (var oraCPatch in oraCPatches)
+            {
+                CPatch cpatch = new CPatch(oraCPatch.CPatchId);
+            }
+        }
 
         public string name { get; private set; }
 
@@ -57,7 +68,7 @@ namespace CoreApp.ReleaseObjects
 
         public Release(string name)
         {
-            fixpacks = new SortedList<string, Fixpack>();
+            fixpacks = new SortedList<string, CPatch>();
 
             //TODO: прогрузить все фикспаки из оракла
 
@@ -72,7 +83,7 @@ namespace CoreApp.ReleaseObjects
 
         public void SetAllDependencies()
         {
-            foreach(Fixpack fp in fixpacks.Values)
+            foreach(CPatch fp in fixpacks.Values)
             {
                 try
                 {
@@ -83,7 +94,7 @@ namespace CoreApp.ReleaseObjects
         }
 
 
-        public bool ReadMetaFromExcelFile(Fixpack fp, string newExcelFilePath)
+        public bool ReadMetaFromExcelFile(CPatch fp, string newExcelFilePath)
         {
             if (!dependenciesSet)
             {
@@ -133,7 +144,7 @@ namespace CoreApp.ReleaseObjects
         private static string regexFrom = "зависит.*?ALFAM.*?([0-9]+)";
         private static string regexTo = "влияет.*?ALFAM.*?([0-9]+)";
 
-        private IEnumerable<Patch> DependedFrom(string rawString)
+        private IEnumerable<ZPatch> DependedFrom(string rawString)
         {
             MatchCollection matchesFrom = Regex.Matches(rawString, regexFrom);
             foreach (Match m in matchesFrom)
@@ -142,7 +153,7 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
-        private IEnumerable<Patch> DependOn(string rawString)
+        private IEnumerable<ZPatch> DependOn(string rawString)
         {
             MatchCollection matchesTo = Regex.Matches(rawString, regexTo);
             foreach (Match m in matchesTo)
@@ -161,9 +172,9 @@ namespace CoreApp.ReleaseObjects
             return true;
         }
 
-        private Patch findPatchByShortName(string shortName)
+        private ZPatch findPatchByShortName(string shortName)
         {
-            foreach (Fixpack fp in fixpacks.Values)
+            foreach (CPatch fp in fixpacks.Values)
             {
                 return fp.patches.First(x => SameEnding(x.Value.name, shortName)).Value;
             }
@@ -205,7 +216,7 @@ namespace CoreApp.ReleaseObjects
 
                     try
                     {
-                        Patch currPatch = findPatchByShortName(patchName);
+                        ZPatch currPatch = findPatchByShortName(patchName);
 
                         currPatch.dependendFrom.UnionWith(DependedFrom(dependenciesCell));
                         currPatch.dependOn.UnionWith(DependOn(dependenciesCell));
@@ -230,9 +241,9 @@ namespace CoreApp.ReleaseObjects
 
                     try
                     {
-                        Patch currPatch = findPatchByShortName(patchName);
+                        ZPatch currPatch = findPatchByShortName(patchName);
 
-                        foreach(Patch excelFromDependency in DependedFrom(dependenciesCell))
+                        foreach(ZPatch excelFromDependency in DependedFrom(dependenciesCell))
                         {
                             if(!currPatch.dependendFrom.Contains(excelFromDependency))
                             {
@@ -240,7 +251,7 @@ namespace CoreApp.ReleaseObjects
                             }
                         }
 
-                        foreach (Patch excelToDependency in DependOn(dependenciesCell))
+                        foreach (ZPatch excelToDependency in DependOn(dependenciesCell))
                         {
                             if (!currPatch.dependOn.Contains(excelToDependency))
                             {

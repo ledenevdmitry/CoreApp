@@ -1,4 +1,5 @@
-﻿using Oracle.ManagedDataAccess.Client;
+﻿using CoreApp.OraUtils.Model;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,6 +91,24 @@ namespace CoreApp.OraUtils
                 transaction,
                 new OracleParameter("release_id", release_id));
             transaction.Commit();
+        }
+
+        public static IEnumerable<ReleaseRecord> getReleases()
+        {
+            return getByScript(allReleasesScript);
+        }
+
+        static string allReleasesScript = $"select release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
+        
+        private static IEnumerable<ReleaseRecord> getByScript(string script)
+        {
+            using (var reader = DBManager.ExecuteQuery(script))
+            {
+                while(reader.Read())
+                {
+                    yield return new ReleaseRecord(reader.GetInt32(0), reader.GetString(1));
+                }
+            }
         }
 
     }

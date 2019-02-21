@@ -9,14 +9,14 @@ namespace CoreApp.Keys
 {
     public class ETLObject : Key
     {
-        public Patch patch { get; set; }
+        public ZPatch patch { get; set; }
 
         public ETLObject()
         {
 
         }
 
-        public ETLObject(string objName, string objType, Patch patch) : base(objName, objType)
+        public ETLObject(string objName, string objType, ZPatch patch) : base(objName, objType)
         {
             this.patch = patch;
         }

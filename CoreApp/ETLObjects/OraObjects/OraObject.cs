@@ -11,7 +11,7 @@ namespace CoreApp
 {
     public class OraObject : ETLObject
     {
-        public OraObject(string objName, string objType, Patch patch) : base(objName, objType, patch)
+        public OraObject(string objName, string objType, ZPatch patch) : base(objName, objType, patch)
         {
 
         }

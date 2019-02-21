@@ -102,20 +102,20 @@ namespace CoreApp.Dicts
     public class ETLDict
     {
         //внешний O - ключ, внутренний - все значения, удовл. этому ключу
-        public Dictionary<Key, Dictionary<ETLObject, Patch>> oneToManyPairs { get; protected set; }
+        public Dictionary<Key, Dictionary<ETLObject, ZPatch>> oneToManyPairs { get; protected set; }
 
         public ETLDict()
         {
-            oneToManyPairs = new Dictionary<Key, Dictionary<ETLObject, Patch>>();
+            oneToManyPairs = new Dictionary<Key, Dictionary<ETLObject, ZPatch>>();
         }        
 
-        public IEnumerable<KeyValuePair<ETLObject, Patch>> EnumerateObjPatchPairs()
+        public IEnumerable<KeyValuePair<ETLObject, ZPatch>> EnumerateObjPatchPairs()
         {
             foreach (var keyToDictPair in oneToManyPairs.Values)
             {
                 foreach (var kvp in keyToDictPair)
                 {
-                    yield return new KeyValuePair<ETLObject, Patch>(kvp.Key, kvp.Value);
+                    yield return new KeyValuePair<ETLObject, ZPatch>(kvp.Key, kvp.Value);
                 }
             }
         }
@@ -131,15 +131,15 @@ namespace CoreApp.Dicts
             }
         }
         
-        public IEnumerable<KeyValuePair<ETLObject, Patch>> EnumeratePairs(Key key)
+        public IEnumerable<KeyValuePair<ETLObject, ZPatch>> EnumeratePairs(Key key)
         {
             foreach(var kvp in oneToManyPairs[key])
             {
-                yield return new KeyValuePair<ETLObject, Patch>(kvp.Key, kvp.Value);
+                yield return new KeyValuePair<ETLObject, ZPatch>(kvp.Key, kvp.Value);
             }
         }
 
-        public IEnumerable<IEnumerable<KeyValuePair<ETLObject, Patch>>> EnumerateByDistinctKeys()
+        public IEnumerable<IEnumerable<KeyValuePair<ETLObject, ZPatch>>> EnumerateByDistinctKeys()
         {
             foreach(var key in oneToManyPairs.Keys)
             {
@@ -159,12 +159,12 @@ namespace CoreApp.Dicts
             }
         }
 
-        public void Add(Key key, ETLObject one, Patch many)
+        public void Add(Key key, ETLObject one, ZPatch many)
         {
 
             if (!oneToManyPairs.ContainsKey(key))
             {
-                oneToManyPairs.Add(key, new Dictionary<ETLObject, Patch>());
+                oneToManyPairs.Add(key, new Dictionary<ETLObject, ZPatch>());
             }
 
             //пересечения будем смотреть только по разным патчам

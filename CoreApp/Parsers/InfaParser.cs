@@ -42,13 +42,13 @@ namespace CoreApp
             return null;
         }
 
-        public static InfaBaseObject CreateInfaObject(string typeStr, string objName, XmlNode node, FileInfo file, Patch patch)
+        public static InfaBaseObject CreateInfaObject(string typeStr, string objName, XmlNode node, FileInfo file, ZPatch patch)
         {
             Type type = StrToObjType(typeStr);
             return CreateInfaObject(type, objName, node, file, patch);
         }
 
-        public static InfaBaseObject CreateInfaObject(Type type, string objName, XmlNode node, FileInfo file, Patch patch)
+        public static InfaBaseObject CreateInfaObject(Type type, string objName, XmlNode node, FileInfo file, ZPatch patch)
         {
             InfaBaseObject obj = (InfaBaseObject)Activator.CreateInstance(type);
             obj.objName = objName;
@@ -92,9 +92,9 @@ namespace CoreApp
             }
             */
             this.dict = dict;
-            foreach(Fixpack fixpack in release.fixpacks.Values)
+            foreach(CPatch fixpack in release.fixpacks.Values)
             {
-                foreach(Patch patch in fixpack.patches.Values)
+                foreach(ZPatch patch in fixpack.patches.Values)
                 {
                     foreach(FileInfo file in patch.dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
@@ -144,8 +144,8 @@ namespace CoreApp
                 //ProgressChanged();
                 foreach (InfaBaseObject parent in infaObj.parents)
                 {
-                    Patch p1 = parent.patch;
-                    Patch p2 = infaObj.patch;
+                    ZPatch p1 = parent.patch;
+                    ZPatch p2 = infaObj.patch;
                     if (!p1.Equals(p2))
                     {
                         InfaSchema s1 = new InfaSchema(parent.file);
