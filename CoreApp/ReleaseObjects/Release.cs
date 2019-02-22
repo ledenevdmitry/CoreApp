@@ -33,6 +33,8 @@ namespace CoreApp.ReleaseObjects
             return ((Release)obj).releaseId == releaseId;
         }
 
+        public string releaseName { get; private set; }
+        public string releaseStatus { get; private set; }
         public List<CPatch> CPatches { get; private set; } //отсортированный на DAL
         public HashSet<CPatch> CPatchesSet { get; private set; } //для поиска
         
@@ -41,19 +43,25 @@ namespace CoreApp.ReleaseObjects
             return CPatches.First(x => x.CPatchId == id);
         }
 
-        public Release(int oraId)
+        public Release(int releaseId, string releaseName)
         {
-            var oraCPatches = CPatchDAL.getCPatchesByRelease(oraId);
+            this.releaseId = releaseId;
+            this.releaseName = releaseName;
+
+            var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
             foreach (var oraCPatch in oraCPatches)
             {
-                CPatch cpatch = new CPatch(oraCPatch.CPatchId);
+                CPatch cpatch = new CPatch(oraCPatch.CPatchId, oraCPatch.CPatchName, oraCPatch.CPatchStatus);
                 CPatches.Add(cpatch);
                 CPatchesSet.Add(cpatch);
             }
         }
 
-        public string name { get; private set; }
+        public Release(string releaseName)
+        {
 
+        }
+        
         DirectoryInfo localDir;
         public static CVS.CVS cvs;
 
@@ -86,16 +94,6 @@ namespace CoreApp.ReleaseObjects
 
             //TODO: прогрузить все фикспаки из оракла
         }
-
-        public Release(string name)
-        {
-            CPatches = new SortedList<string, CPatch>();
-
-            //TODO: прогрузить все фикспаки из оракла
-
-            this.name = name;
-        }
-
 
         public void SetLocalDir(DirectoryInfo localDir)
         {

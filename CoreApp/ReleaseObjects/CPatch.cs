@@ -16,6 +16,8 @@ namespace CoreApp.FixpackObjects
     {
         public string C { get; private set; }
         public string FullName { get; private set; }
+        public string CPatchName { get; private set; }
+        public string CPatchStatus { get; private set; }
         public string LocalPath { get; private set; }
         public static CVS.CVS cvs;
 
@@ -48,9 +50,12 @@ namespace CoreApp.FixpackObjects
             return ZPatches.First(x => x.ZPatchId == id);
         }
 
-        public CPatch(int oraId)
+        public CPatch(int CPatchId, string CPatchName, string CPatchStatus)
         {
-            var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(oraId);
+            this.CPatchId = CPatchId;
+            this.CPatchName = CPatchName;
+
+            var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(CPatchId);
             foreach (var oraZPatchRecord in oraZPatchesRecords)
             {
                 ZPatch zpatch = new ZPatch(oraZPatchRecord.ZPatchId);
@@ -62,7 +67,7 @@ namespace CoreApp.FixpackObjects
 
             dependenciesFrom = new HashSet<CPatch>();
 
-            var oraCPatchesDependenciesFrom = CPatchDAL.getDependenciesFrom(oraId);
+            var oraCPatchesDependenciesFrom = CPatchDAL.getDependenciesFrom(CPatchId);
 
             foreach(var oraCPatchRecord in oraCPatchesDependenciesFrom)
             {
@@ -71,7 +76,7 @@ namespace CoreApp.FixpackObjects
 
             dependenciesTo = new HashSet<CPatch>();
 
-            var oraCPatchesDependenciesTo = CPatchDAL.getDependenciesTo(oraId);
+            var oraCPatchesDependenciesTo = CPatchDAL.getDependenciesTo(CPatchId);
 
             foreach (var oraCPatchRecord in oraCPatchesDependenciesTo)
             {
@@ -139,7 +144,7 @@ namespace CoreApp.FixpackObjects
         public SortedList<int, ZPatch> DependenciesToList()
         {
             List<ZPatch> roots = new List<ZPatch>();
-            foreach (ZPatch patch in ZPatches.Values)
+            foreach (ZPatch patch in ZPatches)
             {
                 if(patch.dependenciesFrom.Count == 0)
                 {
@@ -155,7 +160,7 @@ namespace CoreApp.FixpackObjects
 
             SortedList<int, ZPatch> list = new SortedList<int, ZPatch>();
 
-            foreach (ZPatch patch in ZPatches.Values)
+            foreach (ZPatch patch in ZPatches)
             {
                 list.Add(patch.rank, patch);
             }

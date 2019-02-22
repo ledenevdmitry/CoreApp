@@ -99,10 +99,16 @@ namespace CoreApp.OraUtils
         }
 
         static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
-        
-        private static IEnumerable<ReleaseRecord> getByScript(string script)
+        static string containsRelease = $"select * from dual when exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_NAME = :release_name)";
+
+        private static bool Contains(string release_name)
         {
-            using (var reader = DBManager.ExecuteQuery(script))
+            return DBManager.ExecuteQuery(containsRelease, new OracleParameter(":release_name", release_name)).HasRows;
+        }
+
+        private static IEnumerable<ReleaseRecord> getByScript(string script, params OracleParameter [] parameters)
+        {
+            using (var reader = DBManager.ExecuteQuery(script, parameters))
             {
                 while(reader.Read())
                 {

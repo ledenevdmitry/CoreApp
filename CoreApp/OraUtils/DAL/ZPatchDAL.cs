@@ -183,5 +183,11 @@ namespace CoreApp.OraUtils
             }
         }
 
+        static string containsZPatch = $"select * from dual when exists (select 1 from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and zpatch_NAME = :zpatch_name)";
+
+        private static bool Contains(string zpatch_name)
+        {
+            return DBManager.ExecuteQuery(containsZPatch, new OracleParameter(":zpatch_name", zpatch_name)).HasRows;
+        }
     }
 }

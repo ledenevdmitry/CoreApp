@@ -17,7 +17,7 @@ namespace CoreApp.ReleaseObjects
             var oraReleases = ReleaseDAL.getReleases();
             foreach(var oraRelease in oraReleases)
             {
-                Release release = new Release(oraRelease.releaseId);
+                Release release = new Release(oraRelease.releaseId, oraRelease.releaseName);
             }
         }
 

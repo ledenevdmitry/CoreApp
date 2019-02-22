@@ -152,6 +152,13 @@ namespace CoreApp.OraUtils
             return getByScript(dependenciesTo, new OracleParameter("cpatch_id", cpatch_id));
         }
 
+        static string containsCPatch = $"select * from dual when (select 1 from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_NAME = :cpatch_name)";
+
+        private static bool Contains(string cpatch_name)
+        {
+            return DBManager.ExecuteQuery(containsCPatch, new OracleParameter(":cpatch_name", cpatch_name)).HasRows;
+        }
+
         public static IEnumerable<CPatchRecord> getByScript(string script, params OracleParameter [] parameters)
         {
             using (var reader = DBManager.ExecuteQuery(script))
