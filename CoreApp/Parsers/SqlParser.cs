@@ -125,7 +125,7 @@ namespace CoreApp
         public void Check(bool UMEnabled)
         {
             //StartOfCheck();
-            foreach(var fp in release.fixpacks.Values)
+            foreach(var fp in release.CPatches.Values)
             {
                 foreach(var patch in fp.patches.Values)
                 {

@@ -98,7 +98,7 @@ namespace CoreApp.OraUtils
             return getByScript(allReleasesScript);
         }
 
-        static string allReleasesScript = $"select release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
+        static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
         
         private static IEnumerable<ReleaseRecord> getByScript(string script)
         {

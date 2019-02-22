@@ -131,7 +131,7 @@ namespace CoreApp
             if (LBoxReleases.SelectedIndex != -1)
             {
                 currRelease = releases[(string)LBoxReleases.SelectedItem];
-                foreach (string fpName in currRelease.fixpacks.Keys)
+                foreach (string fpName in currRelease.CPatches.Keys)
                 {
                     LBoxFixpacks.Items.Add(fpName);
                 }

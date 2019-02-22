@@ -92,9 +92,9 @@ namespace CoreApp
             }
             */
             this.dict = dict;
-            foreach(CPatch fixpack in release.fixpacks.Values)
+            foreach(CPatch fixpack in release.CPatches.Values)
             {
-                foreach(ZPatch patch in fixpack.patches.Values)
+                foreach(ZPatch patch in fixpack.ZPatches.Values)
                 {
                     foreach(FileInfo file in patch.dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
@@ -153,7 +153,7 @@ namespace CoreApp
                         if (s1.Equals(s2))
                         {
                             dict.infaDependencies.Add(parent, infaObj);
-                            if(!parent.patch.dependOn.Contains(infaObj.patch) && !infaObj.patch.dependendFrom.Contains(parent.patch))
+                            if(!parent.patch.dependenciesTo.Contains(infaObj.patch) && !infaObj.patch.dependenciesFrom.Contains(parent.patch))
                             {
                                 dict.infaLostDependencies.Add(parent, infaObj);
                             }

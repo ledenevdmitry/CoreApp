@@ -1,4 +1,5 @@
 ﻿using CoreApp.OraUtils;
+using CoreApp.ReleaseObjects;
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
@@ -21,30 +22,80 @@ namespace CoreApp.FixpackObjects
         static string regexC = @"\\(C\d+)";
         static string regexFullName = @"\\(C[^\\]+)";
         static string regexFullPath = @".*C[^\\]+";
-        public List<ZPatch> patches { get; protected set; }
+        public List<ZPatch> ZPatches { get; protected set; } //отсортированный на DAL
+        public HashSet<ZPatch> ZPatchesSet { get; protected set; } //для поиска
 
+        public HashSet<CPatch> dependenciesFrom { get; protected set; }
+        public HashSet<CPatch> dependenciesTo { get; protected set; }
+        public Release release;
+
+        public int CPatchId { get; private set; }
+
+        public override int GetHashCode()
+        {
+            return CPatchId.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj.GetType() != typeof(CPatch)) return false;
+            return ((CPatch)obj).CPatchId == CPatchId;
+        }
+
+        public ZPatch getZPatchById(int id)
+        {
+            return ZPatches.First(x => x.ZPatchId == id);
+        }
 
         public CPatch(int oraId)
         {
-            var oraZPatches = ZPatchDAL.getZPatchesByCPatch(oraId);
-            foreach (var oraZPatch in oraZPatches)
+            var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(oraId);
+            foreach (var oraZPatchRecord in oraZPatchesRecords)
             {
-                ZPatch zpatch = new ZPatch(oraZPatch.ZPatchId);
+                ZPatch zpatch = new ZPatch(oraZPatchRecord.ZPatchId);
+                ZPatches.Add(zpatch);
+                ZPatchesSet.Add(zpatch);
+
+                zpatch.cpatch = this;
             }
+
+            dependenciesFrom = new HashSet<CPatch>();
+
+            var oraCPatchesDependenciesFrom = CPatchDAL.getDependenciesFrom(oraId);
+
+            foreach(var oraCPatchRecord in oraCPatchesDependenciesFrom)
+            {
+                dependenciesFrom.Add(release.getCPatchById(oraCPatchRecord.CPatchId));
+            }
+
+            dependenciesTo = new HashSet<CPatch>();
+
+            var oraCPatchesDependenciesTo = CPatchDAL.getDependenciesTo(oraId);
+
+            foreach (var oraCPatchRecord in oraCPatchesDependenciesTo)
+            {
+                dependenciesTo.Add(release.getCPatchById(oraCPatchRecord.CPatchId));
+            } 
+        }
+
+        public CPatch(FileInfo excelFile)
+        {
+            
         }
 
         public CPatch(DirectoryInfo dir)
         {
-            patches = new Dictionary<string, ZPatch>();
+            ZPatches = new Dictionary<string, ZPatch>();
             C = Regex.Match(dir.FullName, regexC).Groups[1].Value;
             FullName = Regex.Match(dir.FullName, regexFullName).Groups[1].Value;
             LocalPath = Regex.Match(dir.FullName, regexFullPath).Groups[0].Value;
             foreach(DirectoryInfo patchDir in new DirectoryInfo(LocalPath).EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
             {
                 ZPatch patch = new ZPatch(patchDir);
-                if (!patches.ContainsKey(patch.name))
+                if (!ZPatches.ContainsKey(patch.name))
                 {
-                    patches.Add(patch.name, patch);
+                    ZPatches.Add(patch.name, patch);
                 }
             }
 
@@ -88,9 +139,9 @@ namespace CoreApp.FixpackObjects
         public SortedList<int, ZPatch> DependenciesToList()
         {
             List<ZPatch> roots = new List<ZPatch>();
-            foreach (ZPatch patch in patches.Values)
+            foreach (ZPatch patch in ZPatches.Values)
             {
-                if(patch.dependendFrom.Count == 0)
+                if(patch.dependenciesFrom.Count == 0)
                 {
                     roots.Add(patch);
                 }
@@ -104,7 +155,7 @@ namespace CoreApp.FixpackObjects
 
             SortedList<int, ZPatch> list = new SortedList<int, ZPatch>();
 
-            foreach (ZPatch patch in patches.Values)
+            foreach (ZPatch patch in ZPatches.Values)
             {
                 list.Add(patch.rank, patch);
             }
@@ -114,7 +165,7 @@ namespace CoreApp.FixpackObjects
 
         private void SetRanks(ZPatch currPatch)
         {
-            foreach(ZPatch subpatch in currPatch.dependOn)
+            foreach(ZPatch subpatch in currPatch.dependenciesTo)
             {
                 subpatch.rank = Math.Max(subpatch.rank, currPatch.rank + 1);
             }

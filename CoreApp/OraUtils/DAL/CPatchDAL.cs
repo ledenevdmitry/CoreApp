@@ -120,8 +120,15 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        static string allCPatchesScript = $"select cpatch_id, cpatch_name, parent_id, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
-        static string CPatchesByRelease = $"select cpatch_id, cpatch_name, parent_id, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> and release_id = :release_id 'D' order by release_name ";
+        static string allCPatchesScript = $"select distinct cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by cpatch_name ";
+        static string CPatchesByRelease = $"select distinct cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and release_id = :release_id order by cpatch_name ";
+        static string dependenciesTo = $"select distinct cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :cpatch_id order by cpatch_name ";
+        static string dependenciesFrom = 
+             "select distinct c2.cpatch_id, c2.cpatch_name, c2.cpatchstatus, c2.kod_sredy " +
+            $"from cpatch_hdim c1 join cpatch_hdim c2 on c1.parent_id = c2.cpatch_id " +
+            $"where c1.validto = {DBManager.PlusInf} and c1.dwsact <>  'D' " +
+            $"and   c2.validto = {DBManager.PlusInf} and c2.dwsact <>  'D' " +
+            $"and c1.cpatch_id = :cpatch_id order by c2.cpatch_name ";
 
 
         public static IEnumerable<CPatchRecord> getCPatches()
@@ -135,13 +142,23 @@ namespace CoreApp.OraUtils
         }
 
 
+        public static IEnumerable<CPatchRecord> getDependenciesFrom(int cpatch_id)
+        {
+            return getByScript(dependenciesFrom, new OracleParameter("cpatch_id", cpatch_id));
+        }
+
+        public static IEnumerable<CPatchRecord> getDependenciesTo(int cpatch_id)
+        {
+            return getByScript(dependenciesTo, new OracleParameter("cpatch_id", cpatch_id));
+        }
+
         public static IEnumerable<CPatchRecord> getByScript(string script, params OracleParameter [] parameters)
         {
             using (var reader = DBManager.ExecuteQuery(script))
             {
                 while (reader.Read())
                 {
-                    yield return new CPatchRecord(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2), reader.GetString(3), reader.GetString(4));
+                    yield return new CPatchRecord(reader.GetInt32(0), reader.GetString(1), reader.GetString(3), reader.GetString(4));
                 }
             }
         }

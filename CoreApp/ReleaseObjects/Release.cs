@@ -19,8 +19,27 @@ namespace CoreApp.ReleaseObjects
     public class Release
     {
         public static Application excel;
+        public int releaseId { get; private set; }
 
-        public List<CPatch> fixpacks { get; private set; }
+        public override int GetHashCode()
+        {
+            return releaseId.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj.GetType() != typeof(Release)) return false;
+            return ((Release)obj).releaseId == releaseId;
+        }
+
+        public List<CPatch> CPatches { get; private set; } //отсортированный на DAL
+        public HashSet<CPatch> CPatchesSet { get; private set; } //для поиска
+        
+        public CPatch getCPatchById(int id)
+        {
+            return CPatches.First(x => x.CPatchId == id);
+        }
 
         public Release(int oraId)
         {
@@ -28,6 +47,8 @@ namespace CoreApp.ReleaseObjects
             foreach (var oraCPatch in oraCPatches)
             {
                 CPatch cpatch = new CPatch(oraCPatch.CPatchId);
+                CPatches.Add(cpatch);
+                CPatchesSet.Add(cpatch);
             }
         }
 
@@ -68,7 +89,7 @@ namespace CoreApp.ReleaseObjects
 
         public Release(string name)
         {
-            fixpacks = new SortedList<string, CPatch>();
+            CPatches = new SortedList<string, CPatch>();
 
             //TODO: прогрузить все фикспаки из оракла
 
@@ -83,7 +104,7 @@ namespace CoreApp.ReleaseObjects
 
         public void SetAllDependencies()
         {
-            foreach(CPatch fp in fixpacks.Values)
+            foreach(CPatch fp in CPatches.Values)
             {
                 try
                 {
@@ -174,9 +195,9 @@ namespace CoreApp.ReleaseObjects
 
         private ZPatch findPatchByShortName(string shortName)
         {
-            foreach (CPatch fp in fixpacks.Values)
+            foreach (CPatch fp in CPatches.Values)
             {
-                return fp.patches.First(x => SameEnding(x.Value.name, shortName)).Value;
+                return fp.ZPatches.First(x => SameEnding(x.Value.name, shortName)).Value;
             }
             throw new KeyNotFoundException("Патч не найден");
         }
@@ -218,8 +239,8 @@ namespace CoreApp.ReleaseObjects
                     {
                         ZPatch currPatch = findPatchByShortName(patchName);
 
-                        currPatch.dependendFrom.UnionWith(DependedFrom(dependenciesCell));
-                        currPatch.dependOn.UnionWith(DependOn(dependenciesCell));
+                        currPatch.dependenciesFrom.UnionWith(DependedFrom(dependenciesCell));
+                        currPatch.dependenciesTo.UnionWith(DependOn(dependenciesCell));
                     }
                     catch (System.InvalidOperationException) { }
                 }
@@ -245,7 +266,7 @@ namespace CoreApp.ReleaseObjects
 
                         foreach(ZPatch excelFromDependency in DependedFrom(dependenciesCell))
                         {
-                            if(!currPatch.dependendFrom.Contains(excelFromDependency))
+                            if(!currPatch.dependenciesFrom.Contains(excelFromDependency))
                             {
                                 return false;
                             }
@@ -253,14 +274,14 @@ namespace CoreApp.ReleaseObjects
 
                         foreach (ZPatch excelToDependency in DependOn(dependenciesCell))
                         {
-                            if (!currPatch.dependOn.Contains(excelToDependency))
+                            if (!currPatch.dependenciesTo.Contains(excelToDependency))
                             {
                                 return false;
                             }
                         }
 
-                        currPatch.dependendFrom.UnionWith(DependedFrom(dependenciesCell));
-                        currPatch.dependOn.UnionWith(DependOn(dependenciesCell));
+                        currPatch.dependenciesFrom.UnionWith(DependedFrom(dependenciesCell));
+                        currPatch.dependenciesTo.UnionWith(DependOn(dependenciesCell));
                     }
                     catch (System.InvalidOperationException) { }
                 }
