@@ -12,7 +12,7 @@ namespace CoreApp.ReleaseObjects
     {
         static CVS.CVS cvs;
         List<Release> releases;
-        static Application excelApp;
+        public static Application excelApp;
         
         static ReleaseManager()
         {
