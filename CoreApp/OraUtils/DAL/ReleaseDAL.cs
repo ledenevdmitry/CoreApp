@@ -50,7 +50,7 @@ namespace CoreApp.OraUtils
             "insert into release_hdim " +
             "( release_id,  release_name, validfrom, validto, dwsact) " +
             "values " +
-           $"(:release_id, :release_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); ";
+           $"(release_seq.nextval, :release_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); ";
 
         private static string updateScript =
             closeOld("release_id") +
@@ -61,13 +61,12 @@ namespace CoreApp.OraUtils
             insertionsNew('D', "release_id") +
             CPatchDAL.deleteByRelease;
 
-        public static void Insert(int release_id, string release_name)
+        public static void Insert(string release_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
                 insertScript,
                 transaction,
-                new OracleParameter("release_id", release_id),
                 new OracleParameter("release_name", release_name));
             transaction.Commit();
         }
@@ -101,7 +100,7 @@ namespace CoreApp.OraUtils
         static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
         static string containsRelease = $"select * from dual when exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_NAME = :release_name)";
 
-        private static bool Contains(string release_name)
+        public static bool Contains(string release_name)
         {
             return DBManager.ExecuteQuery(containsRelease, new OracleParameter(":release_name", release_name)).HasRows;
         }

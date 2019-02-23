@@ -36,32 +36,64 @@ namespace CoreApp.ReleaseObjects
         public string releaseName { get; private set; }
         public string releaseStatus { get; private set; }
         public List<CPatch> CPatches { get; private set; } //отсортированный на DAL
-        public HashSet<CPatch> CPatchesSet { get; private set; } //для поиска
+        public Dictionary<int, CPatch> CPatchesDict { get; private set; } //для поиска
         
+
+
         public CPatch getCPatchById(int id)
         {
-            return CPatches.First(x => x.CPatchId == id);
+            return CPatchesDict[id];
         }
 
-        public Release(int releaseId, string releaseName)
+        public Release(int releaseId, string release)
         {
-            this.releaseId = releaseId;
-            this.releaseName = releaseName;
+            InitFromDB(releaseId, releaseName);
+        }
+
+        private void InitFromDB()
+        {
 
             var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
             foreach (var oraCPatch in oraCPatches)
             {
                 CPatch cpatch = new CPatch(oraCPatch.CPatchId, oraCPatch.CPatchName, oraCPatch.CPatchStatus);
                 CPatches.Add(cpatch);
-                CPatchesSet.Add(cpatch);
+                CPatchesDict.Add(cpatch.CPatchId, cpatch);
             }
         }
 
-        public Release(string releaseName)
+        private void InitFromDB(int releaseId, string releaseName)
         {
-
+            this.releaseId = releaseId;
+            this.releaseName = releaseName;
+            InitFromDB();
         }
-        
+
+        /*
+        public bool AddCPatch(int? parentId, int releaseId, string CPatchName)
+        {
+            if(CPatchDAL.Contains(CPatchName))
+            {
+                return false;
+            }
+            CPatchDAL.Insert(parentId, releaseId, CPatchName);
+            InitFromDB();
+            return true;
+        }
+
+        public void DeleteCPatch(int cpatchId)
+        {
+            CPatchDAL.DeleteCPatch(cpatchId);
+            InitFromDB();
+        }
+
+        public void UpdateCPatch(int CPatchId, int? parentId, int newReleaseId, string newCPatchName, string newCPatchStatus)
+        {
+            CPatchDAL.Update(CPatchId, parentId, newReleaseId, newCPatchName, newCPatchStatus);
+            InitFromDB();
+        }
+        */
+
         DirectoryInfo localDir;
         public static CVS.CVS cvs;
 
@@ -102,7 +134,7 @@ namespace CoreApp.ReleaseObjects
 
         public void SetAllDependencies()
         {
-            foreach(CPatch fp in CPatches.Values)
+            foreach(CPatch fp in CPatches)
             {
                 try
                 {
@@ -158,7 +190,8 @@ namespace CoreApp.ReleaseObjects
             Marshal.FinalReleaseComObject(wb);
         }
 
-        private static string regexPatchName = @"(C|Z)[0-9]+";
+        private static string regexZPatchName = @"(Z)[0-9]+";
+        private static string regexCPatchName = @"(C)[0-9]+";
 
         private static string regexFrom = "зависит.*?ALFAM.*?([0-9]+)";
         private static string regexTo = "влияет.*?ALFAM.*?([0-9]+)";
@@ -193,9 +226,9 @@ namespace CoreApp.ReleaseObjects
 
         private ZPatch findPatchByShortName(string shortName)
         {
-            foreach (CPatch fp in CPatches.Values)
+            foreach (CPatch fp in CPatches)
             {
-                return fp.ZPatches.First(x => SameEnding(x.Value.name, shortName)).Value;
+                return fp.ZPatches.First(x => SameEnding(x.name, shortName));
             }
             throw new KeyNotFoundException("Патч не найден");
         }
@@ -231,7 +264,7 @@ namespace CoreApp.ReleaseObjects
                 if (linkIndex != -1)
                 {
                     string dependenciesCell = ((Range)columns.Cells[i, linkIndex]).Value2 ?? "";
-                    string patchName = Regex.Match(patchCell, regexPatchName).Value;
+                    string patchName = Regex.Match(patchCell, regexZPatchName).Value;
 
                     try
                     {
@@ -256,7 +289,7 @@ namespace CoreApp.ReleaseObjects
                 if (linkIndex != -1)
                 {
                     string dependenciesCell = ((Range)columns.Cells[i, linkIndex]).Value2 ?? "";
-                    string patchName = Regex.Match(patchCell, regexPatchName).Value;
+                    string patchName = Regex.Match(patchCell, regexZPatchName).Value;
 
                     try
                     {

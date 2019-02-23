@@ -14,7 +14,7 @@ namespace CoreApp.OraUtils
             "insert into zpatch_hdim " +
             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
             "values " +
-           $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); ";
+           $"(zpatch_seq.nextval, :parent_id, :cpatch_id, :zpatch_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); ";
 
         private static string insertionsNew(char dmlType, params string[] pars)
         {
@@ -93,27 +93,26 @@ namespace CoreApp.OraUtils
             closeOld("zpatch_id", "parent_id") +
             insertionsNew('D', "zpatch_id", "parent_id");
 
-        public static void Insert(int zpatch_id, int parent_id, int cpatch_id, int zpatch_name)
+        public static void Insert(int cpatch_id, int? parent_id, int zpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
                 insertScript,
                 transaction,
-                new OracleParameter("zpatch_id", zpatch_id),
-                new OracleParameter("parent_id", parent_id),
+                new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
                 new OracleParameter("cpatch_id", cpatch_id),
                 new OracleParameter("zpatch_name", zpatch_name));
             transaction.Commit();
         }
 
-        public static void Update(int zpatch_id, int parent_id, int new_cpatch_id, int new_zpatch_name)
+        public static void Update(int zpatch_id, int? parent_id, int new_cpatch_id, int new_zpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
                 updateScript,
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
-                new OracleParameter("parent_id", parent_id),
+                new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
                 new OracleParameter("new_cpatch_id", new_cpatch_id),
                 new OracleParameter("new_zpatch_name", new_zpatch_name));
             transaction.Commit();

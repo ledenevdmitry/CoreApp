@@ -25,7 +25,7 @@ namespace CoreApp.FixpackObjects
         static string regexFullName = @"\\(C[^\\]+)";
         static string regexFullPath = @".*C[^\\]+";
         public List<ZPatch> ZPatches { get; protected set; } //отсортированный на DAL
-        public HashSet<ZPatch> ZPatchesSet { get; protected set; } //для поиска
+        public Dictionary<int, ZPatch> ZPatchesDict { get; protected set; } //для поиска
 
         public HashSet<CPatch> dependenciesFrom { get; protected set; }
         public HashSet<CPatch> dependenciesTo { get; protected set; }
@@ -47,7 +47,13 @@ namespace CoreApp.FixpackObjects
 
         public ZPatch getZPatchById(int id)
         {
-            return ZPatches.First(x => x.ZPatchId == id);
+            return ZPatchesDict[id];
+        }
+
+
+        private void InitFromDB()
+        {
+
         }
 
         public CPatch(int CPatchId, string CPatchName, string CPatchStatus)
@@ -60,7 +66,7 @@ namespace CoreApp.FixpackObjects
             {
                 ZPatch zpatch = new ZPatch(oraZPatchRecord.ZPatchId);
                 ZPatches.Add(zpatch);
-                ZPatchesSet.Add(zpatch);
+                ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
 
                 zpatch.cpatch = this;
             }
