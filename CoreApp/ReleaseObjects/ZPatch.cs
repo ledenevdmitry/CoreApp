@@ -11,7 +11,7 @@ namespace CoreApp.FixpackObjects
 {
     public class ZPatch
     {
-        public string name { get; private set; }
+        public string ZPatchName { get; private set; }
         public DirectoryInfo dir { get; private set; }
         public string pathToPatch { get; private set; }
         private static Regex ATCPatchRegex = new Regex(@"\\((\d+\-)?Z(\d+.*?))");
@@ -26,14 +26,21 @@ namespace CoreApp.FixpackObjects
 
         public override int GetHashCode()
         {
-            return ZPatchId.GetHashCode();
+            return ZPatchName.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
             if (obj.GetType() != typeof(ZPatch)) return false;
-            return ((ZPatch)obj).ZPatchId == ZPatchId;
+            return ((ZPatch)obj).ZPatchName == ZPatchName;
+        }
+
+        public ZPatch(string ZPatchName, int CPatch, HashSet<ZPatch> dependenciesFrom, HashSet<ZPatch> dependensiesTo)
+        {
+            this.ZPatchName = ZPatchName;
+            this.dependenciesFrom = dependenciesFrom;
+            this.dependenciesTo = dependenciesTo;
         }
 
 
@@ -84,8 +91,8 @@ namespace CoreApp.FixpackObjects
 
             if(match.Success)
             {
-                name = match.Groups[1].Value;
-                pathToPatch = dir.FullName.Substring(0, match.Index + name.Length + 1);
+                ZPatchName = match.Groups[1].Value;
+                pathToPatch = dir.FullName.Substring(0, match.Index + ZPatchName.Length + 1);
             }
             this.dir = dir;
         }

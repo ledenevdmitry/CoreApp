@@ -304,7 +304,7 @@ namespace CoreApp
             }
 
             CheckReleaseForm checkReleaseForm = new CheckReleaseForm(currRelease);
-            currRelease.SetAllDependencies();
+            currRelease.ReinitByExcelFile();
             checkReleaseForm.ShowDialog();
         }
 

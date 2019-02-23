@@ -35,7 +35,7 @@ namespace CoreApp.Keys
             if (obj.GetType() != this.GetType()) return false;
             ETLObject other = (ETLObject)obj;
 
-            return patch.name.Equals(other.patch.name, StringComparison.CurrentCultureIgnoreCase);
+            return patch.ZPatchName.Equals(other.patch.ZPatchName, StringComparison.CurrentCultureIgnoreCase);
         }
 
     }

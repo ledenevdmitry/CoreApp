@@ -53,14 +53,14 @@ namespace CoreApp.FormUtils
             {
                 ETLObject oraObj = item.Key;
                 ZPatch patch = item.Value;
-                dictDGV.Rows.Add(oraObj.objName, oraObj.objType, patch.name);
+                dictDGV.Rows.Add(oraObj.objName, oraObj.objType, patch.ZPatchName);
             }
 
             foreach (KeyValuePair<ETLObject, ZPatch> item in parser.infaObjectDict.baseDict.EnumerateObjPatchPairs())
             {
                 ETLObject infaObj = item.Key;
                 ZPatch patch = item.Value;
-                dictDGV.Rows.Add(infaObj.objName, infaObj.objType, patch.name);
+                dictDGV.Rows.Add(infaObj.objName, infaObj.objType, patch.ZPatchName);
             }
 
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
@@ -79,7 +79,7 @@ namespace CoreApp.FormUtils
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = oraObj.objName;
                     row.Cells[1].Value = oraObj.objType;
-                    row.Cells[2].Value = patch.name;
+                    row.Cells[2].Value = patch.ZPatchName;
                     row.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                     dictDGV.Rows.Add(row);                    
                 }
@@ -96,7 +96,7 @@ namespace CoreApp.FormUtils
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                     row.Cells[0].Value = infaObj.objName;
                     row.Cells[1].Value = infaObj.GetType().Name;
-                    row.Cells[2].Value = patch.name;
+                    row.Cells[2].Value = patch.ZPatchName;
                     row.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                     dictDGV.Rows.Add(row);
                 }
@@ -115,7 +115,7 @@ namespace CoreApp.FormUtils
                 row1.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                 row1.Cells[0].Value = infaObj1.objName;
                 row1.Cells[1].Value = infaObj1.GetType().Name;
-                row1.Cells[2].Value = infaObj1.patch.name;
+                row1.Cells[2].Value = infaObj1.patch.ZPatchName;
                 row1.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row1);
 
@@ -124,7 +124,7 @@ namespace CoreApp.FormUtils
                 row2.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                 row2.Cells[0].Value = infaObj2.objName;
                 row2.Cells[1].Value = infaObj2.GetType().Name;
-                row2.Cells[2].Value = infaObj2.patch.name;
+                row2.Cells[2].Value = infaObj2.patch.ZPatchName;
                 row2.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row2);
 
@@ -143,7 +143,7 @@ namespace CoreApp.FormUtils
                 row1.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                 row1.Cells[0].Value = infaObj1.objName;
                 row1.Cells[1].Value = infaObj1.GetType().Name;
-                row1.Cells[2].Value = infaObj1.patch.name;
+                row1.Cells[2].Value = infaObj1.patch.ZPatchName;
                 row1.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row1);
 
@@ -152,7 +152,7 @@ namespace CoreApp.FormUtils
                 row2.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
                 row2.Cells[0].Value = infaObj2.objName;
                 row2.Cells[1].Value = infaObj2.GetType().Name;
-                row2.Cells[2].Value = infaObj2.patch.name;
+                row2.Cells[2].Value = infaObj2.patch.ZPatchName;
                 row2.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row2);
 

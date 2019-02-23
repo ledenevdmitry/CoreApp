@@ -18,7 +18,6 @@ namespace CoreApp.ReleaseObjects
 
     public class Release
     {
-        public static Application excel;
         public int releaseId { get; private set; }
 
         public override int GetHashCode()
@@ -52,7 +51,6 @@ namespace CoreApp.ReleaseObjects
 
         private void InitFromDB()
         {
-
             var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
             foreach (var oraCPatch in oraCPatches)
             {
@@ -68,32 +66,7 @@ namespace CoreApp.ReleaseObjects
             this.releaseName = releaseName;
             InitFromDB();
         }
-
-        /*
-        public bool AddCPatch(int? parentId, int releaseId, string CPatchName)
-        {
-            if(CPatchDAL.Contains(CPatchName))
-            {
-                return false;
-            }
-            CPatchDAL.Insert(parentId, releaseId, CPatchName);
-            InitFromDB();
-            return true;
-        }
-
-        public void DeleteCPatch(int cpatchId)
-        {
-            CPatchDAL.DeleteCPatch(cpatchId);
-            InitFromDB();
-        }
-
-        public void UpdateCPatch(int CPatchId, int? parentId, int newReleaseId, string newCPatchName, string newCPatchStatus)
-        {
-            CPatchDAL.Update(CPatchId, parentId, newReleaseId, newCPatchName, newCPatchStatus);
-            InitFromDB();
-        }
-        */
-
+        
         DirectoryInfo localDir;
         public static CVS.CVS cvs;
 
@@ -116,23 +89,12 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
-        //из системы контроля версий
-        public Release(string name, DirectoryInfo dir, Regex pattern) : this(name)
-        {
-            SetLocalDir(dir);
-            DeleteLocal();
-            dir.Create();
-           
-
-            //TODO: прогрузить все фикспаки из оракла
-        }
-
         public void SetLocalDir(DirectoryInfo localDir)
         {
             this.localDir = localDir;
         }
 
-        public void SetAllDependencies()
+        public void ReinitByExcelFile()
         {
             foreach(CPatch fp in CPatches)
             {

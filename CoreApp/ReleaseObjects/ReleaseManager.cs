@@ -1,4 +1,5 @@
 ﻿using CoreApp.OraUtils;
+using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,12 @@ namespace CoreApp.ReleaseObjects
     {
         static CVS.CVS cvs;
         List<Release> releases;
+        static Application excelApp;
+        
+        static ReleaseManager()
+        {
+            excelApp = new Application();
+        }
 
         public ReleaseManager()
         {
