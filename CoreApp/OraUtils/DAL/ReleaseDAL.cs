@@ -50,7 +50,7 @@ namespace CoreApp.OraUtils
             "insert into release_hdim " +
             "( release_id,  release_name, validfrom, validto, dwsact) " +
             "values " +
-           $"(release_seq.nextval, :release_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); ";
+           $"(release_seq.nextval, :release_name, sysdate, {DBManager.PlusInf}, 'I'); ";
 
         private static string updateScript =
             closeOld("release_id") +

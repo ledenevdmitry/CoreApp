@@ -12,9 +12,9 @@ namespace CoreApp.OraUtils
     {
         private static string insertScript =
             "insert into zpatch_hdim " +
-            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
+            "( zpatch_id,          parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
             "values " +
-           $"(zpatch_seq.nextval, :parent_id, :cpatch_id, :zpatch_name, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); ";
+           $"(zpatch_seq.nextval, :parent_id, :cpatch_id, :zpatch_name, :zpatchstatus, sysdate, {DBManager.PlusInf}, 'I'); ";
 
         private static string insertionsNew(char dmlType, params string[] pars)
         {
@@ -93,7 +93,21 @@ namespace CoreApp.OraUtils
             closeOld("zpatch_id", "parent_id") +
             insertionsNew('D', "zpatch_id", "parent_id");
 
-        public static void Insert(int cpatch_id, int? parent_id, int zpatch_name)
+        private static string addDependencyScript =
+            "insert into zpatch_hdim " +
+            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name,  zpatchstatus, validfrom, validto, dwsact ) " +
+            "select" +
+            ":zpatch_id, " +
+            ":parent_id, " +
+            "max(cpatch_id)," +
+            "max(zpatch_name)" +
+            "max(zpatchstatus)" +
+            "sysdate, " +
+           $"{DBManager.PlusInf}, " +
+            "'I'" +
+            "from zpatch_hdim where zpatch_id = :zpatch_id; ";
+
+        public static void Insert(int cpatch_id, int? parent_id, string zpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
@@ -136,6 +150,18 @@ namespace CoreApp.OraUtils
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("parent_id", parent_id));
+            transaction.Commit();
+        }
+
+        public static void AddDependency(int zpatch_id, int parent_id)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+            DBManager.ExecuteNonQuery(
+                addDependencyScript,
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("parent_id", parent_id)
+                );
             transaction.Commit();
         }
 

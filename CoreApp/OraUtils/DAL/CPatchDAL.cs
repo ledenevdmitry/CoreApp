@@ -14,7 +14,7 @@ namespace CoreApp.OraUtils
             "insert into сpatch_hdim " +
             "( cpatch_id,  parent_id,  release_id,  cpatch_name,  cpatchstatus,  kod_sredy, validfrom, validto, dwsact) " +
             "values " +
-           $"( cpatch_seq.nextval, :parent_id, :release_id, :cpatch_name, :cpatchstatus, :kod_sredy, {DBManager.MinusInf}, {DBManager.PlusInf}, 'I'); " ;
+           $"( cpatch_seq.nextval, :parent_id, :release_id, :cpatch_name, :cpatchstatus, :kod_sredy, sysdate, {DBManager.PlusInf}, 'I'); " ;
 
         private static string insertionsNew(char dmlType, params string[] pars)
         {
@@ -71,6 +71,21 @@ namespace CoreApp.OraUtils
         private static string deleteDependencyScript =
             closeOld("cpatch_id", "parent_id") +
             insertionsNew('D', "cpatch_id", "parent_id");
+
+        private static string addDependencyScript =
+        "insert into cpatch_hdim " +
+        "( cpatch_id,  parent_id,  release_id,  cpatch_name,  cpatchstatus, kod_sredy, validfrom, validto, dwsact ) " +
+        "select" +
+        ":cpatch_id, " +
+        ":parent_id, " +
+        "max(release_id)," +
+        "max(cpatch_name)" +
+        "max(cpatchstatus)" +
+        "max(kod_sredy)" +
+        "sysdate, " +
+       $"{DBManager.PlusInf}, " +
+        "'I'" +
+        "from zpatch_hdim where cpatch_id = :cpatch_id; ";
 
         public static void Insert(int? parent_id, int release_id, string cpatch_name)
         {
@@ -156,6 +171,18 @@ namespace CoreApp.OraUtils
         public static bool Contains(string cpatch_name)
         {
             return DBManager.ExecuteQuery(containsCPatch, new OracleParameter(":cpatch_name", cpatch_name)).HasRows;
+        }
+
+        public static void AddDependency(int cpatch_id, int parent_id)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+            DBManager.ExecuteNonQuery(
+                addDependencyScript,
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id),
+                new OracleParameter("parent_id", parent_id)
+                );
+            transaction.Commit();
         }
 
         public static IEnumerable<CPatchRecord> getByScript(string script, params OracleParameter [] parameters)
