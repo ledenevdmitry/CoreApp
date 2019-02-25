@@ -48,3 +48,10 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CoreCom
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.exe
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.pdb
 C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Oracle.ManagedDataAccess.dll
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\CoreApp.exe.config
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\CoreApp.exe
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\CoreApp.pdb
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\INIFileParser.dll
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Oracle.ManagedDataAccess.dll
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\INIFileParser.xml
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CopyComplete

@@ -16,6 +16,7 @@ namespace CoreApp.OraUtils
 
         static DBManager()
         {
+
             CreateConn(IniUtils.IniUtils.GetConfig("Oracle", "TNS"));
         }
 
@@ -31,6 +32,7 @@ namespace CoreApp.OraUtils
             {
                 throw new ArgumentException("Задайте правильный TNS", exc);
             }
+            
         }
 
         //открыть соединение
