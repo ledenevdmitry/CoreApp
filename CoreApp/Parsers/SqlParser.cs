@@ -125,9 +125,9 @@ namespace CoreApp
         public void Check(bool UMEnabled)
         {
             //StartOfCheck();
-            foreach(var fp in release.CPatches.Values)
+            foreach(var fp in release.CPatches)
             {
-                foreach(var patch in fp.patches.Values)
+                foreach(var patch in fp.ZPatches)
                 {
                     foreach (FileInfo file in patch.dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {

@@ -14,26 +14,7 @@ namespace CoreApp
         private static Regex OraRegex = new Regex(@"ORA\|\|(.*)\|\|", RegexOptions.IgnoreCase);
         private static Regex InfaRegex = new Regex(@"IPC\|\|(.*)\Z", RegexOptions.IgnoreCase);
         
-
-        public static void GetFixpacksFromDir(DirectoryInfo dir, out List<CPatch> fixpacks)
-        {
-            List<FileInfo> res = new List<FileInfo>();
-            fixpacks = new List<CPatch>();
-            foreach(DirectoryInfo fixpackDir in dir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
-            {
-                try
-                {
-                    FileInfo fileSc = fixpackDir.GetFiles("file_sc.txt")[0];
-                    res.Add(fileSc);
-                }
-                catch
-                {
-                    throw new ArgumentException($"В папке {fixpackDir.FullName} отсутствует файл сценария");
-                }
-                CPatch fp = new CPatch(fixpackDir);
-                fixpacks.Add(fp);
-            }
-        }
+        
 
         private static string umRegex = @"\\um@";
         public static bool IsUMFile(FileInfo file)

@@ -2,6 +2,7 @@
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,8 @@ namespace CoreApp.ReleaseObjects
     class ReleaseManager
     {
         static CVS.CVS cvs;
-        List<Release> releases;
+        public List<Release> releases { get; private set; }
+        public DirectoryInfo homeDir { get; set; }
         public static Application excelApp;
         
         static ReleaseManager()

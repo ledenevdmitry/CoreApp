@@ -92,9 +92,9 @@ namespace CoreApp
             }
             */
             this.dict = dict;
-            foreach(CPatch fixpack in release.CPatches.Values)
+            foreach(CPatch fixpack in release.CPatches)
             {
-                foreach(ZPatch patch in fixpack.ZPatches.Values)
+                foreach(ZPatch patch in fixpack.ZPatches)
                 {
                     foreach(FileInfo file in patch.dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {

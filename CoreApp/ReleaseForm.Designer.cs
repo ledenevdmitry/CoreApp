@@ -30,21 +30,21 @@
         {
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.BtFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtLoadFromCVS = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtLoadFromLocal = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtSetCVSPath = new System.Windows.Forms.ToolStripMenuItem();
             this.BtSetHomePath = new System.Windows.Forms.ToolStripMenuItem();
             this.BtRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtAddRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCheckRelease = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtDeleteRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtFixpack = new System.Windows.Forms.ToolStripMenuItem();
             this.BtAddFixpack = new System.Windows.Forms.ToolStripMenuItem();
-            this.LBoxReleases = new System.Windows.Forms.ListBox();
-            this.LBoxFixpacks = new System.Windows.Forms.ListBox();
-            this.LbReleases = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
+            this.mainSplitter = new System.Windows.Forms.SplitContainer();
+            this.mainTree = new System.Windows.Forms.TreeView();
+            this.mainDGV = new System.Windows.Forms.DataGridView();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.mainSplitter)).BeginInit();
+            this.mainSplitter.Panel1.SuspendLayout();
+            this.mainSplitter.Panel2.SuspendLayout();
+            this.mainSplitter.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.mainDGV)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -62,39 +62,15 @@
             // BtFile
             // 
             this.BtFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.BtLoadFromCVS,
-            this.BtLoadFromLocal,
-            this.BtSetCVSPath,
             this.BtSetHomePath});
             this.BtFile.Name = "BtFile";
             this.BtFile.Size = new System.Drawing.Size(48, 20);
             this.BtFile.Text = "Файл";
             // 
-            // BtLoadFromCVS
-            // 
-            this.BtLoadFromCVS.Name = "BtLoadFromCVS";
-            this.BtLoadFromCVS.Size = new System.Drawing.Size(294, 22);
-            this.BtLoadFromCVS.Text = "Скачать релиз из СКВ";
-            this.BtLoadFromCVS.Click += new System.EventHandler(this.BtLoadFromCVS_Click);
-            // 
-            // BtLoadFromLocal
-            // 
-            this.BtLoadFromLocal.Name = "BtLoadFromLocal";
-            this.BtLoadFromLocal.Size = new System.Drawing.Size(294, 22);
-            this.BtLoadFromLocal.Text = "Инициализировать из локальной папки";
-            this.BtLoadFromLocal.Click += new System.EventHandler(this.BtLoadFromLocal_Click);
-            // 
-            // BtSetCVSPath
-            // 
-            this.BtSetCVSPath.Name = "BtSetCVSPath";
-            this.BtSetCVSPath.Size = new System.Drawing.Size(294, 22);
-            this.BtSetCVSPath.Text = "Задать адрес СКВ";
-            this.BtSetCVSPath.Click += new System.EventHandler(this.BtSetCVSPath_Click);
-            // 
             // BtSetHomePath
             // 
             this.BtSetHomePath.Name = "BtSetHomePath";
-            this.BtSetHomePath.Size = new System.Drawing.Size(294, 22);
+            this.BtSetHomePath.Size = new System.Drawing.Size(214, 22);
             this.BtSetHomePath.Text = "Задать домашнюю папку";
             this.BtSetHomePath.Click += new System.EventHandler(this.BtSetHomePath_Click);
             // 
@@ -102,8 +78,7 @@
             // 
             this.BtRelease.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.BtAddRelease,
-            this.BtCheckRelease,
-            this.BtDeleteRelease});
+            this.BtCheckRelease});
             this.BtRelease.Name = "BtRelease";
             this.BtRelease.Size = new System.Drawing.Size(51, 20);
             this.BtRelease.Text = "Релиз";
@@ -111,23 +86,14 @@
             // BtAddRelease
             // 
             this.BtAddRelease.Name = "BtAddRelease";
-            this.BtAddRelease.Size = new System.Drawing.Size(180, 22);
+            this.BtAddRelease.Size = new System.Drawing.Size(174, 22);
             this.BtAddRelease.Text = "Добавить";
-            this.BtAddRelease.Click += new System.EventHandler(this.BtAddRelease_Click);
             // 
             // BtCheckRelease
             // 
             this.BtCheckRelease.Name = "BtCheckRelease";
-            this.BtCheckRelease.Size = new System.Drawing.Size(180, 22);
+            this.BtCheckRelease.Size = new System.Drawing.Size(174, 22);
             this.BtCheckRelease.Text = "Проверить";
-            this.BtCheckRelease.Click += new System.EventHandler(this.BtCheckRelease_Click);
-            // 
-            // BtDeleteRelease
-            // 
-            this.BtDeleteRelease.Name = "BtDeleteRelease";
-            this.BtDeleteRelease.Size = new System.Drawing.Size(180, 22);
-            this.BtDeleteRelease.Text = "Удалить локально";
-            this.BtDeleteRelease.Click += new System.EventHandler(this.BtDeleteRelease_Click);
             // 
             // BtFixpack
             // 
@@ -142,60 +108,57 @@
             this.BtAddFixpack.Name = "BtAddFixpack";
             this.BtAddFixpack.Size = new System.Drawing.Size(170, 22);
             this.BtAddFixpack.Text = "Добавить ОП/ФП";
-            this.BtAddFixpack.Click += new System.EventHandler(this.BtAddFixpack_Click);
             // 
-            // LBoxReleases
+            // mainSplitter
             // 
-            this.LBoxReleases.FormattingEnabled = true;
-            this.LBoxReleases.Location = new System.Drawing.Point(12, 53);
-            this.LBoxReleases.Name = "LBoxReleases";
-            this.LBoxReleases.Size = new System.Drawing.Size(208, 381);
-            this.LBoxReleases.TabIndex = 1;
-            this.LBoxReleases.SelectedIndexChanged += new System.EventHandler(this.LBoxReleases_SelectedIndexChanged);
+            this.mainSplitter.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainSplitter.Location = new System.Drawing.Point(0, 24);
+            this.mainSplitter.Name = "mainSplitter";
             // 
-            // LBoxFixpacks
+            // mainSplitter.Panel1
             // 
-            this.LBoxFixpacks.FormattingEnabled = true;
-            this.LBoxFixpacks.Location = new System.Drawing.Point(235, 53);
-            this.LBoxFixpacks.Name = "LBoxFixpacks";
-            this.LBoxFixpacks.Size = new System.Drawing.Size(208, 381);
-            this.LBoxFixpacks.TabIndex = 2;
+            this.mainSplitter.Panel1.Controls.Add(this.mainTree);
             // 
-            // LbReleases
+            // mainSplitter.Panel2
             // 
-            this.LbReleases.AutoSize = true;
-            this.LbReleases.Location = new System.Drawing.Point(12, 37);
-            this.LbReleases.Name = "LbReleases";
-            this.LbReleases.Size = new System.Drawing.Size(46, 13);
-            this.LbReleases.TabIndex = 3;
-            this.LbReleases.Text = "Релизы";
+            this.mainSplitter.Panel2.Controls.Add(this.mainDGV);
+            this.mainSplitter.Size = new System.Drawing.Size(456, 426);
+            this.mainSplitter.SplitterDistance = 152;
+            this.mainSplitter.TabIndex = 1;
+            this.mainSplitter.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.mainSplitter_SplitterMoved);
             // 
-            // label1
+            // mainTree
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(232, 37);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(112, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Фикспаки/поставки";
+            this.mainTree.Location = new System.Drawing.Point(3, 3);
+            this.mainTree.Name = "mainTree";
+            this.mainTree.Size = new System.Drawing.Size(146, 420);
+            this.mainTree.TabIndex = 0;
+            // 
+            // mainDGV
+            // 
+            this.mainDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.mainDGV.Location = new System.Drawing.Point(3, 3);
+            this.mainDGV.Name = "mainDGV";
+            this.mainDGV.Size = new System.Drawing.Size(294, 420);
+            this.mainDGV.TabIndex = 0;
             // 
             // ReleaseForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(456, 450);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.LbReleases);
-            this.Controls.Add(this.LBoxFixpacks);
-            this.Controls.Add(this.LBoxReleases);
+            this.Controls.Add(this.mainSplitter);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "ReleaseForm";
             this.Text = "ReleaseForm";
-            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ReleaseForm_FormClosed);
-            this.Resize += new System.EventHandler(this.ReleaseForm_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.mainSplitter.Panel1.ResumeLayout(false);
+            this.mainSplitter.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.mainSplitter)).EndInit();
+            this.mainSplitter.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.mainDGV)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -206,18 +169,13 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem BtRelease;
         private System.Windows.Forms.ToolStripMenuItem BtFixpack;
-        private System.Windows.Forms.ListBox LBoxReleases;
-        private System.Windows.Forms.ListBox LBoxFixpacks;
-        private System.Windows.Forms.Label LbReleases;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripMenuItem BtAddRelease;
         private System.Windows.Forms.ToolStripMenuItem BtCheckRelease;
         private System.Windows.Forms.ToolStripMenuItem BtAddFixpack;
-        private System.Windows.Forms.ToolStripMenuItem BtDeleteRelease;
         private System.Windows.Forms.ToolStripMenuItem BtFile;
-        private System.Windows.Forms.ToolStripMenuItem BtLoadFromCVS;
-        private System.Windows.Forms.ToolStripMenuItem BtLoadFromLocal;
-        private System.Windows.Forms.ToolStripMenuItem BtSetCVSPath;
         private System.Windows.Forms.ToolStripMenuItem BtSetHomePath;
+        private System.Windows.Forms.SplitContainer mainSplitter;
+        private System.Windows.Forms.TreeView mainTree;
+        private System.Windows.Forms.DataGridView mainDGV;
     }
 }

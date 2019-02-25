@@ -47,3 +47,4 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.Generat
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CoreCompileInputs.cache
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.exe
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.pdb
+C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Oracle.ManagedDataAccess.dll
