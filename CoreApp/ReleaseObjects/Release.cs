@@ -44,7 +44,7 @@ namespace CoreApp.ReleaseObjects
             return CPatchesDict[id];
         }
 
-        public Release(int releaseId, string release)
+        public Release(int releaseId, string releaseName)
         {
             InitFromDB(releaseId, releaseName);
         }
@@ -52,6 +52,8 @@ namespace CoreApp.ReleaseObjects
         private void InitFromDB()
         {
             var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
+            CPatches = new List<CPatch>();
+            CPatchesDict = new Dictionary<int, CPatch>();
             foreach (var oraCPatch in oraCPatches)
             {
                 CPatch cpatch = new CPatch(oraCPatch.CPatchId, oraCPatch.CPatchName, oraCPatch.CPatchStatus);

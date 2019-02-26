@@ -24,6 +24,7 @@ namespace CoreApp
             mainTree.Width = mainSplitter.Panel1.Width;
             mainDGV.Width = mainSplitter.Panel2.Width;
             rm = new ReleaseManager();
+            CreateTree();
         }
 
         private void CreateTree()

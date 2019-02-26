@@ -27,7 +27,6 @@ namespace CoreApp.OraUtils
             {
                 res += $"and {par} = :{par} ";
             }
-            res += "; ";
             return res;
         }
 
@@ -42,7 +41,6 @@ namespace CoreApp.OraUtils
             {
                 res += $"and {par} = :{par} ";
             }
-            res += "; ";
             return res;
         }
 
@@ -50,7 +48,7 @@ namespace CoreApp.OraUtils
             "insert into release_hdim " +
             "( release_id,  release_name, validfrom, validto, dwsact) " +
             "values " +
-           $"(release_seq.nextval, :release_name, sysdate, {DBManager.PlusInf}, 'I'); ";
+           $"(release_seq.nextval, :release_name, sysdate, {DBManager.PlusInf}, 'I') ";
 
         private static string updateScript =
             closeOld("release_id") +
@@ -120,8 +118,8 @@ namespace CoreApp.OraUtils
             return getByScript(allReleasesScript);
         }
 
-        static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name;";
-        static string containsRelease = $"select * from dual where exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_NAME = :release_name);";
+        static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
+        static string containsRelease = $"select * from dual where exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_NAME = :release_name) ";
 
         public static bool Contains(string release_name)
         {
@@ -130,7 +128,6 @@ namespace CoreApp.OraUtils
 
         private static IEnumerable<ReleaseRecord> getByScript(string script, params OracleParameter [] parameters)
         {
-            script = $"begin {script} end;";
             using (var reader = DBManager.ExecuteQuery(script, parameters))
             {
                 while(reader.Read())

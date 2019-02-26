@@ -14,9 +14,9 @@ namespace CoreApp.OraUtils
             "insert into zpatch_hdim " +
             "( zpatch_id,          parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
             "values " +
-           $"(zpatch_seq.nextval, :parent_id, :cpatch_id, :zpatch_name, :zpatchstatus, sysdate, {DBManager.PlusInf}, 'I'); ";
+           $"(zpatch_seq.nextval, :parent_id, :cpatch_id, :zpatch_name, :zpatchstatus, sysdate, {DBManager.PlusInf}, 'I') ";
 
-        private static string insertionsNew(char dmlType, params string[] pars)
+        public static string insertionsNew(char dmlType, params string[] pars)
         {
             string res =
              "insert into zpatch_hdim " +
@@ -34,11 +34,10 @@ namespace CoreApp.OraUtils
             {
                 res += $"and {par} = :{par} ";
             }
-            res += "; ";
             return res;
         }
 
-        private static string closeOld(params string[] pars)
+        public static string closeOld(params string[] pars)
         {
             string res =
             "update zpatch_hdim " +
@@ -49,19 +48,19 @@ namespace CoreApp.OraUtils
             {
                 res += $"and {par} = :{par} ";
             }
-            res += "; ";
             return res;
         }
 
-        /*
-        public static string deleteByRelease =
+
+        public static string deleteByReleaseCloseOld =
             "update zpatch_hdim z" +
             "set validto = sysdate " +
             "where " +
             $"validto = {DBManager.PlusInf} " +
             "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 or z1.cpatch_id = c1.cpatch_id " +
-                        "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)" +
+                        "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)";
 
+        public static string deleteByReleaseInsertionsNew =
              "insert into zpatch_hdim " +
              "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
              "select " +
@@ -75,7 +74,6 @@ namespace CoreApp.OraUtils
             $"validto = {DBManager.PlusInf} " +
              "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 or z1.cpatch_id = c1.cpatch_id " +
                         "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)";
-        */
 
 
         private static string addDependencyScript =
@@ -90,7 +88,7 @@ namespace CoreApp.OraUtils
             "sysdate, " +
            $"{DBManager.PlusInf}, " +
             "'I'" +
-            "from zpatch_hdim where zpatch_id = :zpatch_id; ";
+            "from zpatch_hdim where zpatch_id = :zpatch_id ";
 
         public static void Insert(int cpatch_id, int? parent_id, string zpatch_name)
         {

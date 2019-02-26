@@ -63,6 +63,8 @@ namespace CoreApp.FixpackObjects
         private void InitFromDB()
         {
             var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(CPatchId);
+            ZPatches = new List<ZPatch>();
+            ZPatchesDict = new Dictionary<int, ZPatch>();
             foreach (var oraZPatchRecord in oraZPatchesRecords)
             {
                 ZPatch zpatch = new ZPatch(oraZPatchRecord.ZPatchId);

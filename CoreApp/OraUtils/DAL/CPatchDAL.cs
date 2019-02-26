@@ -72,7 +72,7 @@ namespace CoreApp.OraUtils
         "sysdate, " +
        $"{DBManager.PlusInf}, " +
         "'I'" +
-        "from zpatch_hdim where cpatch_id = :cpatch_id; ";
+        "from zpatch_hdim where cpatch_id = :cpatch_id ";
 
         public static void Insert(int? parent_id, int release_id, string cpatch_name)
         {
@@ -211,7 +211,7 @@ namespace CoreApp.OraUtils
 
         public static IEnumerable<CPatchRecord> getByScript(string script, params OracleParameter [] parameters)
         {
-            using (var reader = DBManager.ExecuteQuery(script))
+            using (var reader = DBManager.ExecuteQuery(script, parameters))
             {
                 while (reader.Read())
                 {
