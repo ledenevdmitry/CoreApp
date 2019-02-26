@@ -56,10 +56,6 @@ namespace CoreApp.OraUtils
             closeOld("release_id") +
             insertionsNew('U', "release_id");
 
-        private static string deleteScript =
-            closeOld("release_id") +
-            insertionsNew('D', "release_id") +
-            CPatchDAL.deleteByRelease;
 
         public static void Insert(string release_name)
         {
@@ -85,10 +81,37 @@ namespace CoreApp.OraUtils
         public static void Delete(int release_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
             DBManager.ExecuteNonQuery(
-                deleteScript,
+                closeOld("release_id"),
                 transaction,
                 new OracleParameter("release_id", release_id));
+
+            DBManager.ExecuteNonQuery(
+                insertionsNew('D', "release_id"),
+                transaction,
+                new OracleParameter("release_id", release_id));
+
+            DBManager.ExecuteNonQuery(
+                CPatchDAL.closeOld("release_id"),
+                transaction,
+                new OracleParameter("release_id", release_id));
+
+            DBManager.ExecuteNonQuery(
+                CPatchDAL.insertionsNew('D', "release_id"),
+                transaction,
+                new OracleParameter("release_id", release_id));
+
+            DBManager.ExecuteNonQuery(
+                ZPatchDAL.deleteByReleaseCloseOld,
+                transaction,
+                new OracleParameter("release_id", release_id));
+
+            DBManager.ExecuteNonQuery(
+                ZPatchDAL.deleteByReleaseInsertionsNew,
+                transaction,
+                new OracleParameter("release_id", release_id));
+
             transaction.Commit();
         }
 
@@ -97,8 +120,8 @@ namespace CoreApp.OraUtils
             return getByScript(allReleasesScript);
         }
 
-        static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
-        static string containsRelease = $"select * from dual when exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_NAME = :release_name)";
+        static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name;";
+        static string containsRelease = $"select * from dual where exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_NAME = :release_name);";
 
         public static bool Contains(string release_name)
         {
@@ -107,6 +130,7 @@ namespace CoreApp.OraUtils
 
         private static IEnumerable<ReleaseRecord> getByScript(string script, params OracleParameter [] parameters)
         {
+            script = $"begin {script} end;";
             using (var reader = DBManager.ExecuteQuery(script, parameters))
             {
                 while(reader.Read())

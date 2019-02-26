@@ -14,9 +14,9 @@ namespace CoreApp.OraUtils
             "insert into сpatch_hdim " +
             "( cpatch_id,  parent_id,  release_id,  cpatch_name,  cpatchstatus,  kod_sredy, validfrom, validto, dwsact) " +
             "values " +
-           $"( cpatch_seq.nextval, :parent_id, :release_id, :cpatch_name, :cpatchstatus, :kod_sredy, sysdate, {DBManager.PlusInf}, 'I'); " ;
+           $"( cpatch_seq.nextval, :parent_id, :release_id, :cpatch_name, :cpatchstatus, :kod_sredy, sysdate, {DBManager.PlusInf}, 'I') " ;
 
-        private static string insertionsNew(char dmlType, params string[] pars)
+        public static string insertionsNew(char dmlType, params string[] pars)
         {
             string res =
              "insert into сpatch_hdim " +
@@ -34,11 +34,10 @@ namespace CoreApp.OraUtils
             {
                 res += $"and {par} = :{par} ";
             }
-            res += "; ";
             return res;
         }
 
-        private static string closeOld(params string[] pars)
+        public static string closeOld(params string[] pars)
         {
             string res = 
             "update cpatch_hdim " +
@@ -49,28 +48,16 @@ namespace CoreApp.OraUtils
             {
                 res += $"and {par} = :{par} ";
             }
-            res += "; ";
             return res;
         }
 
-        private static string updateScript =
-            closeOld("cpatch_id") +
-            insertionsNew('U', "cpatch_id");
-
-        private static string deleteCPatchScript =
-            closeOld("cpatch_id") +
-            insertionsNew('D', "cpatch_id") +
-            ZPatchDAL.deleteByCPatch;
-
-
+        /*
         public static string deleteByRelease =
             closeOld("release_id") +
             insertionsNew('D', "release_id") + 
             ZPatchDAL.deleteByRelease;
+        */
 
-        private static string deleteDependencyScript =
-            closeOld("cpatch_id", "parent_id") +
-            insertionsNew('D', "cpatch_id", "parent_id");
 
         private static string addDependencyScript =
         "insert into cpatch_hdim " +
@@ -102,35 +89,72 @@ namespace CoreApp.OraUtils
         public static void Update(int cpatch_id, int? parent_id, int new_release_id, string new_cpatch_name, string new_cpatchstatus)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
             DBManager.ExecuteNonQuery(
-                updateScript,
+                closeOld("cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id),
                 new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
                 new OracleParameter("new_release_id", new_release_id),
                 new OracleParameter("new_cpatch_name", new_cpatch_name),
                 new OracleParameter("new_cpatchstatus", new_cpatchstatus));
+
+            DBManager.ExecuteNonQuery(
+                insertionsNew('U', "cpatch_id"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id),
+                new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
+                new OracleParameter("new_release_id", new_release_id),
+                new OracleParameter("new_cpatch_name", new_cpatch_name),
+                new OracleParameter("new_cpatchstatus", new_cpatchstatus));
+
             transaction.Commit();
         }
 
         public static void DeleteCPatch(int cpatch_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
             DBManager.ExecuteNonQuery(
-                deleteCPatchScript,
+                closeOld("cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
+
+            DBManager.ExecuteNonQuery(
+                insertionsNew('D', "cpatch_id"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id));
+
+
+            DBManager.ExecuteNonQuery(
+                ZPatchDAL.closeOld("cpatch"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id));
+
+
+            DBManager.ExecuteNonQuery(
+                ZPatchDAL.insertionsNew('D', "cpatch"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id));
+
             transaction.Commit();
         }
 
         public static void DeleteDependency(int cpatch_id, int parent_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
-            DBManager.ExecuteNonQuery(
-                deleteDependencyScript,
+            DBManager.ExecuteNonQuery(                
+                closeOld("cpatch_id", "parent_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id),
                 new OracleParameter("parent_id", parent_id));
+
+            DBManager.ExecuteNonQuery(
+                insertionsNew('D', "cpatch_id", "parent_id"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id),
+                new OracleParameter("parent_id", parent_id));
+            
             transaction.Commit();
         }
 
@@ -166,7 +190,7 @@ namespace CoreApp.OraUtils
             return getByScript(dependenciesTo, new OracleParameter("cpatch_id", cpatch_id));
         }
 
-        static string containsCPatch = $"select * from dual when (select 1 from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_NAME = :cpatch_name)";
+        static string containsCPatch = $"select * from dual where (select 1 from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_NAME = :cpatch_name)";
 
         public static bool Contains(string cpatch_name)
         {

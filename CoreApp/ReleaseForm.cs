@@ -57,5 +57,14 @@ namespace CoreApp
                 IniUtils.IniUtils.SetConfig("Local", "Home", fbd.SelectedPath);
             }
         }
+
+        private void BtAddRelease_Click(object sender, EventArgs e)
+        {
+            AddForm addForm = new AddForm();
+            if(addForm.ShowDialog() == DialogResult.OK)
+            {
+                rm.AddRelease(addForm.Value);
+            }
+        }
     }
 }

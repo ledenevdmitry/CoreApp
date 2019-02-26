@@ -51,3 +51,7 @@ validfrom DATE ,
 validto DATE,
 dwsact VARCHAR2(1))
 TABLESPACE sync;
+
+create sequence sync.release_seq increment by 1;
+create sequence sync.cpatch_seq increment by 1;
+create sequence sync.zpatch_seq increment by 1;

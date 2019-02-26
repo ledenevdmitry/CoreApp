@@ -53,19 +53,7 @@ namespace CoreApp.OraUtils
             return res;
         }
 
-        private static string updateScript =
-            closeOld("zpatch_id") +
-            insertionsNew('U', "zpatch_id");
-
-        private static string deleteZPatchScript =
-            closeOld("zpatch_id") +
-            insertionsNew('D', "zpatch_id");
-
-
-        public static string deleteByCPatch =
-            closeOld("cpatch") +
-            insertionsNew('D', "cpatch");
-
+        /*
         public static string deleteByRelease =
             "update zpatch_hdim z" +
             "set validto = sysdate " +
@@ -87,11 +75,8 @@ namespace CoreApp.OraUtils
             $"validto = {DBManager.PlusInf} " +
              "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 or z1.cpatch_id = c1.cpatch_id " +
                         "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)";
+        */
 
-
-        private static string deleteDependencyScript =
-            closeOld("zpatch_id", "parent_id") +
-            insertionsNew('D', "zpatch_id", "parent_id");
 
         private static string addDependencyScript =
             "insert into zpatch_hdim " +
@@ -123,33 +108,57 @@ namespace CoreApp.OraUtils
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
-                updateScript,
+                closeOld("zpatch_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
                 new OracleParameter("new_cpatch_id", new_cpatch_id),
                 new OracleParameter("new_zpatch_name", new_zpatch_name));
+
+            DBManager.ExecuteNonQuery(
+                insertionsNew('U', "zpatch_id"),
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
+                new OracleParameter("new_cpatch_id", new_cpatch_id),
+                new OracleParameter("new_zpatch_name", new_zpatch_name));    
+
             transaction.Commit();
         }
 
         public static void DeleteZPatch(int zpatch_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
             DBManager.ExecuteNonQuery(
-                deleteZPatchScript,
+                closeOld("zpatch_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id));
+
+            DBManager.ExecuteNonQuery(
+                insertionsNew('D', "zpatch_id"),
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id));
+
             transaction.Commit();
         }
 
         public static void DeleteDependency(int zpatch_id, int parent_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
             DBManager.ExecuteNonQuery(
-                deleteDependencyScript,
+            closeOld("zpatch_id", "parent_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("parent_id", parent_id));
+
+            DBManager.ExecuteNonQuery(
+                insertionsNew('D', "zpatch_id", "parent_id"),
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("parent_id", parent_id));
+
             transaction.Commit();
         }
 
@@ -208,7 +217,7 @@ namespace CoreApp.OraUtils
             }
         }
 
-        static string containsZPatch = $"select * from dual when exists (select 1 from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and zpatch_NAME = :zpatch_name)";
+        static string containsZPatch = $"select * from dual where exists (select 1 from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and zpatch_NAME = :zpatch_name)";
 
         private static bool Contains(string zpatch_name)
         {
