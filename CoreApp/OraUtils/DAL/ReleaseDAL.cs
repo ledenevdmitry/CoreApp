@@ -55,7 +55,7 @@ namespace CoreApp.OraUtils
             insertionsNew('U', "release_id");
 
 
-        public static void Insert(string release_name)
+        public static int Insert(string release_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
 
@@ -69,6 +69,8 @@ namespace CoreApp.OraUtils
                 new OracleParameter("release_id", seqValue),
                 new OracleParameter("release_name", release_name));
             transaction.Commit();
+
+            return seqValue;
         }
 
         public static void Update(int release_id, string new_release_name)
@@ -125,7 +127,7 @@ namespace CoreApp.OraUtils
         }
 
         static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
-        static string containsRelease = $"select * from dual where exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_NAME = :release_name) ";
+        static string containsRelease = $"select * from dual where exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_name = :release_name) ";
 
         public static bool Contains(string release_name)
         {

@@ -84,7 +84,7 @@ namespace CoreApp.OraUtils
             ":parent_id, " +
             "max(cpatch_id)," +
             "max(zpatch_name)," +
-            "max(zpatchstatus)," +
+            "null," +
             "sysdate, " +
            $"{DBManager.PlusInf}, " +
             "'I' " +
@@ -187,11 +187,11 @@ namespace CoreApp.OraUtils
         static string ZPatchesByCPatch = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_id = :cpatch_id order by zpatch_name ";
         static string dependenciesTo = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :zpatch_id order by zpatch_name ";
         static string dependenciesFrom =
-             "select distinct z2.zpatch_id, z2.zpatch_name, z2.zpatchstatus" +
+             "select distinct z2.zpatch_id, z2.zpatch_name, z2.zpatchstatus " +
             $"from zpatch_hdim z1 join zpatch_hdim z2 on z1.parent_id = z2.zpatch_id " +
             $"where z1.validto = {DBManager.PlusInf} and z1.dwsact <>  'D' " +
             $"and   z2.validto = {DBManager.PlusInf} and z2.dwsact <>  'D' " +
-            $"and z1.zpatch_id = :zpatch_id order by c2.cpatch_name ";
+            $"and z1.zpatch_id = :zpatch_id order by z2.zpatch_name ";
 
         public static IEnumerable<ZPatchRecord> getCPatches()
         {
@@ -219,7 +219,10 @@ namespace CoreApp.OraUtils
             {
                 while (reader.Read())
                 {
-                    yield return new ZPatchRecord(reader.GetInt32(0), reader.GetString(2), reader.GetString(3));
+                    yield return new ZPatchRecord(
+                        reader.GetInt32(0), 
+                        reader.GetString(1), 
+                        reader.IsDBNull(2) ? null : reader.GetString(2));
                 }
             }
         }
