@@ -14,7 +14,7 @@ create table sync.zpatch_hdim (
 zpatch_id NUMBER(20),
 parent_id NUMBER(20),
 cpatch_id NUMBER(20),
-zpatch_name VARCHAR2(50),
+zpatch_name VARCHAR2(200),
 validfrom DATE ,
 validto DATE,
 dwsact VARCHAR2(1),
@@ -26,7 +26,7 @@ create table sync.cpatch_hdim  (
 cpatch_id NUMBER(20),
 parent_id NUMBER(20),
 release_id NUMBER(20),
-cpatch_name VARCHAR2(50),
+cpatch_name VARCHAR2(200),
 validfrom DATE ,
 validto DATE,
 dwsact VARCHAR2(1),
@@ -37,7 +37,7 @@ TABLESPACE sync;
 drop table sync.release_hdim;
 create table sync.release_hdim  (       
 release_id NUMBER(20),
-release_name VARCHAR2(50),
+release_name VARCHAR2(200),
 validfrom DATE ,
 validto DATE,
 dwsact VARCHAR2(1))
@@ -55,3 +55,4 @@ TABLESPACE sync;
 create sequence sync.release_seq increment by 1;
 create sequence sync.cpatch_seq increment by 1;
 create sequence sync.zpatch_seq increment by 1;
+alter user sync quota unlimited on sync;

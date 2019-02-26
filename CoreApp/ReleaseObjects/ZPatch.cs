@@ -21,8 +21,9 @@ namespace CoreApp.FixpackObjects
         public HashSet<ZPatch> dependenciesTo { get; private set; }
         public List<FileInfo> objs;
         public int rank;
-        public int ZPatchId { get; private set; }
+        public int ZPatchId { get; set; }
         public CPatch cpatch;
+        public int excelFileRowId;
 
         public override int GetHashCode()
         {
@@ -36,7 +37,7 @@ namespace CoreApp.FixpackObjects
             return ((ZPatch)obj).ZPatchName == ZPatchName;
         }
 
-        public ZPatch(string ZPatchName, int CPatch, HashSet<ZPatch> dependenciesFrom, HashSet<ZPatch> dependensiesTo)
+        public ZPatch(string ZPatchName, int CPatch, HashSet<ZPatch> dependenciesFrom, HashSet<ZPatch> dependenciesTo)
         {
             this.ZPatchName = ZPatchName;
             this.dependenciesFrom = dependenciesFrom;

@@ -11,15 +11,15 @@ namespace CoreApp.OraUtils
     class CPatchDAL
     {
         private static string insertScript =
-            "insert into сpatch_hdim " +
+            "insert into cpatch_hdim " +
             "( cpatch_id,  parent_id,  release_id,  cpatch_name,  cpatchstatus,  kod_sredy, validfrom, validto, dwsact) " +
             "values " +
-           $"( cpatch_seq.nextval, :parent_id, :release_id, :cpatch_name, :cpatchstatus, :kod_sredy, sysdate, {DBManager.PlusInf}, 'I') " ;
+           $"(:cpatch_id, :parent_id, :release_id, :cpatch_name, :cpatchstatus, :kod_sredy, sysdate, {DBManager.PlusInf}, 'I') " ;
 
         public static string insertionsNew(char dmlType, params string[] pars)
         {
             string res =
-             "insert into сpatch_hdim " +
+             "insert into cpatch_hdim " +
              "( cpatch_id,  parent_id,  release_id,  cpatch_name, cpatchstatus, kod_sredy, validfrom, validto, dwsact ) " +
              "select " +
              "cpatch_id, parent_id,  :new_release_id,  :new_cpatch_name, :new_cpatchstatus,  :new_kod_sredy, " +
@@ -74,16 +74,26 @@ namespace CoreApp.OraUtils
         "'I'" +
         "from zpatch_hdim where cpatch_id = :cpatch_id ";
 
-        public static void Insert(int release_id, int? parent_id, string cpatch_name)
+        public static int Insert(int release_id, int? parent_id, string cpatch_name, string cpatchstatus, string kod_sredy)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
+            var seqReader = DBManager.ExecuteQuery("select cpatch_seq.nextval from dual");
+            seqReader.Read();
+            int seqValue = seqReader.GetInt32(0);
+
             DBManager.ExecuteNonQuery(
                 insertScript,
                 transaction,
+                new OracleParameter("cpatch_id", seqValue),
                 new OracleParameter("parent_id"  , (object)parent_id ?? DBNull.Value),
                 new OracleParameter("release_id" , release_id),
-                new OracleParameter("cpatch_name", cpatch_name));
+                new OracleParameter("cpatch_name", cpatch_name),
+                new OracleParameter("cpatchstatus", (object)cpatchstatus ?? DBNull.Value),
+                new OracleParameter("kod_sredy", (object)kod_sredy ?? DBNull.Value));
+
             transaction.Commit();
+            return seqValue;
         }
 
         public static void Update(int cpatch_id, int? parent_id, int new_release_id, string new_cpatch_name, string new_cpatchstatus)
@@ -215,7 +225,11 @@ namespace CoreApp.OraUtils
             {
                 while (reader.Read())
                 {
-                    yield return new CPatchRecord(reader.GetInt32(0), reader.GetString(1), reader.GetString(3), reader.GetString(4));
+                    yield return new CPatchRecord(
+                        reader.GetInt32(0), 
+                        reader.GetString(1), 
+                        reader.IsDBNull(2) ? null : reader.GetString(2), 
+                        reader.IsDBNull(3) ? null : reader.GetString(3));
                 }
             }
         }

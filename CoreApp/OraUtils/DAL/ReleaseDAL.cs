@@ -48,7 +48,7 @@ namespace CoreApp.OraUtils
             "insert into release_hdim " +
             "( release_id,  release_name, validfrom, validto, dwsact) " +
             "values " +
-           $"(release_seq.nextval, :release_name, sysdate, {DBManager.PlusInf}, 'I') ";
+           $"(:release_id, :release_name, sysdate, {DBManager.PlusInf}, 'I') ";
 
         private static string updateScript =
             closeOld("release_id") +
@@ -58,9 +58,15 @@ namespace CoreApp.OraUtils
         public static void Insert(string release_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
+            var seqReader = DBManager.ExecuteQuery("select release_seq.nextval from dual");
+            seqReader.Read();
+            int seqValue = seqReader.GetInt32(0);
+
             DBManager.ExecuteNonQuery(
                 insertScript,
                 transaction,
+                new OracleParameter("release_id", seqValue),
                 new OracleParameter("release_name", release_name));
             transaction.Commit();
         }

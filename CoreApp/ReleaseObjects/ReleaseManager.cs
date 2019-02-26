@@ -46,8 +46,8 @@ namespace CoreApp.ReleaseObjects
             {
                 return false;
             }
-            ReleaseDAL.Insert(releaseName);
-            InitFromDB();
+            Release newRelease = new Release(ReleaseDAL.Insert(releaseName), releaseName);
+            releases.Add(newRelease);
             return true;
         }
 

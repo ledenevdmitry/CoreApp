@@ -12,9 +12,9 @@ namespace CoreApp.OraUtils
     {
         private static string insertScript =
             "insert into zpatch_hdim " +
-            "( zpatch_id,          parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
+            "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
             "values " +
-           $"(zpatch_seq.nextval, :parent_id, :cpatch_id, :zpatch_name, :zpatchstatus, sysdate, {DBManager.PlusInf}, 'I') ";
+           $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, :zpatchstatus, sysdate, {DBManager.PlusInf}, 'I') ";
 
         public static string insertionsNew(char dmlType, params string[] pars)
         {
@@ -79,27 +79,36 @@ namespace CoreApp.OraUtils
         private static string addDependencyScript =
             "insert into zpatch_hdim " +
             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name,  zpatchstatus, validfrom, validto, dwsact ) " +
-            "select" +
+            "select " +
             ":zpatch_id, " +
             ":parent_id, " +
             "max(cpatch_id)," +
-            "max(zpatch_name)" +
-            "max(zpatchstatus)" +
+            "max(zpatch_name)," +
+            "max(zpatchstatus)," +
             "sysdate, " +
            $"{DBManager.PlusInf}, " +
-            "'I'" +
+            "'I' " +
             "from zpatch_hdim where zpatch_id = :zpatch_id ";
 
-        public static void Insert(int cpatch_id, int? parent_id, string zpatch_name)
+        public static int Insert(int cpatch_id, int? parent_id, string zpatch_name, string zpatchstatus)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
+            var seqReader = DBManager.ExecuteQuery("select zpatch_seq.nextval from dual");
+            seqReader.Read();
+            int seqValue = seqReader.GetInt32(0);
+
             DBManager.ExecuteNonQuery(
                 insertScript,
                 transaction,
+                new OracleParameter("zpatch_id", seqValue),
                 new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
                 new OracleParameter("cpatch_id", cpatch_id),
-                new OracleParameter("zpatch_name", zpatch_name));
+                new OracleParameter("zpatch_name", zpatch_name),
+                new OracleParameter("zpatchstatus", (object)zpatchstatus ?? DBNull.Value));
+
             transaction.Commit();
+            return seqValue;
         }
 
         public static void Update(int zpatch_id, int? parent_id, int new_cpatch_id, int new_zpatch_name)
@@ -175,7 +184,7 @@ namespace CoreApp.OraUtils
 
 
         static string allZPatchesScript = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by zpatch_name ";
-        static string ZPatchesByCPatch = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_id = :cpatch_id order by release_name ";
+        static string ZPatchesByCPatch = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_id = :cpatch_id order by zpatch_name ";
         static string dependenciesTo = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :zpatch_id order by zpatch_name ";
         static string dependenciesFrom =
              "select distinct z2.zpatch_id, z2.zpatch_name, z2.zpatchstatus" +
@@ -206,7 +215,7 @@ namespace CoreApp.OraUtils
 
         private static IEnumerable<ZPatchRecord> getByScript(string script, params OracleParameter[] parameters)
         {
-            using (var reader = DBManager.ExecuteQuery(script))
+            using (var reader = DBManager.ExecuteQuery(script, parameters))
             {
                 while (reader.Read())
                 {

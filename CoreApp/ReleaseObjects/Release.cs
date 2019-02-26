@@ -98,8 +98,8 @@ namespace CoreApp.ReleaseObjects
 
         public void AddCPatch(Release release, FileInfo excelFile)
         {
-            CPatch.CreateNewFromExcel(release, excelFile);
-            InitFromDB();
+            CPatch newCPatch = CPatch.CreateNewFromExcel(release, excelFile);
+            CPatches.Add(newCPatch);
         }
     }
 }
