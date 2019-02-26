@@ -67,7 +67,7 @@ namespace CoreApp.FixpackObjects
             ZPatchesDict = new Dictionary<int, ZPatch>();
             foreach (var oraZPatchRecord in oraZPatchesRecords)
             {
-                ZPatch zpatch = new ZPatch(oraZPatchRecord.ZPatchId);
+                ZPatch zpatch = new ZPatch(this, oraZPatchRecord.ZPatchId);
                 ZPatches.Add(zpatch);
                 ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
 
@@ -193,10 +193,6 @@ namespace CoreApp.FixpackObjects
             List<Tuple<int, ZPatch>> addedDependenciesTo,
             List<ZPatch> newPatches)
         {
-            foreach (var newPatch in newPatches)
-            {
-               newPatch.ZPatchId = ZPatchDAL.Insert(CPatchId, null, newPatch.ZPatchName, null);
-            }
 
             //deletedfrom
             foreach (var deletedDependency in deletedDependenciesFrom)
@@ -332,8 +328,11 @@ namespace CoreApp.FixpackObjects
             ZPatch zPatch;
             foreach (Match m in matchesFrom)
             {
-                findPatchByShortName(m.Groups[1].Value, out zPatch);
-                res.Add(zPatch);
+                if (findPatchByShortName(m.Groups[1].Value, out zPatch))
+                {
+                    res.Add(zPatch);
+                }
+                //TODO мб отлавливать случаи, когда не найден. предупреждение или тип того
             }
             return res;
         }
@@ -345,8 +344,10 @@ namespace CoreApp.FixpackObjects
             ZPatch zPatch;
             foreach (Match m in matchesTo)
             {
-                findPatchByShortName(m.Groups[1].Value, out zPatch);
-                res.Add(zPatch);
+                if (findPatchByShortName(m.Groups[1].Value, out zPatch))
+                {
+                    res.Add(zPatch);
+                }
             }
             return res;
         }
@@ -441,8 +442,11 @@ namespace CoreApp.FixpackObjects
                         zpatch.excelFileRowId = i;
                         zpatch.cpatch = this;
 
+                        zpatch.ZPatchId = ZPatchDAL.Insert(CPatchId, null, zpatch.ZPatchName, null);
+
                         newPatches.Add(zpatch);
-                        ZPatches.Add(zpatch);
+                        ZPatches.Add(zpatch);                        
+
                         //TODO проверить последствия
                         //идентификатор назначится только на dal, печаль
                         //ZPatchesDict.Add(zpatch.ZPatchId, zpatch);

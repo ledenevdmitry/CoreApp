@@ -45,8 +45,9 @@ namespace CoreApp.FixpackObjects
         }
 
 
-        public ZPatch(int oraId)
+        public ZPatch(CPatch cpatch, int oraId)
         {
+            this.cpatch = cpatch;
             dependenciesFrom = new HashSet<ZPatch>();
 
             var oraZPatchesDependenciesFrom = ZPatchDAL.getDependenciesFrom(oraId);
