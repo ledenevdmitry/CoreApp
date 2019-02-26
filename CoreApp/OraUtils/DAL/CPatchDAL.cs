@@ -74,7 +74,7 @@ namespace CoreApp.OraUtils
         "'I'" +
         "from zpatch_hdim where cpatch_id = :cpatch_id ";
 
-        public static void Insert(int? parent_id, int release_id, string cpatch_name)
+        public static void Insert(int release_id, int? parent_id, string cpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(

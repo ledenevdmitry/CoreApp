@@ -109,8 +109,9 @@
             // BtAddFixpack
             // 
             this.BtAddFixpack.Name = "BtAddFixpack";
-            this.BtAddFixpack.Size = new System.Drawing.Size(205, 26);
+            this.BtAddFixpack.Size = new System.Drawing.Size(216, 26);
             this.BtAddFixpack.Text = "Добавить ОП/ФП";
+            this.BtAddFixpack.Click += new System.EventHandler(this.BtAddFixpack_Click);
             // 
             // mainSplitter
             // 

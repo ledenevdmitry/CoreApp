@@ -25,6 +25,12 @@ namespace CoreApp
             mainDGV.Width = mainSplitter.Panel2.Width;
             rm = new ReleaseManager();
             CreateTree();
+            Application.Idle += OnIdle;
+        }
+
+        private void OnIdle(object sender, EventArgs e)
+        {
+            BtAddFixpack.Enabled = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
         }
 
         private void CreateTree()
@@ -66,6 +72,23 @@ namespace CoreApp
             {
                 rm.AddRelease(addForm.Value);
             }
+        }
+
+        private void BtAddFixpack_Click(object sender, EventArgs e)
+        {
+            Release currRelease = getReleaseFromTree();
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Файлы Excel|*.xls;*.xlsx;*.xlsm";
+            if(ofd.ShowDialog() == DialogResult.OK)
+            {
+                currRelease.AddCPatch(new FileInfo(ofd.FileName));
+            }
+            
+        }
+
+        private Release getReleaseFromTree()
+        {
+            return rm.releases[int.Parse(mainTree.SelectedNode.Name)];
         }
     }
 }

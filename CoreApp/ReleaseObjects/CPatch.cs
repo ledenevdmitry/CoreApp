@@ -168,7 +168,7 @@ namespace CoreApp.FixpackObjects
             List<Tuple<int, ZPatch>> deletedDependenciesTo;
             List<Tuple<int, ZPatch>> addedDependenciesTo;
 
-            AddNewPatches(res, out newPatches);
+            AddNewZPatches(res, out newPatches);
             CreateCPatchDelta(
                 res,
                 out deletedDependenciesFrom,
@@ -301,6 +301,17 @@ namespace CoreApp.FixpackObjects
             Marshal.FinalReleaseComObject(wb);
         }
 
+        private CPatch()
+        { }
+
+        public static CPatch CreateNewFromExcel(int releaseId, FileInfo excelFile)
+        {
+            CPatch emptyCPatch = new CPatch();
+            emptyCPatch.ReopenExcelColumns(excelFile);
+            CPatchDAL.Insert(releaseId, null, emptyCPatch.CPatchName);
+            return emptyCPatch;
+        }
+
         private static string regexZPatchName = @"(Z)[0-9]+";
         private static string regexCPatchName = @"(C)[0-9]+";
 
@@ -374,7 +385,7 @@ namespace CoreApp.FixpackObjects
             }
         }
         
-        private void AddNewPatches(Range columns, out List<ZPatch> newPatches)
+        private void AddNewZPatches(Range columns, out List<ZPatch> newPatches)
         {
             newPatches = new List<ZPatch>();
 
