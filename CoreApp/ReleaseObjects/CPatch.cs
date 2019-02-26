@@ -67,13 +67,20 @@ namespace CoreApp.FixpackObjects
             ZPatchesDict = new Dictionary<int, ZPatch>();
             foreach (var oraZPatchRecord in oraZPatchesRecords)
             {
-                ZPatch zpatch = new ZPatch(this, oraZPatchRecord.ZPatchId);
+                ZPatch zpatch = new ZPatch(this, oraZPatchRecord.ZPatchName, oraZPatchRecord.ZPatchId, oraZPatchRecord.ZPatchStatus);
                 ZPatches.Add(zpatch);
                 ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
 
                 zpatch.cpatch = this;
             }
-
+            foreach(ZPatch zpatch in ZPatches)
+            {
+                zpatch.SetDependencies();
+            }
+        }
+        
+        public void SetDependencies()
+        {
             dependenciesFrom = new HashSet<CPatch>();
 
             var oraCPatchesDependenciesFrom = CPatchDAL.getDependenciesFrom(CPatchId);
@@ -442,8 +449,6 @@ namespace CoreApp.FixpackObjects
                         zpatch.excelFileRowId = i;
                         zpatch.cpatch = this;
 
-                        zpatch.ZPatchId = ZPatchDAL.Insert(CPatchId, null, zpatch.ZPatchName, null);
-
                         newPatches.Add(zpatch);
                         ZPatches.Add(zpatch);                        
 
@@ -453,6 +458,11 @@ namespace CoreApp.FixpackObjects
                     }
                 }
 
+            }
+
+            foreach(ZPatch zpatch in newPatches)
+            {
+                zpatch.ZPatchId = ZPatchDAL.Insert(CPatchId, null, zpatch.ZPatchName, null);
             }
         }
 

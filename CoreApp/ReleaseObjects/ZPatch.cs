@@ -12,6 +12,7 @@ namespace CoreApp.FixpackObjects
     public class ZPatch
     {
         public string ZPatchName { get; private set; }
+        public string ZPatchStatus { get; private set; }
         public DirectoryInfo dir { get; private set; }
         public string pathToPatch { get; private set; }
         private static Regex ATCPatchRegex = new Regex(@"\\((\d+\-)?Z(\d+.*?))");
@@ -45,12 +46,19 @@ namespace CoreApp.FixpackObjects
         }
 
 
-        public ZPatch(CPatch cpatch, int oraId)
+        public ZPatch(CPatch cpatch, string ZPatchName, int ZPatchId, string ZPatchStatus)
         {
             this.cpatch = cpatch;
+            this.ZPatchId = ZPatchId;
+            this.ZPatchName = ZPatchName;
+            this.ZPatchStatus = ZPatchStatus;
+        }
+
+        public void SetDependencies()
+        {
             dependenciesFrom = new HashSet<ZPatch>();
 
-            var oraZPatchesDependenciesFrom = ZPatchDAL.getDependenciesFrom(oraId);
+            var oraZPatchesDependenciesFrom = ZPatchDAL.getDependenciesFrom(ZPatchId);
 
             foreach (var oraZPatchRecord in oraZPatchesDependenciesFrom)
             {
@@ -59,12 +67,13 @@ namespace CoreApp.FixpackObjects
 
             dependenciesTo = new HashSet<ZPatch>();
 
-            var oraZPatchesDependenciesTo = ZPatchDAL.getDependenciesTo(oraId);
+            var oraZPatchesDependenciesTo = ZPatchDAL.getDependenciesTo(ZPatchId);
 
             foreach (var oraZPatchRecord in oraZPatchesDependenciesTo)
             {
                 dependenciesTo.Add(cpatch.getZPatchById(oraZPatchRecord.ZPatchId));
             }
+
         }
 
         /*
