@@ -125,13 +125,13 @@ namespace CoreApp.FixpackObjects
             List<ZPatch> roots = new List<ZPatch>();
             foreach (ZPatch patch in ZPatches)
             {
-                if(patch.dependenciesFrom.Count == 0)
+                if (patch.dependenciesFrom.Count == 0)
                 {
                     roots.Add(patch);
                 }
             }
 
-            foreach(ZPatch root in roots)
+            foreach (ZPatch root in roots)
             {
                 root.rank = 0;
                 SetRanks(root);
@@ -149,7 +149,7 @@ namespace CoreApp.FixpackObjects
 
         private void SetRanks(ZPatch currPatch)
         {
-            foreach(ZPatch subpatch in currPatch.dependenciesTo)
+            foreach (ZPatch subpatch in currPatch.dependenciesTo)
             {
                 subpatch.rank = Math.Max(subpatch.rank, currPatch.rank + 1);
             }
@@ -209,10 +209,10 @@ namespace CoreApp.FixpackObjects
                     bool canDeleteCDependency = true;
                     foreach (ZPatch zPatch in ZPatches)
                     {
-                        foreach(ZPatch dependency in zPatch.dependenciesFrom)
+                        foreach (ZPatch dependency in zPatch.dependenciesFrom)
                         {
                             //если есть другая связь по этому ФП
-                            if(dependency.cpatch.CPatchId == deletedDependency.Item2.cpatch.CPatchId)
+                            if (dependency.cpatch.CPatchId == deletedDependency.Item2.cpatch.CPatchId)
                             {
                                 canDeleteCDependency = false;
                                 break;
@@ -226,16 +226,16 @@ namespace CoreApp.FixpackObjects
                         CPatchDAL.DeleteDependency(CPatchId, deletedDependency.Item2.cpatch.CPatchId);
                     }
                 }
-                
+
             }
 
             //addedfrom
-            foreach(var addedDependency in addedDependenciesFrom)
+            foreach (var addedDependency in addedDependenciesFrom)
             {
                 ZPatchDAL.AddDependency(addedDependency.Item2.ZPatchId, addedDependency.Item1);
-                if(addedDependency.Item2.cpatch.CPatchId != CPatchId)
+                if (addedDependency.Item2.cpatch.CPatchId != CPatchId)
                 {
-                    if(!dependenciesFrom.Contains(addedDependency.Item2.cpatch))
+                    if (!dependenciesFrom.Contains(addedDependency.Item2.cpatch))
                     {
                         dependenciesFrom.Add(addedDependency.Item2.cpatch);
                         CPatchDAL.AddDependency(addedDependency.Item2.cpatch.CPatchId, CPatchId);
@@ -304,12 +304,19 @@ namespace CoreApp.FixpackObjects
         private CPatch()
         { }
 
-        public static CPatch CreateNewFromExcel(int releaseId, FileInfo excelFile)
+        public static void CreateNewFromExcel(Release release, FileInfo excelFile)
         {
-            CPatch emptyCPatch = new CPatch();
-            emptyCPatch.ReopenExcelColumns(excelFile);
-            CPatchDAL.Insert(releaseId, null, emptyCPatch.CPatchName);
-            return emptyCPatch;
+            CPatch empty = new CPatch();
+            empty.ZPatches = new List<ZPatch>();
+            empty.ZPatchesDict = new Dictionary<int, ZPatch>();
+
+            empty.dependenciesFrom = new HashSet<CPatch>();
+            empty.dependenciesTo = new HashSet<CPatch>();
+            empty.release = release;
+            release.CPatches.Add(empty);
+            //release.CPatchesDict.Add(-1, empty);
+
+            empty.ReopenExcelColumns(excelFile);
         }
 
         private static string regexZPatchName = @"(Z)[0-9]+";
@@ -358,87 +365,99 @@ namespace CoreApp.FixpackObjects
         {
             foreach (CPatch cpatch in release.CPatches)
             {
-                patch = cpatch.ZPatches.First(x => SameEnding(x.ZPatchName, shortName));
-                return true;
+                try
+                {
+                    patch = cpatch.ZPatches.First(x => SameEnding(x.ZPatchName, shortName));
+                    return true;
+                }
+                catch { }
             }
             patch = null;
             return false;
         }
 
-        private void GetColumnsIndexes(Range columns, out int patchNameIndex, out int linkIndex)
+        private int GetPatchNameIndex(Range columns)
         {
-            patchNameIndex = -1;
-            linkIndex = -1;
             for (int i = 1; i <= columns.Columns.Count; ++i)
             {
                 string currCell = ((Range)columns.Cells[1, i]).Value2;
                 if (currCell == "Тема")
                 {
-                    patchNameIndex = i;
-                }
-                else if (currCell == "Issue Link Type" ||
-                        currCell == "Связанные запросы" ||
-                        currCell == "Связи")
-                {
-                    linkIndex = i;
+                    return i;
                 }
             }
+            throw new KeyNotFoundException("Колонка с именем патча не найдена");
         }
-        
+
+        private int GetLinkIndex(Range columns)
+        {
+            for (int i = 1; i <= columns.Columns.Count; ++i)
+            {
+                string currCell = ((Range)columns.Cells[1, i]).Value2;
+                if (currCell == "Issue Link Type")
+                {
+                    return i;
+                }
+            }
+            throw new KeyNotFoundException("Колонка с зависимостями не найдена");
+        }
+
         private void AddNewZPatches(Range columns, out List<ZPatch> newPatches)
         {
             newPatches = new List<ZPatch>();
 
-            int patchNameIndex, linkIndex;
-
-            GetColumnsIndexes(columns, out patchNameIndex, out linkIndex);
+            int patchNameIndex = GetPatchNameIndex(columns);
 
             for (int i = 2; i <= columns.Rows.Count; ++i)
             {
                 string patchCell = ((Range)columns.Cells[i, patchNameIndex]).Value2 ?? "";
-                if (linkIndex != -1)
+
+                MatchCollection matches = Regex.Matches(patchCell, regexZPatchName);
+                if (matches.Count == 0)
                 {
-                    string dependenciesCell = ((Range)columns.Cells[i, linkIndex]).Value2 ?? "";
-                    MatchCollection matches = Regex.Matches(patchCell, regexZPatchName);
-                    if (matches.Count == 0)
+                    matches = Regex.Matches(patchCell, regexCPatchName);
+                    if (matches.Count > 0)
                     {
-                        matches = Regex.Matches(patchCell, regexCPatchName);
-                        if (matches.Count > 0)
+                        //ФП еще не добавлялся
+                        if (CPatchId == 0)
                         {
                             CPatchName = patchCell;
-                        }
-                    }
-                    else
-                    {
-                        string patchName = Regex.Match(patchCell, regexZPatchName).Value;
-                        ZPatch currPatch;
-                        if (!findPatchByShortName(patchName, out currPatch))
-                        {
-                            ZPatch zpatch = new ZPatch(
-                                patchName,
-                                CPatchId,
-                                null,
-                                null);
-
-                            newPatches.Add(zpatch);
-                            ZPatches.Add(zpatch);
-                            ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
+                            CPatchDAL.Insert(release.releaseId, null, patchCell);
                         }
                     }
                 }
+                else
+                {
+                    string patchName = Regex.Match(patchCell, regexZPatchName).Value;
+                    ZPatch currPatch;
+                    if (!findPatchByShortName(patchName, out currPatch))
+                    {
+                        ZPatch zpatch = new ZPatch(
+                            patchName,
+                            CPatchId,
+                            null,
+                            null);
+
+                        newPatches.Add(zpatch);
+                        ZPatches.Add(zpatch);
+                        //TODO проверить последствия
+                        //идентификатор назначится только на dal, печаль
+                        //ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
+                    }
+                }
+
             }
         }
 
 
         private void CreateCPatchDelta(
-            Range columns, 
-            out List<Tuple<int, ZPatch>> deletedDependenciesFrom,  
+            Range columns,
+            out List<Tuple<int, ZPatch>> deletedDependenciesFrom,
             out List<Tuple<int, ZPatch>> addedDependenciesFrom,
             out List<Tuple<int, ZPatch>> deletedDependenciesTo,
             out List<Tuple<int, ZPatch>> addedDependenciesTo,
             out List<ZPatch> newPatches)
         {
-            int patchNameIndex, linkIndex;
 
             newPatches = new List<ZPatch>();
             deletedDependenciesFrom = new List<Tuple<int, ZPatch>>();
@@ -446,74 +465,57 @@ namespace CoreApp.FixpackObjects
             deletedDependenciesTo = new List<Tuple<int, ZPatch>>();
             addedDependenciesTo = new List<Tuple<int, ZPatch>>();
 
-            GetColumnsIndexes(columns, out patchNameIndex, out linkIndex);
 
-            for (int i = 2; i <= columns.Rows.Count; ++i)
+            int linkIndex = GetLinkIndex(columns);
+            if (linkIndex != -1)
             {
-                string patchCell = ((Range)columns.Cells[i, patchNameIndex]).Value2 ?? "";
-                if (linkIndex != -1)
+                for (int i = 2; i <= columns.Rows.Count; ++i)
                 {
                     string dependenciesCell = ((Range)columns.Cells[i, linkIndex]).Value2 ?? "";
-                    MatchCollection matches = Regex.Matches(patchCell, regexZPatchName);
-                    if (matches.Count == 0)
+                      var dependenciesFrom = DependenciesFrom(dependenciesCell);
+
+                    foreach (ZPatch excelFromDependency in dependenciesFrom)
                     {
-                        matches = Regex.Matches(patchCell, regexCPatchName);
-                        if (matches.Count > 0)
+                        if (!ZPatches[i].dependenciesFrom.Contains(excelFromDependency))
                         {
-                            CPatchName = patchCell;
+                            addedDependenciesFrom.Add(new Tuple<int, ZPatch>(ZPatches[i].ZPatchId, excelFromDependency));
+                            ZPatches[i].dependenciesFrom.Add(excelFromDependency);
                         }
                     }
-                    else
+
+                    foreach (ZPatch patchFromDependency in ZPatches[i].dependenciesFrom)
                     {
-                        string patchName = Regex.Match(patchCell, regexZPatchName).Value;
-                        ZPatch currPatch;
-                        findPatchByShortName(patchName, out currPatch);
-
-                        var dependenciesFrom = DependenciesFrom(dependenciesCell);
-
-                        foreach (ZPatch excelFromDependency in dependenciesFrom)
+                        if (!dependenciesFrom.Contains(patchFromDependency))
                         {
-                            if (!currPatch.dependenciesFrom.Contains(excelFromDependency))
-                            {
-                                addedDependenciesFrom.Add(new Tuple<int, ZPatch>(currPatch.ZPatchId, excelFromDependency));
-                                currPatch.dependenciesFrom.Add(excelFromDependency);
-                            }
+                            deletedDependenciesFrom.Add(new Tuple<int, ZPatch>(ZPatches[i].ZPatchId, patchFromDependency));
+                            ZPatches[i].dependenciesFrom.Remove(patchFromDependency);
                         }
-
-                        foreach(ZPatch patchFromDependency in currPatch.dependenciesFrom)
-                        {
-                            if(!dependenciesFrom.Contains(patchFromDependency))
-                            {
-                                deletedDependenciesFrom.Add(new Tuple<int, ZPatch>(currPatch.ZPatchId, patchFromDependency));
-                                currPatch.dependenciesFrom.Remove(patchFromDependency);
-                            }
-                        }
-
-                        var dependenciesTo = DependenciesTo(dependenciesCell);
-
-                        foreach (ZPatch excelToDependency in dependenciesTo)
-                        {
-                            if (!currPatch.dependenciesTo.Contains(excelToDependency))
-                            {
-                                addedDependenciesTo.Add(new Tuple<int, ZPatch>(currPatch.ZPatchId, excelToDependency));
-                                currPatch.dependenciesTo.Add(excelToDependency);
-                            }
-                        }
-
-                        foreach (ZPatch patchToDependency in currPatch.dependenciesTo)
-                        {
-                            if (!dependenciesTo.Contains(patchToDependency))
-                            {
-                                deletedDependenciesFrom.Add(new Tuple<int, ZPatch>(currPatch.ZPatchId, patchToDependency));
-                                currPatch.dependenciesTo.Remove(patchToDependency);
-                            }
-                        }                    
                     }
+
+                    var dependenciesTo = DependenciesTo(dependenciesCell);
+
+                    foreach (ZPatch excelToDependency in dependenciesTo)
+                    {
+                        if (!ZPatches[i].dependenciesTo.Contains(excelToDependency))
+                        {
+                            addedDependenciesTo.Add(new Tuple<int, ZPatch>(ZPatches[i].ZPatchId, excelToDependency));
+                            ZPatches[i].dependenciesTo.Add(excelToDependency);
+                        }
+                    }
+
+                    foreach (ZPatch patchToDependency in ZPatches[i].dependenciesTo)
+                    {
+                        if (!dependenciesTo.Contains(patchToDependency))
+                        {
+                            deletedDependenciesFrom.Add(new Tuple<int, ZPatch>(ZPatches[i].ZPatchId, patchToDependency));
+                            ZPatches[i].dependenciesTo.Remove(patchToDependency);
+                        }
+                    }
+                    
                 }
             }
         }
     }
-
 }
 
 

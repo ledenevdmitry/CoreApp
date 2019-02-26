@@ -81,14 +81,14 @@ namespace CoreApp
             ofd.Filter = "Файлы Excel|*.xls;*.xlsx;*.xlsm";
             if(ofd.ShowDialog() == DialogResult.OK)
             {
-                currRelease.AddCPatch(new FileInfo(ofd.FileName));
+                currRelease.AddCPatch(currRelease, new FileInfo(ofd.FileName));
             }
             
         }
 
         private Release getReleaseFromTree()
         {
-            return rm.releases[int.Parse(mainTree.SelectedNode.Name)];
+            return rm.releasesDict[int.Parse(mainTree.SelectedNode.Name)];
         }
     }
 }

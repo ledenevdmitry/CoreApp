@@ -96,9 +96,10 @@ namespace CoreApp.ReleaseObjects
             this.localDir = localDir;
         }
 
-        public void AddCPatch(FileInfo excelFile)
+        public void AddCPatch(Release release, FileInfo excelFile)
         {
-            CPatch cpatch = CPatch.CreateNewFromExcel(releaseId, excelFile);
+            CPatch.CreateNewFromExcel(release, excelFile);
+            InitFromDB();
         }
     }
 }

@@ -13,6 +13,7 @@ namespace CoreApp.ReleaseObjects
     {
         static CVS.CVS cvs;
         public List<Release> releases { get; private set; }
+        public Dictionary<int, Release> releasesDict { get; private set; }
         public DirectoryInfo homeDir { get; set; }
         public static Application excelApp;
         
@@ -30,10 +31,12 @@ namespace CoreApp.ReleaseObjects
         {
             var oraReleases = ReleaseDAL.getReleases();
             releases = new List<Release>();
+            releasesDict = new Dictionary<int, Release>();
             foreach (var oraRelease in oraReleases)
             {
                 Release release = new Release(oraRelease.releaseId, oraRelease.releaseName);
                 releases.Add(release);
+                releasesDict.Add(release.releaseId, release);
             }
         }
 
