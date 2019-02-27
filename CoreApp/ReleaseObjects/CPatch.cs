@@ -57,17 +57,12 @@ namespace CoreApp.FixpackObjects
             this.CPatchId = CPatchId;
             this.CPatchName = CPatchName;
             this.CPatchStatus = CPatchStatus;
-            InitFromDB();
-        }
-
-        private void InitFromDB()
-        {
-            ZPatches = new List<ZPatch>();
-            ZPatchesDict = new Dictionary<int, ZPatch>();
         }
 
         public void InitZPatches()
         {
+            ZPatches = new List<ZPatch>();
+            ZPatchesDict = new Dictionary<int, ZPatch>();
             var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(CPatchId);
             foreach (var oraZPatchRecord in oraZPatchesRecords)
             {

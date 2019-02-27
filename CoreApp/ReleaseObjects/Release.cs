@@ -47,16 +47,12 @@ namespace CoreApp.ReleaseObjects
         public Release(int releaseId, string releaseName)
         {
             InitFromDB(releaseId, releaseName);
-        }
-
-        private void InitFromDB()
-        {
-            CPatches = new List<CPatch>();
-            CPatchesDict = new Dictionary<int, CPatch>();
-        }
+        }        
 
         public void InitCPatches()
         {
+            CPatches = new List<CPatch>();
+            CPatchesDict = new Dictionary<int, CPatch>();
             var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
             foreach (var oraCPatch in oraCPatches)
             {
@@ -75,7 +71,6 @@ namespace CoreApp.ReleaseObjects
         {
             this.releaseId = releaseId;
             this.releaseName = releaseName;
-            InitFromDB();
         }
 
         DirectoryInfo localDir;

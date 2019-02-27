@@ -98,6 +98,7 @@ namespace CoreApp
                     currRelease.InitCPatches();
                     foreach (CPatch cPatch in currRelease.CPatches)
                     {
+                        mainTree.SelectedNode.Nodes.Clear();
                         mainTree.SelectedNode.Nodes.Add(cPatch.CPatchId.ToString(), cPatch.CPatchName);
                     }
                     break;
@@ -106,6 +107,7 @@ namespace CoreApp
                     currCPatch.InitZPatches();
                     foreach (ZPatch zPatch in currCPatch.ZPatches)
                     {
+                        mainTree.SelectedNode.Nodes.Clear();
                         mainTree.SelectedNode.Nodes.Add(zPatch.ZPatchId.ToString(), zPatch.ZPatchName);
                     }
                     break;
