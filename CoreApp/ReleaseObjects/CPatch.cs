@@ -62,9 +62,13 @@ namespace CoreApp.FixpackObjects
 
         private void InitFromDB()
         {
-            var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(CPatchId);
             ZPatches = new List<ZPatch>();
             ZPatchesDict = new Dictionary<int, ZPatch>();
+        }
+
+        public void InitZPatches()
+        {
+            var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(CPatchId);
             foreach (var oraZPatchRecord in oraZPatchesRecords)
             {
                 ZPatch zpatch = new ZPatch(this, oraZPatchRecord.ZPatchName, oraZPatchRecord.ZPatchId, oraZPatchRecord.ZPatchStatus);
@@ -73,7 +77,7 @@ namespace CoreApp.FixpackObjects
 
                 zpatch.cpatch = this;
             }
-            foreach(ZPatch zpatch in ZPatches)
+            foreach (ZPatch zpatch in ZPatches)
             {
                 zpatch.SetDependencies();
             }

@@ -42,7 +42,6 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csprojAssembly
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.AddForm.resources
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.CheckReleaseForm.resources
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.Properties.Resources.resources
-C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseForm.resources
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.GenerateResource.cache
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CoreCompileInputs.cache
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.exe
@@ -55,3 +54,4 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\INIFileParser.dll
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Oracle.ManagedDataAccess.dll
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\INIFileParser.xml
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CopyComplete
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseManagerForm.resources

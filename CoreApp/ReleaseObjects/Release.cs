@@ -51,10 +51,13 @@ namespace CoreApp.ReleaseObjects
 
         private void InitFromDB()
         {
-            var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
             CPatches = new List<CPatch>();
             CPatchesDict = new Dictionary<int, CPatch>();
+        }
 
+        public void InitCPatches()
+        {
+            var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
             foreach (var oraCPatch in oraCPatches)
             {
                 CPatch cpatch = new CPatch(oraCPatch.CPatchId, oraCPatch.CPatchName, oraCPatch.CPatchStatus);
@@ -62,12 +65,10 @@ namespace CoreApp.ReleaseObjects
                 CPatchesDict.Add(cpatch.CPatchId, cpatch);
             }
 
-            foreach(CPatch cpatch in CPatches)
+            foreach (CPatch cpatch in CPatches)
             {
                 cpatch.SetDependencies();
             }
-
-
         }
 
         private void InitFromDB(int releaseId, string releaseName)

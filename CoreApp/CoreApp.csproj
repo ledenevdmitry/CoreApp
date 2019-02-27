@@ -84,11 +84,11 @@
     <Compile Include="OraUtils\Model\CPatchRecord.cs" />
     <Compile Include="OraUtils\Model\ReleaseRecord.cs" />
     <Compile Include="OraUtils\Model\ZPatchRecord.cs" />
-    <Compile Include="ReleaseForm.cs">
+    <Compile Include="ReleaseManagerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ReleaseForm.Designer.cs">
-      <DependentUpon>ReleaseForm.cs</DependentUpon>
+    <Compile Include="ReleaseManagerForm.Designer.cs">
+      <DependentUpon>ReleaseManagerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ReleaseObjects\CPatch.cs" />
     <Compile Include="ReleaseObjects\InfaSchema.cs" />
@@ -135,8 +135,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="ReleaseForm.resx">
-      <DependentUpon>ReleaseForm.cs</DependentUpon>
+    <EmbeddedResource Include="ReleaseManagerForm.resx">
+      <DependentUpon>ReleaseManagerForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
