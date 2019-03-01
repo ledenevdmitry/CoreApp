@@ -120,5 +120,11 @@ namespace CoreApp.ReleaseObjects
             CPatch newCPatch = CPatch.CreateNewFromExcel(release, excelFile);
             CPatches.Add(newCPatch);
         }
+
+        public void Rename(string newName)
+        {
+            releaseName = newName;
+            ReleaseDAL.Update(releaseId, newName);
+        }
     }
 }

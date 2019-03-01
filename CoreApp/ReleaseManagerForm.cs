@@ -32,11 +32,18 @@ namespace CoreApp
 
             ResizeForm();
 
-            CbStatus.DataSource = Enum.GetValues(typeof(CPatchStatuses));
+            CbCPatchStatus.DataSource = Enum.GetValues(typeof(CPatchStatuses));
 
             rm = new ReleaseManager();
             CreateTree();
             Application.Idle += OnIdle;
+
+            TSMIRename.Click += RenameStart;
+        }
+
+        private void RenameStart(object sender, EventArgs e)
+        {
+            mainTree.SelectedNode.BeginEdit();
         }
 
         private void OnIdle(object sender, EventArgs e)
@@ -50,6 +57,7 @@ namespace CoreApp
             foreach(Release release in rm.releases)
             {
                 var currReleaseNode = mainTree.Nodes.Add(release.releaseId.ToString(), release.releaseName);
+                
             }
         }
 
@@ -67,10 +75,9 @@ namespace CoreApp
             ResizeForm();
         }
 
-        private void DisplayCPatch(CPatch cpatch)
+        private void DisplayCPatch()
         {
-            CbStatus.SelectedItem = cpatch.CPatchStatus;
-
+            CbCPatchStatus.SelectedItem = currCPatch.CPatchStatus;
         }
 
         private void BtSetHomePath_Click(object sender, EventArgs e)
@@ -166,7 +173,7 @@ namespace CoreApp
                     break;
                 case 1:
                     currCPatch = getCPatchFromTree(mainTree.SelectedNode);
-                    actualCPatchStatusIndex = CbStatus.Items.IndexOf(currCPatch.CPatchStatus);
+                    actualCPatchStatusIndex = CbCPatchStatus.Items.IndexOf(currCPatch.CPatchStatus);
                     break;
                 case 2:
                     currZPatch = getZPatchFromTree(mainTree.SelectedNode);
@@ -176,11 +183,37 @@ namespace CoreApp
 
         private void BtStatus_Click(object sender, EventArgs e)
         {
-            CPatchStatuses newStatus = (CPatchStatuses)CbStatus.SelectedItem;
+            CPatchStatuses newStatus = (CPatchStatuses)CbCPatchStatus.SelectedItem;
             if (newStatus != currCPatch.CPatchStatus)
             {
                 currCPatch.UpdateStatus(newStatus);
-                actualCPatchStatusIndex = CbStatus.Items.IndexOf(newStatus);
+                actualCPatchStatusIndex = CbCPatchStatus.Items.IndexOf(newStatus);
+            }
+        }
+
+        private void mainTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+            {
+                e.Node.ContextMenuStrip = mainTreeContextMenu;
+            }
+        }
+
+        private void mainTree_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
+        {
+
+            switch (mainTree.SelectedNode.Level)
+            {
+                case 0:
+                    getReleaseFromTree(mainTree.SelectedNode).Rename(e.Label);
+                    break;
+                case 1:
+                    getCPatchFromTree(mainTree.SelectedNode).Rename(e.Label);
+                    break;
+                case 2:
+                    getZPatchFromTree(mainTree.SelectedNode).Rename(e.Label);
+                    break;
+
             }
         }
     }
