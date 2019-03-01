@@ -18,7 +18,8 @@ namespace CoreApp.OraUtils
 
         public static string insertionsNew(char dmlType, params string[] pars)
         {
-            string joinedPars = String.Join(" and ", pars);
+            string joinedPars = DBManager.JoinParams(pars);
+
             string res =
              "insert into cpatch_hdim " +
              "( cpatch_id,  parent_id,  release_id,  cpatch_name, cpatchstatus, kod_sredy, validfrom, validto, dwsact ) " +
@@ -27,13 +28,14 @@ namespace CoreApp.OraUtils
              "(select max(validto) from cpatch_hdim " +
             $"where {joinedPars}), " +
             $"{DBManager.PlusInf}, '{dmlType}') " +
-             "from cpatch " +
+             "from cpatch_hdim " +
              "where " +
-            $"validto = {DBManager.PlusInf} and {joinedPars}";
+             "validto = (select max(validto) from cpatch_hdim " +
+            $"where {joinedPars}) and {joinedPars}";
             return res;
         }
 
-        public static string update(IEnumerable<string> filter, HashSet<string> rowsToUpdate)
+        public static string update(string[] filter, HashSet<string> rowsToUpdate)
         {
             string[] semicolons = new string[5];
             if (rowsToUpdate.Contains("parent_id"))    semicolons[0] = ":";
@@ -42,7 +44,7 @@ namespace CoreApp.OraUtils
             if (rowsToUpdate.Contains("cpatchstatus")) semicolons[3] = ":";
             if (rowsToUpdate.Contains("kod_sredy"))    semicolons[4] = ":";
 
-
+            string joinedPars = DBManager.JoinParams(filter);
 
             string res =
              "insert into cpatch_hdim " +
@@ -50,16 +52,12 @@ namespace CoreApp.OraUtils
              "select " +
             $"cpatch_id, {semicolons[0]}parent_id,  {semicolons[1]}release_id, {semicolons[2]}cpatch_name, {semicolons[3]}cpatchstatus,  {semicolons[4]}kod_sredy, " +
              "(select max(validto) from cpatch_hdim " +
-             "where cpatch_id = :cpatch_id and " +
-             "parent_id = :old_parent_id), " +
-            $"{DBManager.PlusInf}, 'U') " +
-             "from cpatch " +
+            $"where {joinedPars}), " +
+            $"{DBManager.PlusInf}, 'U' " +
+             "from cpatch_hdim " +
              "where " +
-            $"validto = {DBManager.PlusInf} ";
-            foreach (string par in filter)
-            {
-                res += $"and {par} = :{par} ";
-            }
+            $"validto = (select max(validto) from cpatch_hdim " +
+            $"where {joinedPars}) and {joinedPars}";
             return res;
 
         }
@@ -137,7 +135,8 @@ namespace CoreApp.OraUtils
             DBManager.ExecuteNonQuery(
                 updateStatus,
                 transaction,
-                new OracleParameter("cpatch_id", cpatch_id));
+                new OracleParameter("cpatch_id", cpatch_id),
+                new OracleParameter("cpatchstatus", cpatchstatus));
 
             transaction.Commit();
         }

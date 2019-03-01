@@ -128,18 +128,18 @@ namespace CoreApp
                 case 0:
                     Release currRelease = getReleaseFromTree(mainTree.SelectedNode);
                     currRelease.InitCPatches();
+                    mainTree.SelectedNode.Nodes.Clear();
                     foreach (CPatch cPatch in currRelease.CPatches)
                     {
-                        mainTree.SelectedNode.Nodes.Clear();
                         mainTree.SelectedNode.Nodes.Add(cPatch.CPatchId.ToString(), cPatch.CPatchName);
                     }
                     break;
                 case 1:
                     CPatch currCPatch = getCPatchFromTree(mainTree.SelectedNode);
                     currCPatch.InitZPatches();
+                    mainTree.SelectedNode.Nodes.Clear();
                     foreach (ZPatch zPatch in currCPatch.ZPatches)
                     {
-                        mainTree.SelectedNode.Nodes.Clear();
                         mainTree.SelectedNode.Nodes.Add(zPatch.ZPatchId.ToString(), zPatch.ZPatchName);
                     }
                     break;
@@ -180,6 +180,7 @@ namespace CoreApp
             if (newStatus != currCPatch.CPatchStatus)
             {
                 currCPatch.UpdateStatus(newStatus);
+                actualCPatchStatusIndex = CbStatus.Items.IndexOf(newStatus);
             }
         }
     }

@@ -68,13 +68,21 @@ namespace CoreApp.FixpackObjects
             ZPatches = new List<ZPatch>();
             ZPatchesDict = new Dictionary<int, ZPatch>();
             var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(CPatchId);
+
+            ZPatchStatuses status;
+
             foreach (var oraZPatchRecord in oraZPatchesRecords)
             {
+                if (!Enum.TryParse(oraZPatchRecord.ZPatchStatus, out status))
+                {
+                    status = ZPatchStatuses.UNDEFINED;
+                }
+
                 ZPatch zpatch = new ZPatch(
                     this, 
                     oraZPatchRecord.ZPatchName, 
                     oraZPatchRecord.ZPatchId, 
-                    (ZPatchStatuses)Enum.Parse(typeof(ZPatchStatuses), oraZPatchRecord.ZPatchStatus));
+                    status);
 
                 ZPatches.Add(zpatch);
                 ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
@@ -334,7 +342,6 @@ namespace CoreApp.FixpackObjects
             empty.dependenciesFrom = new HashSet<CPatch>();
             empty.dependenciesTo = new HashSet<CPatch>();
             empty.release = release;
-            release.CPatches.Add(empty);
             //release.CPatchesDict.Add(-1, empty);
 
             empty.ReopenExcelColumns(excelFile);
@@ -446,7 +453,7 @@ namespace CoreApp.FixpackObjects
         {
             CPatchStatus = newStatus;
             //TODO update
-            CPatchDAL.UpdateStatus(CPatchId, nameof(newStatus));
+            CPatchDAL.UpdateStatus(CPatchId, newStatus.ToString());
         }
 
         private void AddNewZPatches(Range columns, out List<ZPatch> newPatches)

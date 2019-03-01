@@ -11,14 +11,12 @@ namespace CoreApp.OraUtils.Model
         public int ZPatchId { get; private set; }
         public string ZPatchName { get; private set; }
         public string ZPatchStatus { get; set; }
-        public string KodSredy { get; private set; }
 
-        public ZPatchRecord(int zPatchId, string zPatchName, string zPatchStatus, string KodSredy)
+        public ZPatchRecord(int zPatchId, string zPatchName, string zPatchStatus)
         {
             ZPatchId = zPatchId;
             ZPatchName = zPatchName;
             ZPatchStatus = zPatchStatus;
-            this.KodSredy = KodSredy;
         }
     }
 }

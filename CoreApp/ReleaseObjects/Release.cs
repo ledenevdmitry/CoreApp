@@ -51,11 +51,11 @@ namespace CoreApp.ReleaseObjects
 
         public void InitCPatches()
         {
-            CPatches = new List<CPatch>();
-            CPatchesDict = new Dictionary<int, CPatch>();
             var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
 
             CPatchStatuses status;
+            CPatches = new List<CPatch>();
+            CPatchesDict = new Dictionary<int, CPatch>();
 
             foreach (var oraCPatch in oraCPatches)
             {
@@ -82,6 +82,8 @@ namespace CoreApp.ReleaseObjects
 
         private void InitFromDB(int releaseId, string releaseName)
         {
+            CPatches = new List<CPatch>();
+            CPatchesDict = new Dictionary<int, CPatch>();
             this.releaseId = releaseId;
             this.releaseName = releaseName;
         }

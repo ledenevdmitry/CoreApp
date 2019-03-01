@@ -11,8 +11,8 @@ namespace CoreApp.OraUtils
     {
         private static OracleConnection conn;
 
-        public const string MinusInf = "to_date('01.01.1900', 'dd.mm.yyyy')";
-        public const string PlusInf = "to_date('31.12.5999', 'dd.mm.yyyy')";
+        public const string MinusInf = "to_date('01.01.1900 0:00:00', 'dd.mm.yyyy HH24.MI:ss')";
+        public const string PlusInf = "to_date('31.12.5999 0:00:00', 'dd.mm.yyyy HH24.MI:ss')";
 
         static DBManager()
         {
@@ -90,6 +90,16 @@ namespace CoreApp.OraUtils
                 }
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        public static string JoinParams(params string[] ps)
+        {
+            string res = $":{ps[0]} = {ps[0]}";
+            for(int i = 1; i < ps.Length; ++i)
+            {
+                res += $"and :{ps[i]} = {ps[i]}";
+            }
+            return res;
         }
 
         public void Dispose()

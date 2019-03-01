@@ -18,7 +18,7 @@ namespace CoreApp.OraUtils
 
         public static string insertionsNew(char dmlType, params string[] pars)
         {
-            string joinedPars = String.Join(" and ", pars);
+            string joinedPars = DBManager.JoinParams(pars);
             string res =
              "insert into zpatch_hdim " +
              "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
@@ -27,9 +27,10 @@ namespace CoreApp.OraUtils
              "(select max(validto) from zpatch_hdim " +
             $"where {joinedPars}), " +
             $"{DBManager.PlusInf}, '{dmlType}') " +
-             "from zpatch " +
+             "from zpatch_hdim " +
              "where " +
-            $"validto = {DBManager.PlusInf} and {joinedPars}";
+            $"validto = (select max(validto) from zpatch_hdim " +
+            $"where {joinedPars}) and {joinedPars}";
             return res;
         }
 
@@ -65,7 +66,7 @@ namespace CoreApp.OraUtils
              "where zpatch_id = :zpatch_id and " +
              "parent_id = :parent_id), " +
             $"{DBManager.PlusInf}, 'D') " +
-             "from zpatch z" +
+             "from zpatch_hdim z" +
              "where " +
             $"validto = {DBManager.PlusInf} " +
              "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 or z1.cpatch_id = c1.cpatch_id " +
@@ -236,8 +237,7 @@ namespace CoreApp.OraUtils
                     yield return new ZPatchRecord(
                         reader.GetInt32(0), 
                         reader.GetString(1), 
-                        reader.IsDBNull(2) ? null : reader.GetString(2),
-                        reader.IsDBNull(3) ? null : reader.GetString(3));
+                        reader.IsDBNull(2) ? null : reader.GetString(2));
                 }
             }
         }
