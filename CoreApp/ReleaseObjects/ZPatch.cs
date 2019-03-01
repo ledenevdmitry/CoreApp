@@ -12,7 +12,7 @@ namespace CoreApp.FixpackObjects
     public class ZPatch
     {
         public string ZPatchName { get; private set; }
-        public string ZPatchStatus { get; private set; }
+        public string ZPatchStatus { get; set; }
         public DirectoryInfo dir { get; private set; }
         public string pathToPatch { get; private set; }
         private static Regex ATCPatchRegex = new Regex(@"\\((\d+\-)?Z(\d+.*?))");
@@ -38,11 +38,12 @@ namespace CoreApp.FixpackObjects
             return ((ZPatch)obj).ZPatchName == ZPatchName;
         }
 
-        public ZPatch(string ZPatchName, int CPatch, HashSet<ZPatch> dependenciesFrom, HashSet<ZPatch> dependenciesTo)
+        public ZPatch(string ZPatchName, int CPatch, HashSet<ZPatch> dependenciesFrom, HashSet<ZPatch> dependenciesTo, string ZPatchStatus)
         {
             this.ZPatchName = ZPatchName;
             this.dependenciesFrom = dependenciesFrom;
             this.dependenciesTo = dependenciesTo;
+            this.ZPatchStatus = ZPatchStatus;
         }
 
 

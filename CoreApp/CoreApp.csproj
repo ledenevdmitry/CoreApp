@@ -81,6 +81,7 @@
     <Compile Include="OraUtils\DAL\ReleaseDAL.cs" />
     <Compile Include="OraUtils\DAL\ZPatchDAL.cs" />
     <Compile Include="OraUtils\DAL\ZPatchOrderDAL.cs" />
+    <Compile Include="OraUtils\DBManagerForTest.cs" />
     <Compile Include="OraUtils\Model\CPatchRecord.cs" />
     <Compile Include="OraUtils\Model\ReleaseRecord.cs" />
     <Compile Include="OraUtils\Model\ZPatchRecord.cs" />

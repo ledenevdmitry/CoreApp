@@ -38,13 +38,12 @@
             this.BtAddFixpack = new System.Windows.Forms.ToolStripMenuItem();
             this.mainSplitter = new System.Windows.Forms.SplitContainer();
             this.mainTree = new System.Windows.Forms.TreeView();
-            this.mainDGV = new System.Windows.Forms.DataGridView();
+            this.GbCPatch = new System.Windows.Forms.GroupBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mainSplitter)).BeginInit();
             this.mainSplitter.Panel1.SuspendLayout();
             this.mainSplitter.Panel2.SuspendLayout();
             this.mainSplitter.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mainDGV)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -126,7 +125,7 @@
             // 
             // mainSplitter.Panel2
             // 
-            this.mainSplitter.Panel2.Controls.Add(this.mainDGV);
+            this.mainSplitter.Panel2.Controls.Add(this.GbCPatch);
             this.mainSplitter.Size = new System.Drawing.Size(608, 526);
             this.mainSplitter.SplitterDistance = 202;
             this.mainSplitter.SplitterWidth = 5;
@@ -142,14 +141,14 @@
             this.mainTree.TabIndex = 0;
             this.mainTree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.mainTree_NodeMouseDoubleClick);
             // 
-            // mainDGV
+            // GbCPatch
             // 
-            this.mainDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.mainDGV.Location = new System.Drawing.Point(4, 4);
-            this.mainDGV.Margin = new System.Windows.Forms.Padding(4);
-            this.mainDGV.Name = "mainDGV";
-            this.mainDGV.Size = new System.Drawing.Size(392, 517);
-            this.mainDGV.TabIndex = 0;
+            this.GbCPatch.Location = new System.Drawing.Point(3, 4);
+            this.GbCPatch.Name = "GbCPatch";
+            this.GbCPatch.Size = new System.Drawing.Size(386, 516);
+            this.GbCPatch.TabIndex = 0;
+            this.GbCPatch.TabStop = false;
+            this.GbCPatch.Text = "C-патч";
             // 
             // ReleaseManagerForm
             // 
@@ -168,7 +167,6 @@
             this.mainSplitter.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.mainSplitter)).EndInit();
             this.mainSplitter.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.mainDGV)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -186,6 +184,6 @@
         private System.Windows.Forms.ToolStripMenuItem BtSetHomePath;
         private System.Windows.Forms.SplitContainer mainSplitter;
         private System.Windows.Forms.TreeView mainTree;
-        private System.Windows.Forms.DataGridView mainDGV;
+        private System.Windows.Forms.GroupBox GbCPatch;
     }
 }

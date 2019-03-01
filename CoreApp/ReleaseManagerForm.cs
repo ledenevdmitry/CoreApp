@@ -44,7 +44,10 @@ namespace CoreApp
         private void mainSplitter_SplitterMoved(object sender, SplitterEventArgs e)
         {
             mainTree.Width = mainSplitter.Panel1.Width;
+            mainTree.Height = mainSplitter.Panel1.Height;
+
             mainDGV.Width = mainSplitter.Panel2.Width;
+            mainTree.Height = mainSplitter.Panel2.Height;
         }
 
         private void BtSetHomePath_Click(object sender, EventArgs e)

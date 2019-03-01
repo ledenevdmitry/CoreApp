@@ -90,6 +90,11 @@ namespace CoreApp.OraUtils
             "'I' " +
             "from zpatch_hdim where zpatch_id = :zpatch_id ";
 
+        private static string ZPatchInstalledScript =
+            "select 1 from dual " +
+            "where exists (select 1 from patch_stat where command_text like '%:zpatch_name%' and status = 0) " +
+            "and not exists(select 1 from patch_stat where command_text like '%:zpatch_name%' and status <> 0)";
+
         public static int Insert(int cpatch_id, int? parent_id, string zpatch_name, string zpatchstatus)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
@@ -109,6 +114,19 @@ namespace CoreApp.OraUtils
 
             transaction.Commit();
             return seqValue;
+        }
+
+        public static bool IsZPatchInstalled(string zpatch_name, string KodSredy)
+        {
+            if (KodSredy == "STAB")
+            {
+                return DBManager.ExecuteQuery(
+                    ZPatchInstalledScript,
+                    new OracleParameter("zpatch_name", zpatch_name)).HasRows;
+            }
+            return DBManagerForTest.ExecuteQuery(
+                ZPatchInstalledScript,
+                new OracleParameter("zpatch_name", zpatch_name)).HasRows;
         }
 
         public static void Update(int zpatch_id, int? parent_id, int new_cpatch_id, int new_zpatch_name)
@@ -222,7 +240,8 @@ namespace CoreApp.OraUtils
                     yield return new ZPatchRecord(
                         reader.GetInt32(0), 
                         reader.GetString(1), 
-                        reader.IsDBNull(2) ? null : reader.GetString(2));
+                        reader.IsDBNull(2) ? null : reader.GetString(2),
+                        reader.IsDBNull(3) ? null : reader.GetString(3));
                 }
             }
         }

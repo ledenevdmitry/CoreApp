@@ -31,6 +31,7 @@ namespace CoreApp.FixpackObjects
         public HashSet<CPatch> dependenciesFrom { get; protected set; }
         public HashSet<CPatch> dependenciesTo { get; protected set; }
         public Release release;
+        public string KodSredy { get; set; }
 
         public int CPatchId { get; private set; }
 
@@ -52,11 +53,12 @@ namespace CoreApp.FixpackObjects
         }
 
 
-        private void InitFromDB(int CPatchId, string CPatchName, string CPatchStatus)
+        private void InitFromDB(int CPatchId, string CPatchName, string CPatchStatus, string KodSredy)
         {
             this.CPatchId = CPatchId;
             this.CPatchName = CPatchName;
             this.CPatchStatus = CPatchStatus;
+            this.KodSredy = KodSredy;
         }
 
         public void InitZPatches()
@@ -75,6 +77,17 @@ namespace CoreApp.FixpackObjects
             foreach (ZPatch zpatch in ZPatches)
             {
                 zpatch.SetDependencies();
+            }
+        }
+
+        public void ResetStatusesByLog()
+        {
+            foreach(ZPatch zpatch in ZPatches)
+            {
+                if (zpatch.ZPatchStatus != "Installed" && ZPatchDAL.IsZPatchInstalled(zpatch.ZPatchName, KodSredy))
+                {
+                    zpatch.ZPatchStatus = "Installed";
+                }
             }
         }
         
@@ -99,9 +112,9 @@ namespace CoreApp.FixpackObjects
             }
         }
 
-        public CPatch(int CPatchId, string CPatchName, string CPatchStatus)
+        public CPatch(int CPatchId, string CPatchName, string CPatchStatus, string KodSredy)
         {
-            InitFromDB(CPatchId, CPatchName, CPatchStatus);
+            InitFromDB(CPatchId, CPatchName, CPatchStatus, KodSredy);
         }
 
         private string FindLocalExcel(CPatch fp)
@@ -396,6 +409,19 @@ namespace CoreApp.FixpackObjects
             throw new KeyNotFoundException("Колонка с именем патча не найдена");
         }
 
+        private int GetPatchStatusIndex(Range columns)
+        {
+            for (int i = 1; i <= columns.Columns.Count; ++i)
+            {
+                string currCell = ((Range)columns.Cells[1, i]).Value2;
+                if (currCell == "Статус")
+                {
+                    return i;
+                }
+            }
+            throw new KeyNotFoundException("Колонка со статусом не найдена");
+        }
+
         private int GetLinkIndex(Range columns)
         {
             for (int i = 1; i <= columns.Columns.Count; ++i)
@@ -414,10 +440,20 @@ namespace CoreApp.FixpackObjects
             newPatches = new List<ZPatch>();
 
             int patchNameIndex = GetPatchNameIndex(columns);
+            int patchStatusIndex = GetPatchStatusIndex(columns);
 
             for (int i = 2; i <= columns.Rows.Count; ++i)
             {
                 string patchCell = ((Range)columns.Cells[i, patchNameIndex]).Value2 ?? "";
+                string excelStatus = ((Range)columns.Cells[i, patchStatusIndex]).Value2;
+                string ZPatchStatus = null;
+
+                if (excelStatus == "Open")
+                    ZPatchStatus = "Open";
+                else if (excelStatus == "Testing" || excelStatus == "Waiting Bank Confirm")
+                    ZPatchStatus = "Ready";
+                else if (excelStatus == "Installed To STAB")
+                    ZPatchStatus = "Installed";
 
                 MatchCollection matches = Regex.Matches(patchCell, regexZPatchName);
                 if (matches.Count == 0)
@@ -443,7 +479,8 @@ namespace CoreApp.FixpackObjects
                             patchName,
                             CPatchId,
                             new HashSet<ZPatch>(),
-                            new HashSet<ZPatch>());
+                            new HashSet<ZPatch>(),
+                            ZPatchStatus);
 
                         zpatch.excelFileRowId = i;
                         zpatch.cpatch = this;

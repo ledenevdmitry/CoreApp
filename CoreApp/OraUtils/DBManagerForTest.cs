@@ -7,16 +7,13 @@ using System.Threading.Tasks;
 
 namespace CoreApp.OraUtils
 {
-    class DBManager : IDisposable
+    class DBManagerForTest : IDisposable
     {
         private static OracleConnection conn;
 
-        public const string MinusInf = "to_date('01.01.1900', 'dd.mm.yyyy')";
-        public const string PlusInf = "to_date('31.12.5999', 'dd.mm.yyyy')";
-
-        static DBManager()
+        static DBManagerForTest()
         {
-            CreateConn(IniUtils.IniUtils.GetConfig("Oracle", "TNS_STAB"));
+            CreateConn(IniUtils.IniUtils.GetConfig("Oracle", "TNS_TEST"));
         }
 
         //создание менеджера с переданным логином и паролем
@@ -29,9 +26,9 @@ namespace CoreApp.OraUtils
             }
             catch (System.InvalidOperationException exc)
             {
-                throw new ArgumentException("Задайте правильный TNS_STAB", exc);
+                throw new ArgumentException("Задайте правильный TNS_TEST", exc);
             }
-            
+
         }
 
         //открыть соединение
