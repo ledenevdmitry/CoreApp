@@ -54,9 +54,22 @@ namespace CoreApp.ReleaseObjects
             CPatches = new List<CPatch>();
             CPatchesDict = new Dictionary<int, CPatch>();
             var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
+
+            CPatchStatuses status;
+
             foreach (var oraCPatch in oraCPatches)
             {
-                CPatch cpatch = new CPatch(oraCPatch.CPatchId, oraCPatch.CPatchName, oraCPatch.CPatchStatus);
+
+                if(!Enum.TryParse(oraCPatch.CPatchStatus, out status))
+                {
+                    status = CPatchStatuses.UNDEFINED;
+                }
+
+                CPatch cpatch = new CPatch(
+                    oraCPatch.CPatchId, 
+                    oraCPatch.CPatchName,
+                    status, 
+                    oraCPatch.Kod_Sredy);
                 CPatches.Add(cpatch);
                 CPatchesDict.Add(cpatch.CPatchId, cpatch);
             }

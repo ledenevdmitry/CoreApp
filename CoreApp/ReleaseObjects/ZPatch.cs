@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 
 namespace CoreApp.FixpackObjects
 {
+    public enum ZPatchStatuses { UNDEFINED, OPEN, READY, INSTALLED, ERROR };
+
     public class ZPatch
     {
         public string ZPatchName { get; private set; }
-        public string ZPatchStatus { get; set; }
+        public ZPatchStatuses ZPatchStatus { get; set; }
         public DirectoryInfo dir { get; private set; }
         public string pathToPatch { get; private set; }
         private static Regex ATCPatchRegex = new Regex(@"\\((\d+\-)?Z(\d+.*?))");
@@ -38,7 +40,7 @@ namespace CoreApp.FixpackObjects
             return ((ZPatch)obj).ZPatchName == ZPatchName;
         }
 
-        public ZPatch(string ZPatchName, int CPatch, HashSet<ZPatch> dependenciesFrom, HashSet<ZPatch> dependenciesTo, string ZPatchStatus)
+        public ZPatch(string ZPatchName, int CPatch, HashSet<ZPatch> dependenciesFrom, HashSet<ZPatch> dependenciesTo, ZPatchStatuses ZPatchStatus)
         {
             this.ZPatchName = ZPatchName;
             this.dependenciesFrom = dependenciesFrom;
@@ -47,7 +49,7 @@ namespace CoreApp.FixpackObjects
         }
 
 
-        public ZPatch(CPatch cpatch, string ZPatchName, int ZPatchId, string ZPatchStatus)
+        public ZPatch(CPatch cpatch, string ZPatchName, int ZPatchId, ZPatchStatuses ZPatchStatus)
         {
             this.cpatch = cpatch;
             this.ZPatchId = ZPatchId;

@@ -18,24 +18,53 @@ namespace CoreApp.OraUtils
 
         public static string insertionsNew(char dmlType, params string[] pars)
         {
+            string joinedPars = String.Join(" and ", pars);
             string res =
              "insert into cpatch_hdim " +
              "( cpatch_id,  parent_id,  release_id,  cpatch_name, cpatchstatus, kod_sredy, validfrom, validto, dwsact ) " +
              "select " +
              "cpatch_id, parent_id,  :new_release_id,  :new_cpatch_name, :new_cpatchstatus,  :new_kod_sredy, " +
              "(select max(validto) from cpatch_hdim " +
-             "where cpatch_id = :cpatch_id and " +
-             "parent_id = :old_parent_id), " +
+            $"where {joinedPars}), " +
             $"{DBManager.PlusInf}, '{dmlType}') " +
              "from cpatch " +
              "where " +
+            $"validto = {DBManager.PlusInf} and {joinedPars}";
+            return res;
+        }
+
+        public static string update(IEnumerable<string> filter, HashSet<string> rowsToUpdate)
+        {
+            string[] semicolons = new string[5];
+            if (rowsToUpdate.Contains("parent_id"))    semicolons[0] = ":";
+            if (rowsToUpdate.Contains("release_id"))   semicolons[1] = ":";
+            if (rowsToUpdate.Contains("cpatch_name"))  semicolons[2] = ":";
+            if (rowsToUpdate.Contains("cpatchstatus")) semicolons[3] = ":";
+            if (rowsToUpdate.Contains("kod_sredy"))    semicolons[4] = ":";
+
+
+
+            string res =
+             "insert into cpatch_hdim " +
+             "( cpatch_id,  parent_id,  release_id,  cpatch_name, cpatchstatus, kod_sredy, validfrom, validto, dwsact ) " +
+             "select " +
+            $"cpatch_id, {semicolons[0]}parent_id,  {semicolons[1]}release_id, {semicolons[2]}cpatch_name, {semicolons[3]}cpatchstatus,  {semicolons[4]}kod_sredy, " +
+             "(select max(validto) from cpatch_hdim " +
+             "where cpatch_id = :cpatch_id and " +
+             "parent_id = :old_parent_id), " +
+            $"{DBManager.PlusInf}, 'U') " +
+             "from cpatch " +
+             "where " +
             $"validto = {DBManager.PlusInf} ";
-            foreach (string par in pars)
+            foreach (string par in filter)
             {
                 res += $"and {par} = :{par} ";
             }
             return res;
+
         }
+
+        static string updateStatus = update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatchstatus" }));
 
         public static string closeOld(params string[] pars)
         {
@@ -96,27 +125,19 @@ namespace CoreApp.OraUtils
             return seqValue;
         }
 
-        public static void Update(int cpatch_id, int? parent_id, int new_release_id, string new_cpatch_name, string new_cpatchstatus)
+        public static void UpdateStatus(int cpatch_id, string cpatchstatus)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
                 closeOld("cpatch_id"),
                 transaction,
-                new OracleParameter("cpatch_id", cpatch_id),
-                new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
-                new OracleParameter("new_release_id", new_release_id),
-                new OracleParameter("new_cpatch_name", new_cpatch_name),
-                new OracleParameter("new_cpatchstatus", new_cpatchstatus));
+                new OracleParameter("cpatch_id", cpatch_id));
 
             DBManager.ExecuteNonQuery(
-                insertionsNew('U', "cpatch_id"),
+                updateStatus,
                 transaction,
-                new OracleParameter("cpatch_id", cpatch_id),
-                new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
-                new OracleParameter("new_release_id", new_release_id),
-                new OracleParameter("new_cpatch_name", new_cpatch_name),
-                new OracleParameter("new_cpatchstatus", new_cpatchstatus));
+                new OracleParameter("cpatch_id", cpatch_id));
 
             transaction.Commit();
         }

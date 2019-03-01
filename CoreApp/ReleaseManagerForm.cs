@@ -18,11 +18,22 @@ namespace CoreApp
     public partial class ReleaseManagerForm : Form
     {
         ReleaseManager rm;
+
+        Release currRelease;
+        CPatch currCPatch;
+        ZPatch currZPatch;
+
+        int actualCPatchStatusIndex = -1;
+        int actualZPatchStatusIndex = -1;
+
         public ReleaseManagerForm()
         {
             InitializeComponent();
-            mainTree.Width = mainSplitter.Panel1.Width;
-            mainDGV.Width = mainSplitter.Panel2.Width;
+
+            ResizeForm();
+
+            CbStatus.DataSource = Enum.GetValues(typeof(CPatchStatuses));
+
             rm = new ReleaseManager();
             CreateTree();
             Application.Idle += OnIdle;
@@ -31,6 +42,7 @@ namespace CoreApp
         private void OnIdle(object sender, EventArgs e)
         {
             BtAddFixpack.Enabled = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
+            GbCPatch.Visible = mainTree.SelectedNode.Level == 1;
         }
 
         private void CreateTree()
@@ -41,13 +53,24 @@ namespace CoreApp
             }
         }
 
+        private void ResizeForm()
+        {
+            mainTree.Width = SCMain.Panel1.Width;
+            mainTree.Height = SCMain.Panel1.Height;
+
+            GbCPatch.Width = SCMain.Panel2.Width;
+            GbCPatch.Height = SCMain.Panel2.Height;
+        }
+
         private void mainSplitter_SplitterMoved(object sender, SplitterEventArgs e)
         {
-            mainTree.Width = mainSplitter.Panel1.Width;
-            mainTree.Height = mainSplitter.Panel1.Height;
+            ResizeForm();
+        }
 
-            mainDGV.Width = mainSplitter.Panel2.Width;
-            mainTree.Height = mainSplitter.Panel2.Height;
+        private void DisplayCPatch(CPatch cpatch)
+        {
+            CbStatus.SelectedItem = cpatch.CPatchStatus;
+
         }
 
         private void BtSetHomePath_Click(object sender, EventArgs e)
@@ -88,8 +111,14 @@ namespace CoreApp
 
         private CPatch getCPatchFromTree(TreeNode node)
         {
-            Release currRelease = getReleaseFromTree(node.Parent);
+            currRelease = getReleaseFromTree(node.Parent);
             return currRelease.CPatchesDict[int.Parse(node.Name)];
+        }
+
+        private ZPatch getZPatchFromTree(TreeNode node)
+        {
+            currCPatch = getCPatchFromTree(node.Parent);
+            return currCPatch.ZPatchesDict[int.Parse(node.Name)];
         }
 
         private void mainTree_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -114,6 +143,43 @@ namespace CoreApp
                         mainTree.SelectedNode.Nodes.Add(zPatch.ZPatchId.ToString(), zPatch.ZPatchName);
                     }
                     break;
+            }
+            mainTree.SelectedNode.Expand();
+        }
+
+        private void CbStatus_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            if (e.Index == actualCPatchStatusIndex)
+            {
+                e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
+            }
+            e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
+        }
+
+        private void mainTree_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            switch (mainTree.SelectedNode.Level)
+            {
+                case 0:
+                    currRelease = getReleaseFromTree(mainTree.SelectedNode);
+                    break;
+                case 1:
+                    currCPatch = getCPatchFromTree(mainTree.SelectedNode);
+                    actualCPatchStatusIndex = CbStatus.Items.IndexOf(currCPatch.CPatchStatus);
+                    break;
+                case 2:
+                    currZPatch = getZPatchFromTree(mainTree.SelectedNode);
+                    break;
+            }
+        }
+
+        private void BtStatus_Click(object sender, EventArgs e)
+        {
+            CPatchStatuses newStatus = (CPatchStatuses)CbStatus.SelectedItem;
+            if (newStatus != currCPatch.CPatchStatus)
+            {
+                currCPatch.UpdateStatus(newStatus);
             }
         }
     }

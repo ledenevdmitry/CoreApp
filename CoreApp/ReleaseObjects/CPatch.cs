@@ -13,12 +13,14 @@ using System.Threading.Tasks;
 
 namespace CoreApp.FixpackObjects
 {
+    public enum CPatchStatuses  { UNDEFINED, NOTREADY, READY }
+
     public class CPatch
     {
         public string C { get; private set; }
         public string FullName { get; private set; }
         public string CPatchName { get; private set; }
-        public string CPatchStatus { get; private set; }
+        public CPatchStatuses CPatchStatus { get; private set; }
         public string LocalPath { get; private set; }
         public static CVS.CVS cvs;
 
@@ -53,7 +55,7 @@ namespace CoreApp.FixpackObjects
         }
 
 
-        private void InitFromDB(int CPatchId, string CPatchName, string CPatchStatus, string KodSredy)
+        private void InitFromDB(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, string KodSredy)
         {
             this.CPatchId = CPatchId;
             this.CPatchName = CPatchName;
@@ -68,7 +70,12 @@ namespace CoreApp.FixpackObjects
             var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(CPatchId);
             foreach (var oraZPatchRecord in oraZPatchesRecords)
             {
-                ZPatch zpatch = new ZPatch(this, oraZPatchRecord.ZPatchName, oraZPatchRecord.ZPatchId, oraZPatchRecord.ZPatchStatus);
+                ZPatch zpatch = new ZPatch(
+                    this, 
+                    oraZPatchRecord.ZPatchName, 
+                    oraZPatchRecord.ZPatchId, 
+                    (ZPatchStatuses)Enum.Parse(typeof(ZPatchStatuses), oraZPatchRecord.ZPatchStatus));
+
                 ZPatches.Add(zpatch);
                 ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
 
@@ -84,9 +91,9 @@ namespace CoreApp.FixpackObjects
         {
             foreach(ZPatch zpatch in ZPatches)
             {
-                if (zpatch.ZPatchStatus != "Installed" && ZPatchDAL.IsZPatchInstalled(zpatch.ZPatchName, KodSredy))
+                if (zpatch.ZPatchStatus != ZPatchStatuses.INSTALLED && ZPatchDAL.IsZPatchInstalled(zpatch.ZPatchName, KodSredy))
                 {
-                    zpatch.ZPatchStatus = "Installed";
+                    zpatch.ZPatchStatus = ZPatchStatuses.INSTALLED;
                 }
             }
         }
@@ -112,7 +119,7 @@ namespace CoreApp.FixpackObjects
             }
         }
 
-        public CPatch(int CPatchId, string CPatchName, string CPatchStatus, string KodSredy)
+        public CPatch(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, string KodSredy)
         {
             InitFromDB(CPatchId, CPatchName, CPatchStatus, KodSredy);
         }
@@ -435,6 +442,13 @@ namespace CoreApp.FixpackObjects
             throw new KeyNotFoundException("Колонка с зависимостями не найдена");
         }
 
+        public void UpdateStatus(CPatchStatuses newStatus)
+        {
+            CPatchStatus = newStatus;
+            //TODO update
+            CPatchDAL.UpdateStatus(CPatchId, nameof(newStatus));
+        }
+
         private void AddNewZPatches(Range columns, out List<ZPatch> newPatches)
         {
             newPatches = new List<ZPatch>();
@@ -446,14 +460,14 @@ namespace CoreApp.FixpackObjects
             {
                 string patchCell = ((Range)columns.Cells[i, patchNameIndex]).Value2 ?? "";
                 string excelStatus = ((Range)columns.Cells[i, patchStatusIndex]).Value2;
-                string ZPatchStatus = null;
+                ZPatchStatuses ZPatchStatus = ZPatchStatuses.UNDEFINED;
 
                 if (excelStatus == "Open")
-                    ZPatchStatus = "Open";
+                    ZPatchStatus = ZPatchStatuses.OPEN;
                 else if (excelStatus == "Testing" || excelStatus == "Waiting Bank Confirm")
-                    ZPatchStatus = "Ready";
+                    ZPatchStatus = ZPatchStatuses.READY;
                 else if (excelStatus == "Installed To STAB")
-                    ZPatchStatus = "Installed";
+                    ZPatchStatus = ZPatchStatuses.INSTALLED;
 
                 MatchCollection matches = Regex.Matches(patchCell, regexZPatchName);
                 if (matches.Count == 0)

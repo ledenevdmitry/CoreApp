@@ -18,22 +18,18 @@ namespace CoreApp.OraUtils
 
         public static string insertionsNew(char dmlType, params string[] pars)
         {
+            string joinedPars = String.Join(" and ", pars);
             string res =
              "insert into zpatch_hdim " +
              "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
              "select " +
              "zpatch_id, parent_id,  :new_cpatch_id,  :new_zpatch_name, :new_zpatchstatus, " +
              "(select max(validto) from zpatch_hdim " +
-             "where zpatch_id = :zpatch_id and " +
-             "parent_id = :parent_id), " +
+            $"where {joinedPars}), " +
             $"{DBManager.PlusInf}, '{dmlType}') " +
              "from zpatch " +
              "where " +
-            $"validto = {DBManager.PlusInf} ";
-            foreach (string par in pars)
-            {
-                res += $"and {par} = :{par} ";
-            }
+            $"validto = {DBManager.PlusInf} and {joinedPars}";
             return res;
         }
 
