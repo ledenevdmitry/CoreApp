@@ -40,15 +40,16 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
-        public bool AddRelease(string releaseName)
+        public Release AddRelease(string releaseName)
         {
             if(ReleaseDAL.Contains(releaseName))
             {
-                return false;
+                return null;
             }
             Release newRelease = new Release(ReleaseDAL.Insert(releaseName), releaseName);
             releases.Add(newRelease);
-            return true;
+            releasesDict.Add(newRelease.releaseId, newRelease);
+            return newRelease;
         }
 
         public void DeleteRelease(int releaseId)

@@ -48,6 +48,33 @@ namespace CoreApp.OraUtils
             return res;
         }
 
+        private static string Update(string[] filter, HashSet<string> rowsToUpdate)
+        {
+            string[] semicolons = new string[5];
+            if (rowsToUpdate.Contains("parent_id")) semicolons[0] = ":";
+            if (rowsToUpdate.Contains("cpatch_id")) semicolons[1] = ":";
+            if (rowsToUpdate.Contains("zpatch_name")) semicolons[2] = ":";
+            if (rowsToUpdate.Contains("zpatchstatus")) semicolons[3] = ":";
+
+            string joinedPars = DBManager.JoinParams(filter);
+
+            string res =
+             "insert into zpatch_hdim " +
+             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
+             "select " +
+            $"zpatch_id, {semicolons[0]}parent_id,  {semicolons[1]}cpatch_id, {semicolons[2]}zpatch_name, {semicolons[3]}zpatchstatus, " +
+             "(select max(validto) from zpatch_hdim " +
+            $"where {joinedPars}), " +
+            $"{DBManager.PlusInf}, 'U' " +
+             "from zpatch_hdim " +
+             "where " +
+            $"validto = (select max(validto) from zpatch_hdim " +
+            $"where {joinedPars}) and {joinedPars}";
+            return res;
+        }
+        
+        static string updateStatus = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "zpatchstatus" }));
+        static string updateName = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "zpatch_name" }));
 
         public static string deleteByReleaseCloseOld =
             "update zpatch_hdim z" +
@@ -126,24 +153,38 @@ namespace CoreApp.OraUtils
                 new OracleParameter("zpatch_name", zpatch_name)).HasRows;
         }
 
-        public static void Update(int zpatch_id, int? parent_id, int new_cpatch_id, int new_zpatch_name)
+        public static void UpdateName(int zpatch_id, string zpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
                 closeOld("zpatch_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
-                new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
-                new OracleParameter("new_cpatch_id", new_cpatch_id),
-                new OracleParameter("new_zpatch_name", new_zpatch_name));
+                new OracleParameter("zpatch_name", zpatch_name));
 
             DBManager.ExecuteNonQuery(
-                insertionsNew('U', "zpatch_id"),
+                updateName,
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
-                new OracleParameter("parent_id", (object)parent_id ?? DBNull.Value),
-                new OracleParameter("new_cpatch_id", new_cpatch_id),
-                new OracleParameter("new_zpatch_name", new_zpatch_name));    
+                new OracleParameter("zpatch_name", zpatch_name));    
+
+            transaction.Commit();
+        }
+
+        public static void UpdateStatus(int zpatch_id, string zpatchstatus)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+            DBManager.ExecuteNonQuery(
+                closeOld("zpatch_id"),
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("zpatchstatus", zpatchstatus));
+
+            DBManager.ExecuteNonQuery(
+                updateStatus,
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("zpatchstatus", zpatchstatus));
 
             transaction.Commit();
         }

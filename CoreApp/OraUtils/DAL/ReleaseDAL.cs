@@ -16,13 +16,14 @@ namespace CoreApp.OraUtils
              "insert into release_hdim " +
              "( release_id,  release_name, validfrom, validto, dwsact ) " +
              "select " +
-             "release_id, :new_release_name" +
+             "release_id, :new_release_name, " +
              "(select max(validto) from release_hdim " +
-             "where release_id = :release_id and " +
-            $"{DBManager.PlusInf}, '{dmlType}') " +
+             "where release_id = :release_id), " +
+            $"{DBManager.PlusInf}, '{dmlType}' " +
              "from release_hdim " +
              "where " +
-            $"validto = {DBManager.PlusInf} ";
+            $"validto = (select max(validto) from release_hdim " +
+             "where release_id = :release_id) ";
             foreach (string par in pars)
             {
                 res += $"and {par} = :{par} ";
@@ -44,16 +45,12 @@ namespace CoreApp.OraUtils
             return res;
         }
 
+
         private static string insertScript =
             "insert into release_hdim " +
             "( release_id,  release_name, validfrom, validto, dwsact) " +
             "values " +
            $"(:release_id, :release_name, sysdate, {DBManager.PlusInf}, 'I') ";
-
-        private static string updateScript =
-            closeOld("release_id") +
-            insertionsNew('U', "release_id");
-
 
         public static int Insert(string release_name)
         {
@@ -76,11 +73,19 @@ namespace CoreApp.OraUtils
         public static void Update(int release_id, string new_release_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
+
             DBManager.ExecuteNonQuery(
-                updateScript,
+            closeOld("release_id"),
                 transaction,
                 new OracleParameter("release_id", release_id),
                 new OracleParameter("new_release_name", new_release_name));
+
+            DBManager.ExecuteNonQuery(
+                insertionsNew('U', "release_id"),
+                transaction,
+                new OracleParameter("release_id", release_id),
+                new OracleParameter("new_release_name", new_release_name));
+
             transaction.Commit();
         }
 

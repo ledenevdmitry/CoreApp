@@ -48,6 +48,14 @@ namespace CoreApp.FixpackObjects
             this.ZPatchStatus = ZPatchStatus;
         }
 
+        public void Rename(string newName)
+        {
+            if(newName != null && ZPatchName != newName)
+            {
+                ZPatchName = newName;
+                ZPatchDAL.UpdateName(ZPatchId, newName);
+            }
+        }
 
         public ZPatch(CPatch cpatch, string ZPatchName, int ZPatchId, ZPatchStatuses ZPatchStatus)
         {

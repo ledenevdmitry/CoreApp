@@ -43,21 +43,21 @@ namespace CoreApp
 
         private void RenameStart(object sender, EventArgs e)
         {
+            mainTree.LabelEdit = true;
             mainTree.SelectedNode.BeginEdit();
         }
 
         private void OnIdle(object sender, EventArgs e)
         {
             BtAddFixpack.Enabled = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
-            GbCPatch.Visible = mainTree.SelectedNode.Level == 1;
+            GbCPatch.Visible = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 1;
         }
 
         private void CreateTree()
         {
             foreach(Release release in rm.releases)
             {
-                var currReleaseNode = mainTree.Nodes.Add(release.releaseId.ToString(), release.releaseName);
-                
+                var currReleaseNode = mainTree.Nodes.Add(release.releaseId.ToString(), release.releaseName);                
             }
         }
 
@@ -66,8 +66,14 @@ namespace CoreApp
             mainTree.Width = SCMain.Panel1.Width;
             mainTree.Height = SCMain.Panel1.Height;
 
-            GbCPatch.Width = SCMain.Panel2.Width;
-            GbCPatch.Height = SCMain.Panel2.Height;
+            if (GbCPatch.Visible)
+            {
+                GbCPatch.Width = SCMain.Panel2.Width;
+                GbCPatch.Height = SCMain.Panel2.Height;
+
+                LboxCPatchDependenciesFrom.Width = SCCPatch.Panel1.Width;
+                
+            }
         }
 
         private void mainSplitter_SplitterMoved(object sender, SplitterEventArgs e)
@@ -95,7 +101,12 @@ namespace CoreApp
             AddForm addForm = new AddForm();
             if(addForm.ShowDialog() == DialogResult.OK)
             {
-                rm.AddRelease(addForm.Value);
+                Release newRelease = rm.AddRelease(addForm.Value);
+                if (newRelease != null)
+                {
+                    mainTree.Nodes.Add(newRelease.releaseId.ToString(), newRelease.releaseName);
+                }
+                
             }
         }
 
@@ -104,11 +115,13 @@ namespace CoreApp
             Release currRelease = getReleaseFromTree(mainTree.SelectedNode);
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Файлы Excel|*.xls;*.xlsx;*.xlsm";
+
             if(ofd.ShowDialog() == DialogResult.OK)
             {
-                currRelease.AddCPatch(currRelease, new FileInfo(ofd.FileName));
+                CPatch newCpatch = currRelease.AddCPatch(currRelease, new FileInfo(ofd.FileName));
+                mainTree.SelectedNode.Nodes.Add(newCpatch.CPatchId.ToString(), newCpatch.CPatchName);
+                mainTree.SelectedNode.Expand();
             }
-            
         }
 
         private Release getReleaseFromTree(TreeNode node)
@@ -179,6 +192,7 @@ namespace CoreApp
                     currZPatch = getZPatchFromTree(mainTree.SelectedNode);
                     break;
             }
+            mainTree.LabelEdit = false;
         }
 
         private void BtStatus_Click(object sender, EventArgs e)

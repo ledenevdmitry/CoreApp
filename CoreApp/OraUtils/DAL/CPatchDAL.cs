@@ -35,7 +35,7 @@ namespace CoreApp.OraUtils
             return res;
         }
 
-        public static string update(string[] filter, HashSet<string> rowsToUpdate)
+        private static string Update(string[] filter, HashSet<string> rowsToUpdate)
         {
             string[] semicolons = new string[5];
             if (rowsToUpdate.Contains("parent_id"))    semicolons[0] = ":";
@@ -59,10 +59,10 @@ namespace CoreApp.OraUtils
             $"validto = (select max(validto) from cpatch_hdim " +
             $"where {joinedPars}) and {joinedPars}";
             return res;
-
         }
 
-        static string updateStatus = update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatchstatus" }));
+        static string updateStatus = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatchstatus" }));
+        static string updateName = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatch_name" }));
 
         public static string closeOld(params string[] pars)
         {
@@ -140,6 +140,26 @@ namespace CoreApp.OraUtils
 
             transaction.Commit();
         }
+
+        public static void UpdateName(int cpatch_id, string cpatch_name)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+
+            DBManager.ExecuteNonQuery(
+                closeOld("cpatch_id"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id));
+
+            DBManager.ExecuteNonQuery(
+                updateName,
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id),
+                new OracleParameter("cpatch_name", cpatch_name));
+
+            transaction.Commit();
+        }
+
+
 
         public static void DeleteCPatch(int cpatch_id)
         {

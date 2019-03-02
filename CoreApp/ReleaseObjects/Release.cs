@@ -115,16 +115,21 @@ namespace CoreApp.ReleaseObjects
             this.localDir = localDir;
         }
 
-        public void AddCPatch(Release release, FileInfo excelFile)
+        public CPatch AddCPatch(Release release, FileInfo excelFile)
         {
             CPatch newCPatch = CPatch.CreateNewFromExcel(release, excelFile);
             CPatches.Add(newCPatch);
+            CPatchesDict.Add(newCPatch.CPatchId, newCPatch);
+            return newCPatch;
         }
 
         public void Rename(string newName)
         {
-            releaseName = newName;
-            ReleaseDAL.Update(releaseId, newName);
+            if (newName != null && newName != releaseName)
+            {
+                releaseName = newName;
+                ReleaseDAL.Update(releaseId, newName);
+            }
         }
     }
 }

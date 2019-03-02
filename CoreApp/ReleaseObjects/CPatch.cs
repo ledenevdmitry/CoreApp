@@ -181,6 +181,15 @@ namespace CoreApp.FixpackObjects
             return list;
         }
 
+        public void Rename(string newName)
+        {
+            if(newName != null && newName != CPatchName)
+            {
+                CPatchName = newName;
+                CPatchDAL.UpdateName(CPatchId, CPatchName);
+            }
+        }
+
         private void SetRanks(ZPatch currPatch)
         {
             foreach (ZPatch subpatch in currPatch.dependenciesTo)
