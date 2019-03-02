@@ -71,8 +71,13 @@ namespace CoreApp
                 GbCPatch.Width = SCMain.Panel2.Width;
                 GbCPatch.Height = SCMain.Panel2.Height;
 
-                LboxCPatchDependenciesFrom.Width = SCCPatch.Panel1.Width;
-                
+                LboxCPatchDependenciesFrom.Width = SCCPatchDependenciesFrom.Panel1.Width;
+                LboxCPatchDependenciesFrom.Height = SCCPatchDependenciesFrom.Panel1.Height - LbCPatchDependenciesFrom.Height;
+
+                LboxCPatchDependenciesTo.Width = SCCPatchDependenciesTo.Panel1.Width;
+                LboxCPatchDependenciesTo.Height = SCCPatchDependenciesTo.Panel1.Height - LbCPatchDependenciesTo.Height;
+
+                //LboxCPatchDependenciesFrom.Height = SCCPatchDependencies.Panel1.Height - LboxCPatchDependenciesFrom.Top - (SCCPatchDependencies.Panel1.Bottom - LboxCPatchDependenciesFrom.Bottom);
             }
         }
 
