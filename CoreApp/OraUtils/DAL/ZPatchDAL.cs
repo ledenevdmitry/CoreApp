@@ -206,7 +206,7 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void DeleteDependency(int zpatch_id, int parent_id)
+        public static void DeleteDependency(int parent_id, int zpatch_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
 

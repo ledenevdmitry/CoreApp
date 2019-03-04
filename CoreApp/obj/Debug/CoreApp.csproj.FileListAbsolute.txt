@@ -33,7 +33,6 @@ C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.Co
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\INIFileParser.dll
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\INIFileParser.xml
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.AddForm.resources
-C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseForm.resources
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CopyComplete
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.CheckReleaseForm.resources
 C:\Users\dledenev\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.AddForm.resources
@@ -55,3 +54,5 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Oracle.ManagedDataAcce
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\INIFileParser.xml
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CopyComplete
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseManagerForm.resources
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Oracle.ManagedDataAccess.dll
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseManagerForm.resources

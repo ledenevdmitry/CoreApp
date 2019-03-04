@@ -35,6 +35,7 @@ namespace CoreApp
             CbCPatchStatus.DataSource = Enum.GetValues(typeof(CPatchStatuses));
 
             rm = new ReleaseManager();
+            CbCPatchRelease.Items.AddRange(rm.releases.ToArray());
 
             CreateTree();
             Application.Idle += OnIdle;
@@ -90,7 +91,6 @@ namespace CoreApp
         private void DisplayCPatch()
         {
             CbCPatchStatus.SelectedItem = currCPatch.CPatchStatus;
-            CbCPatchRelease.DataSource = rm.releases;
             CbCPatchRelease.SelectedItem = currCPatch.release;
 
             LboxCPatchDependenciesFrom.DataSource = currCPatch.dependenciesFrom.ToList();
@@ -116,6 +116,7 @@ namespace CoreApp
                 if (newRelease != null)
                 {
                     mainTree.Nodes.Add(newRelease.releaseId.ToString(), newRelease.releaseName);
+                    CbCPatchRelease.Items.Add(newRelease);
                 }
                 
             }

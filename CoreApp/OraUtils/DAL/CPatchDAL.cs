@@ -208,7 +208,7 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void DeleteDependency(int cpatch_id, int parent_id)
+        public static void DeleteDependency(int parent_id, int cpatch_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(                
