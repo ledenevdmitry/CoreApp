@@ -225,7 +225,7 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void AddDependency(int zpatch_id, int parent_id)
+        public static void AddDependency(int parent_id, int zpatch_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(

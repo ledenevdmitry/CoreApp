@@ -25,6 +25,11 @@ namespace CoreApp.ReleaseObjects
             return releaseId.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return releaseName;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -36,6 +41,7 @@ namespace CoreApp.ReleaseObjects
         public string releaseStatus { get; private set; }
         public List<CPatch> CPatches { get; private set; } //отсортированный на DAL
         public Dictionary<int, CPatch> CPatchesDict { get; private set; } //для поиска
+        public ReleaseManager rm;
 
 
 
@@ -70,6 +76,9 @@ namespace CoreApp.ReleaseObjects
                     oraCPatch.CPatchName,
                     status, 
                     oraCPatch.Kod_Sredy);
+
+                cpatch.release = this;
+
                 CPatches.Add(cpatch);
                 CPatchesDict.Add(cpatch.CPatchId, cpatch);
             }

@@ -56,3 +56,12 @@ create sequence sync.release_seq increment by 1;
 create sequence sync.cpatch_seq increment by 1;
 create sequence sync.zpatch_seq increment by 1;
 alter user sync quota unlimited on sync;
+
+create table vssfolder (
+kod_sredy VARCHAR2(50),
+vsspath VARCHAR2(500));
+
+grant select on vssfolder to sync;
+insert into vssfolder (kod_sredy, vsspath) values ('STAB', '$/Patches/Working STAB');
+insert into vssfolder (kod_sredy, vsspath) values ('TEST', '$/Patches/Test/_CORE');
+commit;

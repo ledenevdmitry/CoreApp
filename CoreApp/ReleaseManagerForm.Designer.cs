@@ -42,7 +42,7 @@
             this.GbCPatch = new System.Windows.Forms.GroupBox();
             this.SCCPatch = new System.Windows.Forms.SplitContainer();
             this.BtCPatchRelease = new System.Windows.Forms.Button();
-            this.CBCPatchRelease = new System.Windows.Forms.ComboBox();
+            this.CbCPatchRelease = new System.Windows.Forms.ComboBox();
             this.LbCPatchRelease = new System.Windows.Forms.Label();
             this.BtCPatchStatus = new System.Windows.Forms.Button();
             this.CbCPatchStatus = new System.Windows.Forms.ComboBox();
@@ -53,13 +53,13 @@
             this.LboxCPatchDependenciesFrom = new System.Windows.Forms.ListBox();
             this.BtCPatchAddDependenciesFrom = new System.Windows.Forms.Button();
             this.BtCPatchDeleteDependenciesFrom = new System.Windows.Forms.Button();
-            this.mainTreeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.TSMIRename = new System.Windows.Forms.ToolStripMenuItem();
             this.SCCPatchDependenciesTo = new System.Windows.Forms.SplitContainer();
             this.LbCPatchDependenciesTo = new System.Windows.Forms.Label();
             this.LboxCPatchDependenciesTo = new System.Windows.Forms.ListBox();
             this.BtCPatchAddDependenciesTo = new System.Windows.Forms.Button();
             this.BtCPatchDeleteDependenciesTo = new System.Windows.Forms.Button();
+            this.mainTreeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.TSMIRename = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).BeginInit();
             this.SCMain.Panel1.SuspendLayout();
@@ -78,11 +78,11 @@
             this.SCCPatchDependenciesFrom.Panel1.SuspendLayout();
             this.SCCPatchDependenciesFrom.Panel2.SuspendLayout();
             this.SCCPatchDependenciesFrom.SuspendLayout();
-            this.mainTreeContextMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SCCPatchDependenciesTo)).BeginInit();
             this.SCCPatchDependenciesTo.Panel1.SuspendLayout();
             this.SCCPatchDependenciesTo.Panel2.SuspendLayout();
             this.SCCPatchDependenciesTo.SuspendLayout();
+            this.mainTreeContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainMenu
@@ -203,7 +203,7 @@
             // SCCPatch.Panel1
             // 
             this.SCCPatch.Panel1.Controls.Add(this.BtCPatchRelease);
-            this.SCCPatch.Panel1.Controls.Add(this.CBCPatchRelease);
+            this.SCCPatch.Panel1.Controls.Add(this.CbCPatchRelease);
             this.SCCPatch.Panel1.Controls.Add(this.LbCPatchRelease);
             this.SCCPatch.Panel1.Controls.Add(this.BtCPatchStatus);
             this.SCCPatch.Panel1.Controls.Add(this.CbCPatchStatus);
@@ -224,14 +224,17 @@
             this.BtCPatchRelease.TabIndex = 8;
             this.BtCPatchRelease.Text = "Подтвердить";
             this.BtCPatchRelease.UseVisualStyleBackColor = true;
+            this.BtCPatchRelease.Click += new System.EventHandler(this.BtCPatchRelease_Click);
             // 
-            // CBCPatchRelease
+            // CbCPatchRelease
             // 
-            this.CBCPatchRelease.FormattingEnabled = true;
-            this.CBCPatchRelease.Location = new System.Drawing.Point(77, 36);
-            this.CBCPatchRelease.Name = "CBCPatchRelease";
-            this.CBCPatchRelease.Size = new System.Drawing.Size(182, 24);
-            this.CBCPatchRelease.TabIndex = 7;
+            this.CbCPatchRelease.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
+            this.CbCPatchRelease.FormattingEnabled = true;
+            this.CbCPatchRelease.Location = new System.Drawing.Point(77, 36);
+            this.CbCPatchRelease.Name = "CbCPatchRelease";
+            this.CbCPatchRelease.Size = new System.Drawing.Size(182, 23);
+            this.CbCPatchRelease.TabIndex = 7;
+            this.CbCPatchRelease.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.CbCPatchRelease_DrawItem);
             // 
             // LbCPatchRelease
             // 
@@ -345,20 +348,6 @@
             this.BtCPatchDeleteDependenciesFrom.Text = "Удалить выбранные";
             this.BtCPatchDeleteDependenciesFrom.UseVisualStyleBackColor = true;
             // 
-            // mainTreeContextMenu
-            // 
-            this.mainTreeContextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.mainTreeContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.TSMIRename});
-            this.mainTreeContextMenu.Name = "mainTreeContextMenu";
-            this.mainTreeContextMenu.Size = new System.Drawing.Size(191, 28);
-            // 
-            // TSMIRename
-            // 
-            this.TSMIRename.Name = "TSMIRename";
-            this.TSMIRename.Size = new System.Drawing.Size(190, 24);
-            this.TSMIRename.Text = "Переименовать";
-            // 
             // SCCPatchDependenciesTo
             // 
             this.SCCPatchDependenciesTo.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -416,6 +405,20 @@
             this.BtCPatchDeleteDependenciesTo.Text = "Удалить выбранные";
             this.BtCPatchDeleteDependenciesTo.UseVisualStyleBackColor = true;
             // 
+            // mainTreeContextMenu
+            // 
+            this.mainTreeContextMenu.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.mainTreeContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TSMIRename});
+            this.mainTreeContextMenu.Name = "mainTreeContextMenu";
+            this.mainTreeContextMenu.Size = new System.Drawing.Size(191, 28);
+            // 
+            // TSMIRename
+            // 
+            this.TSMIRename.Name = "TSMIRename";
+            this.TSMIRename.Size = new System.Drawing.Size(190, 24);
+            this.TSMIRename.Text = "Переименовать";
+            // 
             // ReleaseManagerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -448,12 +451,12 @@
             this.SCCPatchDependenciesFrom.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SCCPatchDependenciesFrom)).EndInit();
             this.SCCPatchDependenciesFrom.ResumeLayout(false);
-            this.mainTreeContextMenu.ResumeLayout(false);
             this.SCCPatchDependenciesTo.Panel1.ResumeLayout(false);
             this.SCCPatchDependenciesTo.Panel1.PerformLayout();
             this.SCCPatchDependenciesTo.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SCCPatchDependenciesTo)).EndInit();
             this.SCCPatchDependenciesTo.ResumeLayout(false);
+            this.mainTreeContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -482,7 +485,7 @@
         private System.Windows.Forms.Label LbCPatchDependenciesFrom;
         private System.Windows.Forms.ListBox LboxCPatchDependenciesFrom;
         private System.Windows.Forms.Button BtCPatchRelease;
-        private System.Windows.Forms.ComboBox CBCPatchRelease;
+        private System.Windows.Forms.ComboBox CbCPatchRelease;
         private System.Windows.Forms.Label LbCPatchRelease;
         private System.Windows.Forms.ContextMenuStrip mainTreeContextMenu;
         private System.Windows.Forms.ToolStripMenuItem TSMIRename;

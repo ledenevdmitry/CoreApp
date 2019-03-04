@@ -63,6 +63,7 @@ namespace CoreApp.OraUtils
 
         static string updateStatus = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatchstatus" }));
         static string updateName = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatch_name" }));
+        static string updateRelease = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "release_id" }));
 
         public static string closeOld(params string[] pars)
         {
@@ -89,17 +90,17 @@ namespace CoreApp.OraUtils
         private static string addDependencyScript =
         "insert into cpatch_hdim " +
         "( cpatch_id,  parent_id,  release_id,  cpatch_name,  cpatchstatus, kod_sredy, validfrom, validto, dwsact ) " +
-        "select" +
+        "select " +
         ":cpatch_id, " +
         ":parent_id, " +
-        "max(release_id)," +
-        "max(cpatch_name)" +
-        "max(cpatchstatus)" +
-        "max(kod_sredy)" +
+        "max(release_id), " +
+        "max(cpatch_name), " +
+        "max(cpatchstatus), " +
+        "max(kod_sredy), " +
         "sysdate, " +
        $"{DBManager.PlusInf}, " +
-        "'I'" +
-        "from zpatch_hdim where cpatch_id = :cpatch_id ";
+        "'I' " +
+        "from cpatch_hdim where cpatch_id = :cpatch_id ";
 
         public static int Insert(int release_id, int? parent_id, string cpatch_name, string cpatchstatus, string kod_sredy)
         {
@@ -159,6 +160,23 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
+        public static void UpdateRelease(int cpatch_id, int release_id)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+
+            DBManager.ExecuteNonQuery(
+                closeOld("cpatch_id"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id));
+
+            DBManager.ExecuteNonQuery(
+                updateRelease,
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id),
+                new OracleParameter("release_id", release_id));
+
+            transaction.Commit();
+        }
 
 
         public static void DeleteCPatch(int cpatch_id)
@@ -247,7 +265,7 @@ namespace CoreApp.OraUtils
             return DBManager.ExecuteQuery(containsCPatch, new OracleParameter(":cpatch_name", cpatch_name)).HasRows;
         }
 
-        public static void AddDependency(int cpatch_id, int parent_id)
+        public static void AddDependency(int parent_id, int cpatch_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(

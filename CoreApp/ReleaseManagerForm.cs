@@ -35,6 +35,7 @@ namespace CoreApp
             CbCPatchStatus.DataSource = Enum.GetValues(typeof(CPatchStatuses));
 
             rm = new ReleaseManager();
+
             CreateTree();
             Application.Idle += OnIdle;
 
@@ -89,6 +90,11 @@ namespace CoreApp
         private void DisplayCPatch()
         {
             CbCPatchStatus.SelectedItem = currCPatch.CPatchStatus;
+            CbCPatchRelease.DataSource = rm.releases;
+            CbCPatchRelease.SelectedItem = currCPatch.release;
+
+            LboxCPatchDependenciesFrom.DataSource = currCPatch.dependenciesFrom.ToList();
+            LboxCPatchDependenciesTo.DataSource = currCPatch.dependenciesTo.ToList();
         }
 
         private void BtSetHomePath_Click(object sender, EventArgs e)
@@ -182,6 +188,8 @@ namespace CoreApp
             e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
         }
 
+
+
         private void mainTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
             switch (mainTree.SelectedNode.Level)
@@ -192,6 +200,7 @@ namespace CoreApp
                 case 1:
                     currCPatch = getCPatchFromTree(mainTree.SelectedNode);
                     actualCPatchStatusIndex = CbCPatchStatus.Items.IndexOf(currCPatch.CPatchStatus);
+                    DisplayCPatch();
                     break;
                 case 2:
                     currZPatch = getZPatchFromTree(mainTree.SelectedNode);
@@ -234,6 +243,31 @@ namespace CoreApp
                     break;
 
             }
+        }
+
+        private void BtCPatchRelease_Click(object sender, EventArgs e)
+        {
+            TreeNode cpatchNodeToMove = mainTree.SelectedNode;
+
+            //удаляем старую ноду из дерева
+            mainTree.Nodes.Remove(cpatchNodeToMove);
+
+            Release newRelease = (Release)CbCPatchRelease.SelectedItem;
+            currCPatch.ChangeRelease(newRelease);
+
+            //добавляем ноду к новому релизу
+            mainTree.Nodes[newRelease.releaseId.ToString()].Nodes.Add(cpatchNodeToMove);
+            mainTree.SelectedNode = cpatchNodeToMove;
+        }
+
+        private void CbCPatchRelease_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            if (e.Index == ((ComboBox)sender).Items.IndexOf(currCPatch.release))
+            {
+                e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
+            }
+            e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
         }
     }
 }

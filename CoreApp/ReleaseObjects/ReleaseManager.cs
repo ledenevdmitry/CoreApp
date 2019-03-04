@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CoreApp.ReleaseObjects
 {
-    class ReleaseManager
+    public class ReleaseManager
     {
         static CVS.CVS cvs;
         public List<Release> releases { get; private set; }
@@ -35,6 +35,7 @@ namespace CoreApp.ReleaseObjects
             foreach (var oraRelease in oraReleases)
             {
                 Release release = new Release(oraRelease.releaseId, oraRelease.releaseName);
+                release.rm = this;
                 releases.Add(release);
                 releasesDict.Add(release.releaseId, release);
             }

@@ -51,9 +51,20 @@ namespace CoreApp.FixpackObjects
 
         public ZPatch getZPatchById(int id)
         {
-            return ZPatchesDict[id];
+            foreach(CPatch cpatch in release.CPatches)
+            {
+                if (cpatch.ZPatchesDict.ContainsKey(id))
+                {
+                    return cpatch.ZPatches[id];
+                }
+            }
+            return null;
         }
 
+        public override string ToString()
+        {
+            return CPatchName;
+        }
 
         private void InitFromDB(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, string KodSredy)
         {
@@ -187,6 +198,20 @@ namespace CoreApp.FixpackObjects
             {
                 CPatchName = newName;
                 CPatchDAL.UpdateName(CPatchId, CPatchName);
+            }
+        }
+
+        public void ChangeRelease(Release newRelease)
+        {
+            if(release.releaseId != newRelease.releaseId)
+            {
+                release.CPatches.Remove(this);
+                release.CPatchesDict.Remove(CPatchId);
+
+                newRelease.CPatches.Add(this);
+                newRelease.CPatchesDict.Add(CPatchId, this);
+
+                CPatchDAL.UpdateRelease(CPatchId, newRelease.releaseId);
             }
         }
 
@@ -472,17 +497,20 @@ namespace CoreApp.FixpackObjects
             int patchNameIndex = GetPatchNameIndex(columns);
             int patchStatusIndex = GetPatchStatusIndex(columns);
 
+            CPatchName = "NOT DEFINED";
+            CPatchId = CPatchDAL.Insert(release.releaseId, null, CPatchName, null, null);
+
             for (int i = 2; i <= columns.Rows.Count; ++i)
             {
                 string patchCell = ((Range)columns.Cells[i, patchNameIndex]).Value2 ?? "";
                 string excelStatus = ((Range)columns.Cells[i, patchStatusIndex]).Value2;
                 ZPatchStatuses ZPatchStatus = ZPatchStatuses.UNDEFINED;
 
-                if (excelStatus == "Open")
+                if (excelStatus == "Открытый")
                     ZPatchStatus = ZPatchStatuses.OPEN;
-                else if (excelStatus == "Testing" || excelStatus == "Waiting Bank Confirm")
+                else if (excelStatus == "Testing" || excelStatus == "Waiting bank confirm")
                     ZPatchStatus = ZPatchStatuses.READY;
-                else if (excelStatus == "Installed To STAB")
+                else if (excelStatus == "Installed to STAB" || excelStatus == "Installed to STAB2")
                     ZPatchStatus = ZPatchStatuses.INSTALLED;
 
                 MatchCollection matches = Regex.Matches(patchCell, regexZPatchName);
@@ -492,10 +520,10 @@ namespace CoreApp.FixpackObjects
                     if (matches.Count > 0)
                     {
                         //ФП еще не добавлялся
-                        if (CPatchId == 0)
+                        if (CPatchName == "NOT DEFINED")
                         {
                             CPatchName = patchCell;
-                            CPatchId = CPatchDAL.Insert(release.releaseId, null, patchCell, null, null);
+                            CPatchDAL.UpdateName(CPatchId, patchCell);
                         }
                     }
                 }
@@ -505,22 +533,21 @@ namespace CoreApp.FixpackObjects
                     ZPatch currPatch;
                     if (!findPatchByShortName(patchName, out currPatch))
                     {
-                        ZPatch zpatch = new ZPatch(
-                            patchName,
-                            CPatchId,
-                            new HashSet<ZPatch>(),
-                            new HashSet<ZPatch>(),
-                            ZPatchStatus);
+                        if (ZPatchStatus != ZPatchStatuses.OPEN)
+                        {
+                            ZPatch zpatch = new ZPatch(
+                                patchName,
+                                CPatchId,
+                                new HashSet<ZPatch>(),
+                                new HashSet<ZPatch>(),
+                                ZPatchStatus);
 
-                        zpatch.excelFileRowId = i;
-                        zpatch.cpatch = this;
+                            zpatch.excelFileRowId = i;
+                            zpatch.cpatch = this;
 
-                        newPatches.Add(zpatch);
-                        ZPatches.Add(zpatch);                        
-
-                        //TODO проверить последствия
-                        //идентификатор назначится только на dal, печаль
-                        //ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
+                            newPatches.Add(zpatch);
+                            ZPatches.Add(zpatch);
+                        }
                     }
                 }
 
@@ -529,7 +556,7 @@ namespace CoreApp.FixpackObjects
             foreach(ZPatch zpatch in newPatches)
             {
                 zpatch.ZPatchId = ZPatchDAL.Insert(CPatchId, null, zpatch.ZPatchName, null);
-            }
+            }            
         }
 
 
