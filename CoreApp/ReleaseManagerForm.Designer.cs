@@ -79,6 +79,8 @@
             this.BtZPatchAddDependenciesTo = new System.Windows.Forms.Button();
             this.mainTreeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.TSMIRename = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtReleaseGraph = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtCPatchGraph = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).BeginInit();
             this.SCMain.Panel1.SuspendLayout();
@@ -154,7 +156,8 @@
             // 
             this.BtRelease.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.BtAddRelease,
-            this.BtCheckRelease});
+            this.BtCheckRelease,
+            this.BtReleaseGraph});
             this.BtRelease.Name = "BtRelease";
             this.BtRelease.Size = new System.Drawing.Size(61, 24);
             this.BtRelease.Text = "Релиз";
@@ -175,7 +178,8 @@
             // BtFixpack
             // 
             this.BtFixpack.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.BtAddFixpack});
+            this.BtAddFixpack,
+            this.BtCPatchGraph});
             this.BtFixpack.Name = "BtFixpack";
             this.BtFixpack.Size = new System.Drawing.Size(85, 24);
             this.BtFixpack.Text = "Поставка";
@@ -677,6 +681,20 @@
             this.TSMIRename.Size = new System.Drawing.Size(190, 24);
             this.TSMIRename.Text = "Переименовать";
             // 
+            // BtReleaseGraph
+            // 
+            this.BtReleaseGraph.Name = "BtReleaseGraph";
+            this.BtReleaseGraph.Size = new System.Drawing.Size(216, 26);
+            this.BtReleaseGraph.Text = "Граф";
+            this.BtReleaseGraph.Click += new System.EventHandler(this.BtReleaseGraph_Click);
+            // 
+            // BtCPatchGraph
+            // 
+            this.BtCPatchGraph.Name = "BtCPatchGraph";
+            this.BtCPatchGraph.Size = new System.Drawing.Size(216, 26);
+            this.BtCPatchGraph.Text = "Граф";
+            this.BtCPatchGraph.Click += new System.EventHandler(this.BtCPatchGraph_Click);
+            // 
             // ReleaseManagerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -792,5 +810,7 @@
         private System.Windows.Forms.ListBox LboxZPatchDependenciesTo;
         private System.Windows.Forms.Button BtZPatchDeleteDependenciesTo;
         private System.Windows.Forms.Button BtZPatchAddDependenciesTo;
+        private System.Windows.Forms.ToolStripMenuItem BtReleaseGraph;
+        private System.Windows.Forms.ToolStripMenuItem BtCPatchGraph;
     }
 }

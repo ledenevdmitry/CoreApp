@@ -332,5 +332,19 @@ namespace CoreApp
             }
             e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
         }
+
+        private void BtReleaseGraph_Click(object sender, EventArgs e)
+        {
+            Microsoft.Msagl.Drawing.Graph releaseGraph = currRelease.DrawGraph();
+            GraphForm rgf = new GraphForm(releaseGraph);
+            rgf.ShowDialog();
+        }
+
+        private void BtCPatchGraph_Click(object sender, EventArgs e)
+        {
+            Microsoft.Msagl.Drawing.Graph cpatchGraph = currCPatch.DrawGraph();
+            GraphForm rgf = new GraphForm(cpatchGraph);
+            rgf.ShowDialog();
+        }
     }
 }

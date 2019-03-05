@@ -56,3 +56,10 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.csproj.CopyCom
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseManagerForm.resources
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Oracle.ManagedDataAccess.dll
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ReleaseManagerForm.resources
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.dll
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.Drawing.dll
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.GraphViewerGdi.dll
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.xml
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.Drawing.xml
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.GraphViewerGdi.xml
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.GraphForm.resources

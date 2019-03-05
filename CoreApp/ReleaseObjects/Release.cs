@@ -12,6 +12,8 @@ using System.Text.RegularExpressions;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using CoreApp.OraUtils;
+using Microsoft.Msagl.GraphViewerGdi;
+using Microsoft.Msagl.Drawing;
 
 namespace CoreApp.ReleaseObjects
 {
@@ -145,6 +147,27 @@ namespace CoreApp.ReleaseObjects
                 releaseName = newName;
                 ReleaseDAL.Update(releaseId, newName);
             }
+        }
+
+        public Graph DrawGraph()
+        {
+            Graph graph = new Graph(); 
+            foreach(CPatch cpatch in CPatches)
+            {
+                Node node = new Node(cpatch.CPatchId.ToString());
+                node.Label.Text = cpatch.CPatchName;
+                graph.AddNode(node);
+            }
+
+            foreach (CPatch cpatch in CPatches)
+            {
+                foreach(CPatch depFrom in cpatch.dependenciesFrom)
+                {
+                    graph.AddEdge(depFrom.CPatchId.ToString(), cpatch.CPatchId.ToString());
+                }
+            }
+
+            return graph;
         }
     }
 }

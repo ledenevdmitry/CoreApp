@@ -1,6 +1,8 @@
 ﻿using CoreApp.OraUtils;
 using CoreApp.OraUtils.Model;
 using CoreApp.ReleaseObjects;
+using Microsoft.Msagl.Core.Layout;
+using Microsoft.Msagl.Drawing;
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
@@ -568,6 +570,45 @@ namespace CoreApp.FixpackObjects
             }            
         }
 
+        public Graph DrawGraph()
+        {
+            Graph graph = new Graph();
+            foreach (ZPatch zpatch in ZPatches)
+            {
+                Microsoft.Msagl.Drawing.Node node = new Microsoft.Msagl.Drawing.Node(zpatch.ZPatchId.ToString());
+                node.Label.Text = zpatch.ZPatchName;
+                graph.AddNode(node);
+            }
+
+            foreach (ZPatch zpatch in ZPatches)
+            {
+                foreach (ZPatch depFrom in zpatch.dependenciesFrom)
+                {
+                    if(depFrom.cpatch != this)
+                    {
+                        Microsoft.Msagl.Drawing.Node node = new Microsoft.Msagl.Drawing.Node(depFrom.ZPatchId.ToString());
+                        node.Label.FontColor = Color.Red;
+                        node.LabelText = $"{depFrom.ZPatchName} ({depFrom.cpatch.CPatchName})";
+                        graph.AddNode(node);
+                    }
+                    graph.AddEdge(depFrom.ZPatchId.ToString(), zpatch.ZPatchId.ToString());
+                }
+
+                foreach (ZPatch depTo in zpatch.dependenciesTo)
+                {
+                    if (depTo.cpatch != this)
+                    {
+                        Microsoft.Msagl.Drawing.Node node = new Microsoft.Msagl.Drawing.Node(depTo.ZPatchId.ToString());
+                        node.Label.FontColor = Color.Red;
+                        node.LabelText = $"{depTo.ZPatchName} ({depTo.cpatch.CPatchName})";
+                        graph.AddNode(node);
+                    }
+                    graph.AddEdge(zpatch.ZPatchId.ToString(), depTo.ZPatchId.ToString());
+                }
+            }
+
+            return graph;
+        }        
 
         private void CreateCPatchDelta(
             Range columns,
