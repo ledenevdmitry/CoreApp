@@ -75,9 +75,8 @@ namespace CoreApp.ReleaseObjects
                     oraCPatch.CPatchId, 
                     oraCPatch.CPatchName,
                     status, 
-                    oraCPatch.Kod_Sredy);
-
-                cpatch.release = this;
+                    oraCPatch.Kod_Sredy, 
+                    this);                
 
                 CPatches.Add(cpatch);
                 CPatchesDict.Add(cpatch.CPatchId, cpatch);
@@ -86,6 +85,11 @@ namespace CoreApp.ReleaseObjects
             foreach (CPatch cpatch in CPatches)
             {
                 cpatch.SetDependencies();
+
+                foreach (ZPatch zpatch in cpatch.ZPatches)
+                {
+                    zpatch.SetDependencies();
+                }
             }
         }
 
@@ -129,6 +133,8 @@ namespace CoreApp.ReleaseObjects
             CPatch newCPatch = CPatch.CreateNewFromExcel(release, excelFile);
             CPatches.Add(newCPatch);
             CPatchesDict.Add(newCPatch.CPatchId, newCPatch);
+            newCPatch.release = this;
+
             return newCPatch;
         }
 

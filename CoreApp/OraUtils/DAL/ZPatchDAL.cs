@@ -75,6 +75,7 @@ namespace CoreApp.OraUtils
         
         static string updateStatus = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "zpatchstatus" }));
         static string updateName = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "zpatch_name" }));
+        static string updateCPatch = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "cpatch_id" }));
 
         public static string deleteByReleaseCloseOld =
             "update zpatch_hdim z" +
@@ -288,6 +289,24 @@ namespace CoreApp.OraUtils
         private static bool Contains(string zpatch_name)
         {
             return DBManager.ExecuteQuery(containsZPatch, new OracleParameter(":zpatch_name", zpatch_name)).HasRows;
+        }
+
+        public static void UpdateCPatch(int zpatch_id, int cpatch_id)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+
+            DBManager.ExecuteNonQuery(
+                closeOld("zpatch_id"),
+                transaction,
+                new OracleParameter("zpatch_id", cpatch_id));
+
+            DBManager.ExecuteNonQuery(
+                updateCPatch,
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("cpatch_id", cpatch_id));
+
+            transaction.Commit();
         }
     }
 }

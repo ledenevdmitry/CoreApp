@@ -55,7 +55,7 @@ namespace CoreApp.FixpackObjects
             {
                 if (cpatch.ZPatchesDict.ContainsKey(id))
                 {
-                    return cpatch.ZPatches[id];
+                    return cpatch.ZPatchesDict[id];
                 }
             }
             return null;
@@ -100,10 +100,6 @@ namespace CoreApp.FixpackObjects
 
                 zpatch.cpatch = this;
             }
-            foreach (ZPatch zpatch in ZPatches)
-            {
-                zpatch.SetDependencies();
-            }
         }
 
         public void ResetStatusesByLog()
@@ -138,9 +134,12 @@ namespace CoreApp.FixpackObjects
             }
         }
 
-        public CPatch(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, string KodSredy)
+        public CPatch(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, string KodSredy, Release release)
         {
+            this.release = release;
             InitFromDB(CPatchId, CPatchName, CPatchStatus, KodSredy);
+            //лучше их инициализировать сразу, чтобы проще было с зависимостями
+            InitZPatches();
         }
 
         private string FindLocalExcel(CPatch fp)

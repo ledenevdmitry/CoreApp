@@ -109,14 +109,37 @@ namespace CoreApp.FixpackObjects
                 IsATCPatch = false;
             }
 
-            //TODO: Проверять зависимости патча в эксельке
-
             if(match.Success)
             {
                 ZPatchName = match.Groups[1].Value;
                 pathToPatch = dir.FullName.Substring(0, match.Index + ZPatchName.Length + 1);
             }
             this.dir = dir;
+        }
+
+        public void UpdateStatus(ZPatchStatuses newStatus)
+        {
+            ZPatchStatus = newStatus;
+            CPatchDAL.UpdateStatus(ZPatchId, newStatus.ToString());
+        }
+
+        public override string ToString()
+        {
+            return ZPatchName;
+        }
+
+        public void ChangeCPatch(CPatch newCPatch)
+        {
+            if (cpatch.CPatchId != newCPatch.CPatchId)
+            {
+                cpatch.ZPatches.Remove(this);
+                cpatch.ZPatchesDict.Remove(ZPatchId);
+
+                newCPatch.ZPatches.Add(this);
+                newCPatch.ZPatchesDict.Add(ZPatchId, this);
+
+                ZPatchDAL.UpdateCPatch(ZPatchId, newCPatch.CPatchId);
+            }
         }
     }
 }

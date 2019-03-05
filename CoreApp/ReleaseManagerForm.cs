@@ -33,6 +33,7 @@ namespace CoreApp
             ResizeForm();
 
             CbCPatchStatus.DataSource = Enum.GetValues(typeof(CPatchStatuses));
+            CbZPatchStatus.DataSource = Enum.GetValues(typeof(ZPatchStatuses));
 
             rm = new ReleaseManager();
             CbCPatchRelease.Items.AddRange(rm.releases.ToArray());
@@ -53,6 +54,7 @@ namespace CoreApp
         {
             BtAddFixpack.Enabled = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
             GbCPatch.Visible = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 1;
+            GbZPatch.Visible = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 2;
         }
 
         private void CreateTree()
@@ -81,6 +83,18 @@ namespace CoreApp
 
                 //LboxCPatchDependenciesFrom.Height = SCCPatchDependencies.Panel1.Height - LboxCPatchDependenciesFrom.Top - (SCCPatchDependencies.Panel1.Bottom - LboxCPatchDependenciesFrom.Bottom);
             }
+
+            if(GbZPatch.Visible)
+            {
+                GbZPatch.Width = SCMain.Panel2.Width;
+                GbZPatch.Height = SCMain.Panel2.Height;
+
+                LboxZPatchDependenciesFrom.Width = SCZPatchDependenciesFrom.Panel1.Width;
+                LboxZPatchDependenciesFrom.Height = SCZPatchDependenciesFrom.Panel1.Height - LbZPatchDependenciesFrom.Height;
+
+                LboxZPatchDependenciesTo.Width = SCZPatchDependenciesTo.Panel1.Width;
+                LboxZPatchDependenciesTo.Height = SCZPatchDependenciesTo.Panel1.Height - LbZPatchDependenciesTo.Height;
+            }
         }
 
         private void mainSplitter_SplitterMoved(object sender, SplitterEventArgs e)
@@ -95,6 +109,15 @@ namespace CoreApp
 
             LboxCPatchDependenciesFrom.DataSource = currCPatch.dependenciesFrom.ToList();
             LboxCPatchDependenciesTo.DataSource = currCPatch.dependenciesTo.ToList();
+        }
+
+        private void DisplayZPatch()
+        {
+            CbZPatchStatus.SelectedItem = currZPatch.ZPatchStatus;
+            CbZPatchCPatch.SelectedItem = currZPatch.cpatch;
+
+            LboxZPatchDependenciesFrom.DataSource = currZPatch.dependenciesFrom.ToList();
+            LboxZPatchDependenciesTo.DataSource = currZPatch.dependenciesTo.ToList();
         }
 
         private void BtSetHomePath_Click(object sender, EventArgs e)
@@ -155,31 +178,25 @@ namespace CoreApp
 
         private void mainTree_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            switch(mainTree.SelectedNode.Level)
+            if(mainTree.SelectedNode.Level == 0)
             {
-                case 0:
-                    Release currRelease = getReleaseFromTree(mainTree.SelectedNode);
-                    currRelease.InitCPatches();
-                    mainTree.SelectedNode.Nodes.Clear();
-                    foreach (CPatch cPatch in currRelease.CPatches)
+                Release currRelease = getReleaseFromTree(mainTree.SelectedNode);
+                currRelease.InitCPatches();
+                mainTree.SelectedNode.Nodes.Clear();
+                foreach (CPatch cPatch in currRelease.CPatches)
+                {
+                    TreeNode newNode = mainTree.SelectedNode.Nodes.Add(cPatch.CPatchId.ToString(), cPatch.CPatchName);
+
+                    foreach (ZPatch zPatch in cPatch.ZPatches)
                     {
-                        mainTree.SelectedNode.Nodes.Add(cPatch.CPatchId.ToString(), cPatch.CPatchName);
+                        newNode.Nodes.Add(zPatch.ZPatchId.ToString(), zPatch.ZPatchName);
                     }
-                    break;
-                case 1:
-                    CPatch currCPatch = getCPatchFromTree(mainTree.SelectedNode);
-                    currCPatch.InitZPatches();
-                    mainTree.SelectedNode.Nodes.Clear();
-                    foreach (ZPatch zPatch in currCPatch.ZPatches)
-                    {
-                        mainTree.SelectedNode.Nodes.Add(zPatch.ZPatchId.ToString(), zPatch.ZPatchName);
-                    }
-                    break;
+                }
             }
             mainTree.SelectedNode.Expand();
         }
 
-        private void CbStatus_DrawItem(object sender, DrawItemEventArgs e)
+        private void CbCPatchStatus_DrawItem(object sender, DrawItemEventArgs e)
         {
             e.DrawBackground();
             if (e.Index == actualCPatchStatusIndex)
@@ -189,7 +206,15 @@ namespace CoreApp
             e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
         }
 
-
+        private void CbZPatchStatus_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            if (e.Index == actualZPatchStatusIndex)
+            {
+                e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
+            }
+            e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
+        }
 
         private void mainTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -205,18 +230,30 @@ namespace CoreApp
                     break;
                 case 2:
                     currZPatch = getZPatchFromTree(mainTree.SelectedNode);
+                    actualZPatchStatusIndex = CbZPatchStatus.Items.IndexOf(currZPatch.ZPatchStatus);
+                    DisplayZPatch();
                     break;
             }
             mainTree.LabelEdit = false;
         }
 
-        private void BtStatus_Click(object sender, EventArgs e)
+        private void BtCPatchStatus_Click(object sender, EventArgs e)
         {
             CPatchStatuses newStatus = (CPatchStatuses)CbCPatchStatus.SelectedItem;
             if (newStatus != currCPatch.CPatchStatus)
             {
                 currCPatch.UpdateStatus(newStatus);
                 actualCPatchStatusIndex = CbCPatchStatus.Items.IndexOf(newStatus);
+            }
+        }
+
+        private void BtZPatchStatus_Click(object sender, EventArgs e)
+        {
+            ZPatchStatuses newStatus = (ZPatchStatuses)CbZPatchStatus.SelectedItem;
+            if (newStatus != currZPatch.ZPatchStatus)
+            {
+                currZPatch.UpdateStatus(newStatus);
+                actualZPatchStatusIndex = CbZPatchStatus.Items.IndexOf(newStatus);
             }
         }
 
@@ -261,10 +298,35 @@ namespace CoreApp
             mainTree.SelectedNode = cpatchNodeToMove;
         }
 
+        private void BtZPatchCPatch_Click(object sender, EventArgs e)
+        {
+            TreeNode zpatchNodeToMove = mainTree.SelectedNode;
+
+            //удаляем старую ноду из дерева
+            mainTree.Nodes.Remove(zpatchNodeToMove);
+
+            CPatch newCPatch = (CPatch)CbZPatchCPatch.SelectedItem;
+            currZPatch.ChangeCPatch(newCPatch);
+
+            //добавляем ноду к новому релизу
+            mainTree.Nodes[newCPatch.CPatchId.ToString()].Nodes.Add(zpatchNodeToMove);
+            mainTree.SelectedNode = zpatchNodeToMove;
+        }
+
         private void CbCPatchRelease_DrawItem(object sender, DrawItemEventArgs e)
         {
             e.DrawBackground();
             if (e.Index == ((ComboBox)sender).Items.IndexOf(currCPatch.release))
+            {
+                e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
+            }
+            e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
+        }
+
+        private void CbZPatchCPatch_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            e.DrawBackground();
+            if (e.Index == ((ComboBox)sender).Items.IndexOf(currZPatch.cpatch))
             {
                 e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
             }
