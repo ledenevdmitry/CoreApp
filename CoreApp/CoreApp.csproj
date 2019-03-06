@@ -86,7 +86,7 @@
     <Compile Include="FileScUtils.cs" />
     <Compile Include="IniUtils\IniUtils.cs" />
     <Compile Include="OraUtils\DAL\CPatchDAL.cs" />
-    <Compile Include="OraUtils\DAL\VSSProjectsDAL.cs" />
+    <Compile Include="OraUtils\DAL\CVSProjectsDAL.cs" />
     <Compile Include="OraUtils\DBManager.cs" />
     <Compile Include="OraUtils\DAL\ReleaseDAL.cs" />
     <Compile Include="OraUtils\DAL\ZPatchDAL.cs" />

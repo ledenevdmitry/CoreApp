@@ -25,6 +25,7 @@ namespace CoreApp.ReleaseObjects
         public ReleaseManager()
         {
             InitFromDB();
+            homeDir = new DirectoryInfo(IniUtils.IniUtils.GetConfig("Local", "Home"));
         }
 
         private void InitFromDB()
@@ -34,7 +35,7 @@ namespace CoreApp.ReleaseObjects
             releasesDict = new Dictionary<int, Release>();
             foreach (var oraRelease in oraReleases)
             {
-                Release release = new Release(oraRelease.releaseId, oraRelease.releaseName);
+                Release release = new Release(oraRelease.releaseId, oraRelease.releaseName, this);
                 release.rm = this;
                 releases.Add(release);
                 releasesDict.Add(release.releaseId, release);
@@ -47,7 +48,7 @@ namespace CoreApp.ReleaseObjects
             {
                 return null;
             }
-            Release newRelease = new Release(ReleaseDAL.Insert(releaseName), releaseName);
+            Release newRelease = new Release(ReleaseDAL.Insert(releaseName), releaseName, this);
             releases.Add(newRelease);
             releasesDict.Add(newRelease.releaseId, newRelease);
             return newRelease;

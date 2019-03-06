@@ -1,4 +1,5 @@
 ﻿using CoreApp.OraUtils;
+using CoreApp.OraUtils.DAL;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,6 +28,7 @@ namespace CoreApp.FixpackObjects
         public int ZPatchId { get; set; }
         public CPatch cpatch;
         public int excelFileRowId;
+        public static CVS.CVS cvs;
 
         public override int GetHashCode()
         {
@@ -63,6 +65,14 @@ namespace CoreApp.FixpackObjects
             this.ZPatchId = ZPatchId;
             this.ZPatchName = ZPatchName;
             this.ZPatchStatus = ZPatchStatus;
+        }
+
+        private string GetCVSPath()
+        {
+            if(ZPatchStatus == ZPatchStatuses.OPEN)
+            {
+
+            }
         }
 
         public void SetDependencies()
@@ -139,6 +149,18 @@ namespace CoreApp.FixpackObjects
                 newCPatch.ZPatchesDict.Add(ZPatchId, this);
 
                 ZPatchDAL.UpdateCPatch(ZPatchId, newCPatch.CPatchId);
+            }
+        }
+
+        public void GetFromCVS()
+        {
+            if(ZPatchStatus != ZPatchStatuses.OPEN)
+            {
+                string cvsFolder = CVSProjectsDAL.GetPath(cpatch.KodSredy) + ;
+            }
+            else
+            {
+                throw new Exception("Патч открыт, переведите статус");
             }
         }
     }

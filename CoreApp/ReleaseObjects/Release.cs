@@ -52,9 +52,10 @@ namespace CoreApp.ReleaseObjects
             return CPatchesDict[id];
         }
 
-        public Release(int releaseId, string releaseName)
+        public Release(int releaseId, string releaseName, ReleaseManager rm)
         {
             InitFromDB(releaseId, releaseName);
+            this.rm = rm;
         }        
 
         public void InitCPatches()

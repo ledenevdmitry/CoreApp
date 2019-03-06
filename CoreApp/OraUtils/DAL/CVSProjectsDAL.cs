@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace CoreApp.OraUtils.DAL
 {
-    class VSSFolder
+    class CVSProjectsDAL
     {
-        public string GetPath(string kod_sredy)
+        public static string GetPath(string kod_sredy)
         {
             return 
                 DBManager.ExecuteQuery(

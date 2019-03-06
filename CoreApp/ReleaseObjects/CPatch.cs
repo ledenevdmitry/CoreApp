@@ -1,4 +1,5 @@
 ﻿using CoreApp.OraUtils;
+using CoreApp.OraUtils.DAL;
 using CoreApp.OraUtils.Model;
 using CoreApp.ReleaseObjects;
 using Microsoft.Msagl.Core.Layout;
@@ -15,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace CoreApp.FixpackObjects
 {
-    public enum CPatchStatuses  { UNDEFINED, NOTREADY, READY }
+    public enum CPatchStatuses  { UNDEFINED, NOTREADY, READY, INSTALLED, REVISION }
 
     public class CPatch
     {
@@ -24,6 +25,7 @@ namespace CoreApp.FixpackObjects
         public string CPatchName { get; private set; }
         public CPatchStatuses CPatchStatus { get; private set; }
         public string LocalPath { get; private set; }
+        public string cvsPath;
         public static CVS.CVS cvs;
 
         static string regexC = @"\\(C\d+)";
@@ -136,10 +138,26 @@ namespace CoreApp.FixpackObjects
             }
         }
 
+        private string GetCVSPath()
+        {
+            string cvsRoot = CVSProjectsDAL.GetPath(KodSredy);
+            string match = null;
+            string shortName = Regex.Match(CPatchName, @"C\d+").Value;
+            return cvs.FirstInEntireBase(cvsRoot, ref match, new Regex(shortName), 2);
+        }
+
+        public void Download()
+        {
+            cvs.Download(GetCVSPath(), LocalPath);
+        }
+
         public CPatch(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, string KodSredy, Release release)
         {
             this.release = release;
             InitFromDB(CPatchId, CPatchName, CPatchStatus, KodSredy);
+
+            LocalPath = $"{release.rm.homeDir.FullName}/{CPatchName}";
+
             //лучше их инициализировать сразу, чтобы проще было с зависимостями
             InitZPatches();
         }
