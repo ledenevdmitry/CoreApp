@@ -576,6 +576,7 @@ namespace CoreApp.FixpackObjects
             foreach (ZPatch zpatch in ZPatches)
             {
                 Microsoft.Msagl.Drawing.Node node = new Microsoft.Msagl.Drawing.Node(zpatch.ZPatchId.ToString());
+                node.Attr.FillColor = Color.LightGreen;
                 node.Label.Text = zpatch.ZPatchName;
                 graph.AddNode(node);
             }
@@ -587,7 +588,8 @@ namespace CoreApp.FixpackObjects
                     if(depFrom.cpatch != this)
                     {
                         Microsoft.Msagl.Drawing.Node node = new Microsoft.Msagl.Drawing.Node(depFrom.ZPatchId.ToString());
-                        node.Label.FontColor = Color.Red;
+                        node.Attr.FillColor = Color.DarkRed;
+                        node.Label.FontColor = Color.White;
                         node.LabelText = $"{depFrom.ZPatchName} ({depFrom.cpatch.CPatchName})";
                         graph.AddNode(node);
                     }
@@ -599,7 +601,8 @@ namespace CoreApp.FixpackObjects
                     if (depTo.cpatch != this)
                     {
                         Microsoft.Msagl.Drawing.Node node = new Microsoft.Msagl.Drawing.Node(depTo.ZPatchId.ToString());
-                        node.Label.FontColor = Color.Red;
+                        node.Attr.FillColor = Color.DarkRed;
+                        node.Label.FontColor = Color.White;
                         node.LabelText = $"{depTo.ZPatchName} ({depTo.cpatch.CPatchName})";
                         graph.AddNode(node);
                     }

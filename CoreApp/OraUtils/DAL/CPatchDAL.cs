@@ -93,10 +93,10 @@ namespace CoreApp.OraUtils
         "select " +
         ":cpatch_id, " +
         ":parent_id, " +
-        "max(release_id), " +
-        "max(cpatch_name), " +
-        "max(cpatchstatus), " +
-        "max(kod_sredy), " +
+       $"(select max(release_id)   from cpatch_hdim where cpatch_id = :cpatch_id and validto = {DBManager.PlusInf} and dwsact <> 'D')," +
+       $"(select max(cpatch_name)  from cpatch_hdim where cpatch_id = :cpatch_id and validto = {DBManager.PlusInf} and dwsact <> 'D')," +
+       $"(select max(cpatchstatus) from cpatch_hdim where cpatch_id = :cpatch_id and validto = {DBManager.PlusInf} and dwsact <> 'D')," +
+       $"(select max(kod_sredy)    from cpatch_hdim where cpatch_id = :cpatch_id and validto = {DBManager.PlusInf} and dwsact <> 'D')," +
         "sysdate, " +
        $"{DBManager.PlusInf}, " +
         "'I' " +

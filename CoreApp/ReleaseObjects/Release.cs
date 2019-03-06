@@ -156,6 +156,7 @@ namespace CoreApp.ReleaseObjects
             {
                 Node node = new Node(cpatch.CPatchId.ToString());
                 node.Label.Text = cpatch.CPatchName;
+                node.Attr.FillColor = Color.LightGreen;
                 graph.AddNode(node);
             }
 

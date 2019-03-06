@@ -28,9 +28,7 @@ namespace CoreApp
 
         public ReleaseManagerForm()
         {
-            InitializeComponent();
-
-            ResizeForm();
+            InitializeComponent();            
 
             CbCPatchStatus.DataSource = Enum.GetValues(typeof(CPatchStatuses));
             CbZPatchStatus.DataSource = Enum.GetValues(typeof(ZPatchStatuses));
@@ -53,8 +51,16 @@ namespace CoreApp
         private void OnIdle(object sender, EventArgs e)
         {
             BtAddFixpack.Enabled = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
-            GbCPatch.Visible = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 1;
-            GbZPatch.Visible = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 2;
+
+            BtReleaseGraph.Enabled = 
+                mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
+
+            GbCPatch.Visible = 
+            BtCPatchGraph.Enabled = 
+                mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 1;
+
+            GbZPatch.Visible = 
+                mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 2;
         }
 
         private void CreateTree()
@@ -63,43 +69,6 @@ namespace CoreApp
             {
                 var currReleaseNode = mainTree.Nodes.Add(release.releaseId.ToString(), release.releaseName);                
             }
-        }
-
-        private void ResizeForm()
-        {
-            mainTree.Width = SCMain.Panel1.Width;
-            mainTree.Height = SCMain.Panel1.Height;
-
-            if (GbCPatch.Visible)
-            {
-                GbCPatch.Width = SCMain.Panel2.Width;
-                GbCPatch.Height = SCMain.Panel2.Height;
-
-                LboxCPatchDependenciesFrom.Width = SCCPatchDependenciesFrom.Panel1.Width;
-                LboxCPatchDependenciesFrom.Height = SCCPatchDependenciesFrom.Panel1.Height - LbCPatchDependenciesFrom.Height;
-
-                LboxCPatchDependenciesTo.Width = SCCPatchDependenciesTo.Panel1.Width;
-                LboxCPatchDependenciesTo.Height = SCCPatchDependenciesTo.Panel1.Height - LbCPatchDependenciesTo.Height;
-
-                //LboxCPatchDependenciesFrom.Height = SCCPatchDependencies.Panel1.Height - LboxCPatchDependenciesFrom.Top - (SCCPatchDependencies.Panel1.Bottom - LboxCPatchDependenciesFrom.Bottom);
-            }
-
-            if(GbZPatch.Visible)
-            {
-                GbZPatch.Width = SCMain.Panel2.Width;
-                GbZPatch.Height = SCMain.Panel2.Height;
-
-                LboxZPatchDependenciesFrom.Width = SCZPatchDependenciesFrom.Panel1.Width;
-                LboxZPatchDependenciesFrom.Height = SCZPatchDependenciesFrom.Panel1.Height - LbZPatchDependenciesFrom.Height;
-
-                LboxZPatchDependenciesTo.Width = SCZPatchDependenciesTo.Panel1.Width;
-                LboxZPatchDependenciesTo.Height = SCZPatchDependenciesTo.Panel1.Height - LbZPatchDependenciesTo.Height;
-            }
-        }
-
-        private void mainSplitter_SplitterMoved(object sender, SplitterEventArgs e)
-        {
-            ResizeForm();
         }
 
         private void DisplayCPatch()

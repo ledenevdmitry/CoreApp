@@ -107,9 +107,9 @@ namespace CoreApp.OraUtils
             "select " +
             ":zpatch_id, " +
             ":parent_id, " +
-            "max(cpatch_id)," +
-            "max(zpatch_name)," +
-            "null," +
+           $"(select max(cpatch_id)   from zpatch_hdim where zpatch_id = :zpatch_id and validto = {DBManager.PlusInf} and dwsact <> 'D')," +
+           $"(select max(zpatch_name) from zpatch_hdim where zpatch_id = :zpatch_id and validto = {DBManager.PlusInf} and dwsact <> 'D')," +
+           $"(select max(zpatchstatus) from zpatch_hdim where zpatch_id = :zpatch_id and validto = {DBManager.PlusInf} and dwsact <> 'D')," +
             "sysdate, " +
            $"{DBManager.PlusInf}, " +
             "'I' " +
