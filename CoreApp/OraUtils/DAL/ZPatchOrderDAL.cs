@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CoreApp.OraUtils.Model;
+using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,95 @@ namespace CoreApp.OraUtils
 {
     class ZPatchOrderDAL
     {
+        private static string insertScript = 
+            "insert into zpatchorder_hdim " +
+            "( zpatch_id,  zpatch_order , validfrom, validto, dwsact ) " +
+            "values " +
+           $"(:zpatch_id, :zpatch_order, sysdate, {DBManager.PlusInf}, 'I') ";
+
+        private static string closeOld =
+            "update zpatchorder_hdim set validto = sysdate where zpatch_id = :zpatch_id";
+
+        private static string insertNew(string dmlType)
+        {
+            return
+            "insert into zpatchorder_hdim " +
+            "( zpatch_id,  zpatch_order , validfrom, validto, dwsact ) " +
+            "select " +
+            "zpatch_id, " +
+            dmlType == "D" ? "" : ":" + "zpatch_order, " +
+            "validto," +
+           $"{DBManager.PlusInf}, " +
+           $"{dmlType}" +
+            "from zpatchorder_hdim" +
+            "where validfrom = (select max(validfrom) from zpatchorder_hdim where zpatch_id = :zpatch_id) and zpatch_id = :zpatch_id)";
+        }
+
+
+        public static void Insert(int zpatch_id, int zpatch_order)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+
+            DBManager.ExecuteNonQuery(
+                insertScript,
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("zpatch_order", zpatch_order));
+
+            transaction.Commit();
+        }
+
+
+        public static void Update(int zpatch_id, int zpatch_order)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+
+            DBManager.ExecuteNonQuery(
+                closeOld,
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id));
+
+            DBManager.ExecuteNonQuery(
+                insertNew("U"),
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("zpatch_order", zpatch_order));
+
+            transaction.Commit();
+        }
+
+        public static void Delete(int zpatch_id, int zpatch_order)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+
+            DBManager.ExecuteNonQuery(
+                closeOld,
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id));
+
+            DBManager.ExecuteNonQuery(
+                insertNew("D"),
+                transaction,
+                new OracleParameter("zpatch_id", zpatch_id),
+                new OracleParameter("zpatch_order", zpatch_order));
+
+            transaction.Commit();
+        }
+
+        static string allZPatchOrders = $"select zpatch_id, zpatch_order from zpatchorder_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' ";
+
+
+        public IEnumerable<ZPatchOrderRecord> GetZPatchOrders()
+        {
+            using (var reader = DBManager.ExecuteQuery(allZPatchOrders))
+            {
+                while (reader.Read())
+                {
+                    yield return new ZPatchOrderRecord(
+                        reader.GetInt32(0),
+                        reader.GetInt32(1));
+                }
+            }
+        }
     }
 }

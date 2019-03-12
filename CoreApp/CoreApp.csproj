@@ -94,6 +94,7 @@
     <Compile Include="OraUtils\DBManagerForTest.cs" />
     <Compile Include="OraUtils\Model\CPatchRecord.cs" />
     <Compile Include="OraUtils\Model\ReleaseRecord.cs" />
+    <Compile Include="OraUtils\Model\ZPatchOrderRecord.cs" />
     <Compile Include="OraUtils\Model\ZPatchRecord.cs" />
     <Compile Include="GraphForm.cs">
       <SubType>Form</SubType>
@@ -170,7 +171,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -35,7 +35,7 @@ namespace CoreApp.Parsers
         }
         */
         
-        public ETLParser(Release release, bool UMEnabled)
+        public ETLParser(Release release)
         {
             this.release = release;
 

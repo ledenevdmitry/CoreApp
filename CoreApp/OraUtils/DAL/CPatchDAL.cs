@@ -24,9 +24,8 @@ namespace CoreApp.OraUtils
              "insert into cpatch_hdim " +
              "( cpatch_id,  parent_id,  release_id,  cpatch_name, cpatchstatus, kod_sredy, validfrom, validto, dwsact ) " +
              "select " +
-             "cpatch_id, parent_id,  :new_release_id,  :new_cpatch_name, :new_cpatchstatus,  :new_kod_sredy, " +
-             "(select max(validto) from cpatch_hdim " +
-            $"where {joinedPars}), " +
+             "cpatch_id, parent_id,  release_id,  cpatch_name, cpatchstatus,  kod_sredy, " +
+             "validto, " +
             $"{DBManager.PlusInf}, '{dmlType}') " +
              "from cpatch_hdim " +
              "where " +
@@ -226,11 +225,11 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        static string allCPatchesScript = $"select distinct cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by cpatch_name ";
-        static string CPatchesByRelease = $"select distinct cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and release_id = :release_id order by cpatch_name ";
-        static string dependenciesTo = $"select distinct cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :cpatch_id order by cpatch_name ";
+        static string allCPatchesScript = $"select cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by cpatch_name ";
+        static string CPatchesByRelease = $"select cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and release_id = :release_id order by cpatch_name ";
+        static string dependenciesTo = $"select cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :cpatch_id order by cpatch_name ";
         static string dependenciesFrom = 
-             "select distinct c2.cpatch_id, c2.cpatch_name, c2.cpatchstatus, c2.kod_sredy " +
+             "select c2.cpatch_id, c2.cpatch_name, c2.cpatchstatus, c2.kod_sredy " +
             $"from cpatch_hdim c1 join cpatch_hdim c2 on c1.parent_id = c2.cpatch_id " +
             $"where c1.validto = {DBManager.PlusInf} and c1.dwsact <>  'D' " +
             $"and   c2.validto = {DBManager.PlusInf} and c2.dwsact <>  'D' " +

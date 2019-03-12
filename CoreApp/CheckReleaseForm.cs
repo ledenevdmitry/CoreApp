@@ -130,7 +130,7 @@ namespace CoreApp
             //{
             //List<Fixpack> fixpacks;
             //List<FileInfo> files = FileScUtils.GetFilesFromMainDir(new DirectoryInfo(fbd.SelectedPath), out fixpacks);
-            etlparser = new ETLParser(release, UMEnabled);
+            etlparser = new ETLParser(release);
 
             //PBChecks.Value = 0;
             //PBChecks.Maximum = etlparser.infaParser.WorkAmount(etlparser.infaObjectDict) + etlparser.fileCount();

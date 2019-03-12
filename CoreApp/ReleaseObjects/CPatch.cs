@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 namespace CoreApp.FixpackObjects
 {
     public enum CPatchStatuses  { UNDEFINED, NOTREADY, READY, INSTALLED, REVISION }
+    public enum EnvCodes { UNDEFINED, STAB, TEST}
 
     public class CPatch
     {
@@ -37,7 +38,7 @@ namespace CoreApp.FixpackObjects
         public HashSet<CPatch> dependenciesFrom { get; protected set; }
         public HashSet<CPatch> dependenciesTo { get; protected set; }
         public Release release;
-        public string KodSredy { get; set; }
+        public EnvCodes KodSredy { get; set; }
 
         public int CPatchId { get; private set; }
 
@@ -70,7 +71,7 @@ namespace CoreApp.FixpackObjects
             return CPatchName;
         }
 
-        private void InitFromDB(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, string KodSredy)
+        private void InitFromDB(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, EnvCodes KodSredy)
         {
             this.CPatchId = CPatchId;
             this.CPatchName = CPatchName;
@@ -110,9 +111,10 @@ namespace CoreApp.FixpackObjects
         {
             foreach(ZPatch zpatch in ZPatches)
             {
-                if (zpatch.ZPatchStatus != ZPatchStatuses.INSTALLED && ZPatchDAL.IsZPatchInstalled(zpatch.ZPatchName, KodSredy))
+                if (zpatch.ZPatchStatus != ZPatchStatuses.INSTALLED && ZPatchDAL.IsZPatchInstalled(zpatch.ZPatchName, KodSredy.ToString()))
                 {
                     zpatch.ZPatchStatus = ZPatchStatuses.INSTALLED;
+                    ZPatchDAL.UpdateStatus(zpatch.ZPatchId, ZPatchStatuses.INSTALLED.ToString());
                 }
             }
         }
@@ -140,7 +142,7 @@ namespace CoreApp.FixpackObjects
 
         private string GetCVSPath()
         {
-            string cvsRoot = CVSProjectsDAL.GetPath(KodSredy);
+            string cvsRoot = CVSProjectsDAL.GetPath(KodSredy.ToString());
             string match = null;
             string shortName = Regex.Match(CPatchName, @"C\d+").Value;
             return cvs.FirstInEntireBase(cvsRoot, ref match, new Regex(shortName), 2);
@@ -151,7 +153,7 @@ namespace CoreApp.FixpackObjects
             cvs.Download(GetCVSPath(), LocalPath);
         }
 
-        public CPatch(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, string KodSredy, Release release)
+        public CPatch(int CPatchId, string CPatchName, CPatchStatuses CPatchStatus, EnvCodes KodSredy, Release release)
         {
             this.release = release;
             InitFromDB(CPatchId, CPatchName, CPatchStatus, KodSredy);
@@ -198,10 +200,10 @@ namespace CoreApp.FixpackObjects
             foreach (ZPatch root in roots)
             {
                 root.rank = 0;
-                SetRanks(root);
+                SetChildrenRanks(root);
             }
 
-            SortedList<int, ZPatch> list = new SortedList<int, ZPatch>();
+            SortedList<int, ZPatch> list = new SortedList<int, ZPatch>(Comparer<int>.Create((x, y) => x < y ? -1 : 1));
 
             foreach (ZPatch patch in ZPatches)
             {
@@ -234,11 +236,12 @@ namespace CoreApp.FixpackObjects
             }
         }
 
-        private void SetRanks(ZPatch currPatch)
+        private void SetChildrenRanks(ZPatch currPatch)
         {
             foreach (ZPatch subpatch in currPatch.dependenciesTo)
             {
                 subpatch.rank = Math.Max(subpatch.rank, currPatch.rank + 1);
+                SetChildrenRanks(subpatch);
             }
         }
 

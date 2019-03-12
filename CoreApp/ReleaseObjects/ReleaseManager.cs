@@ -25,7 +25,11 @@ namespace CoreApp.ReleaseObjects
         public ReleaseManager()
         {
             InitFromDB();
-            homeDir = new DirectoryInfo(IniUtils.IniUtils.GetConfig("Local", "Home"));
+            string homePath = IniUtils.IniUtils.GetConfig("Local", "Home");
+            if (!string.IsNullOrWhiteSpace(homePath))
+            {
+                homeDir = new DirectoryInfo(homePath);
+            }
         }
 
         private void InitFromDB()

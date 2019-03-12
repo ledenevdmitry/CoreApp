@@ -67,12 +67,41 @@ namespace CoreApp.FixpackObjects
             this.ZPatchStatus = ZPatchStatus;
         }
 
-        private string GetCVSPath()
+        private bool GetCVSPath(out string path)
         {
-            if(ZPatchStatus == ZPatchStatuses.OPEN)
-            {
+            string root;
 
+            if (ZPatchStatus == ZPatchStatuses.OPEN)
+            {
+                root = CVSProjectsDAL.GetPath(EnvCodes.UNDEFINED.ToString());
             }
+            else
+            {
+                root = CVSProjectsDAL.GetPath(cpatch.KodSredy.ToString());
+            }
+
+            string match = null;
+            try
+            {
+                path = cvs.FirstInEntireBase(root, ref match, new Regex($"{ZPatchName}$"), 1);
+                return true;
+            }
+            catch(ArgumentException)
+            {
+                path = null;
+                return false;
+            }
+        }
+
+        public bool Download()
+        {
+            string path;
+            if(GetCVSPath(out path))
+            {
+                cvs.Download(path, $"{cpatch.release.rm.homeDir}/{cpatch.release.releaseName}/{cpatch.CPatchName}/{ZPatchName}");
+                return true;
+            }
+            return false;
         }
 
         public void SetDependencies()
@@ -156,7 +185,7 @@ namespace CoreApp.FixpackObjects
         {
             if(ZPatchStatus != ZPatchStatuses.OPEN)
             {
-                string cvsFolder = CVSProjectsDAL.GetPath(cpatch.KodSredy) + ;
+                //string cvsFolder = CVSProjectsDAL.GetPath(cpatch.KodSredy) + ;
             }
             else
             {

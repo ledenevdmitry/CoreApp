@@ -23,9 +23,8 @@ namespace CoreApp.OraUtils
              "insert into zpatch_hdim " +
              "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
              "select " +
-             "zpatch_id, parent_id,  :new_cpatch_id,  :new_zpatch_name, :new_zpatchstatus, " +
-             "(select max(validto) from zpatch_hdim " +
-            $"where {joinedPars}), " +
+             "zpatch_id, parent_id,  cpatch_id,  zpatch_name, zpatchstatus, " +
+             "validto, " +
             $"{DBManager.PlusInf}, '{dmlType}') " +
              "from zpatch_hdim " +
              "where " +
@@ -240,11 +239,11 @@ namespace CoreApp.OraUtils
 
 
 
-        static string allZPatchesScript = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by zpatch_name ";
-        static string ZPatchesByCPatch = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_id = :cpatch_id order by zpatch_name ";
-        static string dependenciesTo = $"select distinct zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :zpatch_id order by zpatch_name ";
+        static string allZPatchesScript = $"select zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by zpatch_name ";
+        static string ZPatchesByCPatch = $"select zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_id = :cpatch_id order by zpatch_name ";
+        static string dependenciesTo = $"select zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :zpatch_id order by zpatch_name ";
         static string dependenciesFrom =
-             "select distinct z2.zpatch_id, z2.zpatch_name, z2.zpatchstatus " +
+             "select z2.zpatch_id, z2.zpatch_name, z2.zpatchstatus " +
             $"from zpatch_hdim z1 join zpatch_hdim z2 on z1.parent_id = z2.zpatch_id " +
             $"where z1.validto = {DBManager.PlusInf} and z1.dwsact <>  'D' " +
             $"and   z2.validto = {DBManager.PlusInf} and z2.dwsact <>  'D' " +
