@@ -225,15 +225,53 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        static string allCPatchesScript = $"select cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by cpatch_name ";
-        static string CPatchesByRelease = $"select cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and release_id = :release_id order by cpatch_name ";
-        static string dependenciesTo = $"select cpatch_id, cpatch_name, cpatchstatus, kod_sredy from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :cpatch_id order by cpatch_name ";
+        static string allCPatchesScript = 
+            $"select " +
+            $"cpatch_id, " +
+            $"max(cpatch_name), " +
+            $"max(cpatchstatus), " +
+            $"max(kod_sredy) " +
+            $"from " +
+            $"cpatch_hdim " +
+            $"where " +
+            $"validto = {DBManager.PlusInf} and dwsact <> 'D' " +
+            $"group by cpatch_id " +
+            $"order by max(cpatch_name) ";
+
+        static string CPatchesByRelease = 
+            $"select " +
+            $"cpatch_id, " +
+            $"max(cpatch_name), " +
+            $"max(cpatchstatus), " +
+            $"max(kod_sredy) " +
+            $"from cpatch_hdim " +
+            $"where validto = {DBManager.PlusInf} and dwsact <>  'D' and release_id = :release_id " +
+            $"group by cpatch_id " +
+            $"order by max(cpatch_name) ";
+
+        static string dependenciesTo = 
+            $"select " +
+            $"cpatch_id, " +
+            $"max(cpatch_name), " +
+            $"max(cpatchstatus), " +
+            $"max(kod_sredy) " +
+            $"from cpatch_hdim " +
+            $"where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :cpatch_id " +
+            $"group by cpatch_id " +
+            $"order by max(cpatch_name) ";
+
         static string dependenciesFrom = 
-             "select c2.cpatch_id, c2.cpatch_name, c2.cpatchstatus, c2.kod_sredy " +
+            "select " +
+            "c2.cpatch_id, " +
+            "max(c2.cpatch_name), " +
+            "max(c2.cpatchstatus), " +
+            "max(c2.kod_sredy)" +
             $"from cpatch_hdim c1 join cpatch_hdim c2 on c1.parent_id = c2.cpatch_id " +
             $"where c1.validto = {DBManager.PlusInf} and c1.dwsact <>  'D' " +
             $"and   c2.validto = {DBManager.PlusInf} and c2.dwsact <>  'D' " +
-            $"and c1.cpatch_id = :cpatch_id order by c2.cpatch_name ";
+            $"and c1.cpatch_id = :cpatch_id " +
+            $"group by c2.cpatch_id " +
+            $"order by max(c2.cpatch_name) ";
 
 
         public static IEnumerable<CPatchRecord> getCPatches()

@@ -131,7 +131,14 @@ namespace CoreApp.OraUtils
             return getByScript(allReleasesScript);
         }
 
-        static string allReleasesScript = $"select distinct release_id, release_name from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by release_name ";
+        static string allReleasesScript = 
+            $"select release_id, " +
+            $"max(release_name) " +
+            $"from release_hdim " +
+            $"where validto = {DBManager.PlusInf} and dwsact <> 'D' " +
+            $"group by release_id " +
+            $"order by max(release_name) ";
+
         static string containsRelease = $"select * from dual where exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_name = :release_name) ";
 
         public static bool Contains(string release_name)

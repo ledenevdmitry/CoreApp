@@ -81,6 +81,7 @@
             this.BtZPatchAddDependenciesTo = new System.Windows.Forms.Button();
             this.mainTreeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.TSMIRename = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtZPatchOrder = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).BeginInit();
             this.SCMain.Panel1.SuspendLayout();
@@ -190,7 +191,8 @@
             // 
             this.BtFixpack.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.BtAddFixpack,
-            this.BtCPatchGraph});
+            this.BtCPatchGraph,
+            this.BtZPatchOrder});
             this.BtFixpack.Name = "BtFixpack";
             this.BtFixpack.Size = new System.Drawing.Size(85, 24);
             this.BtFixpack.Text = "Поставка";
@@ -198,14 +200,14 @@
             // BtAddFixpack
             // 
             this.BtAddFixpack.Name = "BtAddFixpack";
-            this.BtAddFixpack.Size = new System.Drawing.Size(205, 26);
+            this.BtAddFixpack.Size = new System.Drawing.Size(216, 26);
             this.BtAddFixpack.Text = "Добавить ОП/ФП";
             this.BtAddFixpack.Click += new System.EventHandler(this.BtAddFixpack_Click);
             // 
             // BtCPatchGraph
             // 
             this.BtCPatchGraph.Name = "BtCPatchGraph";
-            this.BtCPatchGraph.Size = new System.Drawing.Size(205, 26);
+            this.BtCPatchGraph.Size = new System.Drawing.Size(216, 26);
             this.BtCPatchGraph.Text = "Граф";
             this.BtCPatchGraph.Click += new System.EventHandler(this.BtCPatchGraph_Click);
             // 
@@ -610,7 +612,7 @@
             this.GbZPatchDependenciesFrom.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GbZPatchDependenciesFrom.Location = new System.Drawing.Point(0, 0);
             this.GbZPatchDependenciesFrom.Name = "GbZPatchDependenciesFrom";
-            this.GbZPatchDependenciesFrom.Size = new System.Drawing.Size(194, 309);
+            this.GbZPatchDependenciesFrom.Size = new System.Drawing.Size(194, 290);
             this.GbZPatchDependenciesFrom.TabIndex = 1;
             this.GbZPatchDependenciesFrom.TabStop = false;
             this.GbZPatchDependenciesFrom.Text = "Зависит от";
@@ -622,7 +624,7 @@
             this.LboxZPatchDependenciesFrom.ItemHeight = 16;
             this.LboxZPatchDependenciesFrom.Location = new System.Drawing.Point(3, 18);
             this.LboxZPatchDependenciesFrom.Name = "LboxZPatchDependenciesFrom";
-            this.LboxZPatchDependenciesFrom.Size = new System.Drawing.Size(188, 288);
+            this.LboxZPatchDependenciesFrom.Size = new System.Drawing.Size(188, 269);
             this.LboxZPatchDependenciesFrom.TabIndex = 0;
             // 
             // BtZPatchAddDependenciesFrom
@@ -670,7 +672,7 @@
             this.GbZPatchDependenciesTo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.GbZPatchDependenciesTo.Location = new System.Drawing.Point(0, 0);
             this.GbZPatchDependenciesTo.Name = "GbZPatchDependenciesTo";
-            this.GbZPatchDependenciesTo.Size = new System.Drawing.Size(197, 309);
+            this.GbZPatchDependenciesTo.Size = new System.Drawing.Size(197, 290);
             this.GbZPatchDependenciesTo.TabIndex = 1;
             this.GbZPatchDependenciesTo.TabStop = false;
             this.GbZPatchDependenciesTo.Text = "Влияет на";
@@ -682,7 +684,7 @@
             this.LboxZPatchDependenciesTo.ItemHeight = 16;
             this.LboxZPatchDependenciesTo.Location = new System.Drawing.Point(3, 18);
             this.LboxZPatchDependenciesTo.Name = "LboxZPatchDependenciesTo";
-            this.LboxZPatchDependenciesTo.Size = new System.Drawing.Size(191, 288);
+            this.LboxZPatchDependenciesTo.Size = new System.Drawing.Size(191, 269);
             this.LboxZPatchDependenciesTo.TabIndex = 0;
             // 
             // BtZPatchDeleteDependenciesTo
@@ -716,6 +718,13 @@
             this.TSMIRename.Name = "TSMIRename";
             this.TSMIRename.Size = new System.Drawing.Size(190, 24);
             this.TSMIRename.Text = "Переименовать";
+            // 
+            // BtZPatchOrder
+            // 
+            this.BtZPatchOrder.Name = "BtZPatchOrder";
+            this.BtZPatchOrder.Size = new System.Drawing.Size(216, 26);
+            this.BtZPatchOrder.Text = "Порядок патчей";
+            this.BtZPatchOrder.Click += new System.EventHandler(this.BtZPatchOrder_Click);
             // 
             // ReleaseManagerForm
             // 
@@ -834,5 +843,6 @@
         private System.Windows.Forms.GroupBox GbCPatchDependenciesTo;
         private System.Windows.Forms.GroupBox GbZPatchDependenciesFrom;
         private System.Windows.Forms.GroupBox GbZPatchDependenciesTo;
+        private System.Windows.Forms.ToolStripMenuItem BtZPatchOrder;
     }
 }

@@ -63,3 +63,4 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.xml
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.Drawing.xml
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.GraphViewerGdi.xml
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.GraphForm.resources
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchOrderForm.resources

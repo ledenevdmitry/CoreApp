@@ -138,6 +138,12 @@
     <Compile Include="Parsers\SqlParser.cs" />
     <Compile Include="ReleaseObjects\Release.cs" />
     <Compile Include="ReleaseObjects\ReleaseManager.cs" />
+    <Compile Include="ZPatchOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ZPatchOrderForm.Designer.cs">
+      <DependentUpon>ZPatchOrderForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="AddForm.resx">
       <DependentUpon>AddForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -158,6 +164,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ReleaseManagerForm.resx">
       <DependentUpon>ReleaseManagerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ZPatchOrderForm.resx">
+      <DependentUpon>ZPatchOrderForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

@@ -39,6 +39,7 @@ namespace CoreApp.FixpackObjects
         public HashSet<CPatch> dependenciesTo { get; protected set; }
         public Release release;
         public EnvCodes KodSredy { get; set; }
+        public SortedList<int, ZPatch> ZPatchOrder { get; private set; }
 
         public int CPatchId { get; private set; }
 
@@ -162,6 +163,17 @@ namespace CoreApp.FixpackObjects
 
             //лучше их инициализировать сразу, чтобы проще было с зависимостями
             InitZPatches();
+            InitZPatchOrder();
+        }
+
+        private void InitZPatchOrder()
+        {
+            ZPatchOrder = new SortedList<int, ZPatch>();
+            var zpatchOrderRecords = ZPatchOrderDAL.GetZPatchOrdersByCPatch(CPatchId);
+            foreach(ZPatchOrderRecord patchOrderRecord in zpatchOrderRecords)
+            {
+                ZPatchOrder.Add(patchOrderRecord.zpatchOrder, ZPatchesDict[patchOrderRecord.zpatchId]);
+            }
         }
 
         private string FindLocalExcel(CPatch fp)
@@ -185,8 +197,32 @@ namespace CoreApp.FixpackObjects
             }
         }
 
+        private void AddNewDependenciesToList(List<ZPatch> newPatches)
+        {
+            var fullList = AllDependenciesToList();
+            int i = fullList.Count;
 
-        public SortedList<int, ZPatch> DependenciesToList()
+            //иду по порядку, добавляю в конец новые патчи
+            foreach(var patch in fullList.Values)
+            {
+                if(newPatches.Contains(patch))
+                {
+                    ZPatchOrder.Add(i++, patch);
+                    ZPatchOrderDAL.Insert(patch.ZPatchId, i);
+                }
+            }
+        }
+
+        public void UpdateZPatchOrder(ZPatch zpatch, int order)
+        {
+            if(ZPatchOrder[order] != zpatch)
+            {
+                ZPatchOrder[order] = zpatch;
+                ZPatchOrderDAL.Update(zpatch.ZPatchId, order);
+            }
+        }
+
+        private SortedList<int, ZPatch> AllDependenciesToList()
         {
             List<ZPatch> roots = new List<ZPatch>();
             foreach (ZPatch patch in ZPatches)
@@ -203,11 +239,25 @@ namespace CoreApp.FixpackObjects
                 SetChildrenRanks(root);
             }
 
-            SortedList<int, ZPatch> list = new SortedList<int, ZPatch>(Comparer<int>.Create((x, y) => x < y ? -1 : 1));
+            SortedList<int, ZPatch> sourceList = new SortedList<int, ZPatch>(Comparer<int>.Create((x, y) => x < y ? -1 : 1));
 
-            foreach (ZPatch patch in ZPatches)
+            foreach (ZPatch zpatch in ZPatches)
             {
-                list.Add(patch.rank, patch);
+                sourceList.Add(zpatch.rank, zpatch);
+            }
+
+            SortedList<int, ZPatch> list = new SortedList<int, ZPatch>();
+
+            int i = 0;
+            foreach (var item in sourceList)
+            {
+                list.Add(i++, item.Value);
+            }
+            
+            foreach (var item in list)
+            {
+                ZPatchOrderDAL.Delete(item.Value.ZPatchId);
+                ZPatchOrderDAL.Insert(item.Value.ZPatchId, item.Key);
             }
 
             return list;
@@ -283,6 +333,52 @@ namespace CoreApp.FixpackObjects
             List<Tuple<ZPatch, ZPatch>> addedDependenciesTo,
             List<ZPatch> newPatches)
         {
+            bool oldDependenciesAreCorrect = true;
+
+            //определяем, должен ли порядок быть переписан, или достаточно только добавить новые патчи в конец
+            foreach(var newDependency in addedDependenciesFrom)
+            {
+                //если появилась новая зависимость, такая, что появился новый патч, влияющий на старый
+                if(newPatches.Contains(newDependency.Item1) && !newPatches.Contains(newDependency.Item2))
+                {
+                    oldDependenciesAreCorrect = false;
+                    break;
+                }
+
+                //если появилась новая зависимость, такая, что старый порядок для старых патчей стал некорректным
+                if(ZPatchOrder.IndexOfValue(newDependency.Item1) > ZPatchOrder.IndexOfValue(newDependency.Item2))
+                {
+                    oldDependenciesAreCorrect = false;
+                    break;
+                }
+            }
+
+            if(oldDependenciesAreCorrect)
+            foreach(var newDependency in addedDependenciesTo)
+            {
+                //если появилась новая зависимость, такая, что появился новый патч, влияющий на старый
+                if (!newPatches.Contains(newDependency.Item1) && newPatches.Contains(newDependency.Item2))
+                {
+                    oldDependenciesAreCorrect = false;
+                    break;
+                }
+
+                //если появилась новая зависимость, такая, что старый порядок для старых патчей стал некорректным
+                if (ZPatchOrder.IndexOfValue(newDependency.Item1) < ZPatchOrder.IndexOfValue(newDependency.Item2))
+                {
+                    oldDependenciesAreCorrect = false;
+                    break;
+                }
+            }
+
+            if(oldDependenciesAreCorrect)
+            {
+                AddNewDependenciesToList(newPatches);
+            }
+            else
+            {
+                ZPatchOrder = AllDependenciesToList();
+            }
 
             //deletedfrom
             foreach (var deletedDependency in deletedDependenciesFrom)
@@ -407,6 +503,7 @@ namespace CoreApp.FixpackObjects
 
             empty.dependenciesFrom = new HashSet<CPatch>();
             empty.dependenciesTo = new HashSet<CPatch>();
+            empty.ZPatchOrder = new SortedList<int, ZPatch>();
             empty.release = release;
             //release.CPatchesDict.Add(-1, empty);
 

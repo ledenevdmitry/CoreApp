@@ -32,7 +32,7 @@ namespace CoreApp.FixpackObjects
 
         public override int GetHashCode()
         {
-            return ZPatchName.GetHashCode();
+            return ZPatchId.GetHashCode();
         }
 
         public override bool Equals(object obj)

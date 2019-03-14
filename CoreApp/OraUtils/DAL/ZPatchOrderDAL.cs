@@ -26,12 +26,13 @@ namespace CoreApp.OraUtils
             "( zpatch_id,  zpatch_order , validfrom, validto, dwsact ) " +
             "select " +
             "zpatch_id, " +
-            dmlType == "D" ? "" : ":" + "zpatch_order, " +
+            (dmlType == "D" ? "" : ":") + 
+            "zpatch_order, " +
             "validto," +
            $"{DBManager.PlusInf}, " +
-           $"{dmlType}" +
-            "from zpatchorder_hdim" +
-            "where validfrom = (select max(validfrom) from zpatchorder_hdim where zpatch_id = :zpatch_id) and zpatch_id = :zpatch_id)";
+           $"'{dmlType}' " +
+            "from zpatchorder_hdim " +
+            "where validfrom = (select max(validfrom) from zpatchorder_hdim where zpatch_id = :zpatch_id) and zpatch_id = :zpatch_id";
         }
 
 
@@ -67,7 +68,7 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static void Delete(int zpatch_id, int zpatch_order)
+        public static void Delete(int zpatch_id)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
 
@@ -79,18 +80,20 @@ namespace CoreApp.OraUtils
             DBManager.ExecuteNonQuery(
                 insertNew("D"),
                 transaction,
-                new OracleParameter("zpatch_id", zpatch_id),
-                new OracleParameter("zpatch_order", zpatch_order));
+                new OracleParameter("zpatch_id", zpatch_id));
 
             transaction.Commit();
         }
 
         static string allZPatchOrders = $"select zpatch_id, zpatch_order from zpatchorder_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' ";
+        static string ZPatchOrdersByCPatch =
+            "select o.zpatch_id, o.zpatch_order " +
+            "from zpatchorder_hdim o join zpatch_hdim p on o.zpatch_id = p.zpatch_id" +
+           $"where validto = {DBManager.PlusInf} and dwsact <> 'D' and z.cpatch_id = :cpatch_id";
 
-
-        public IEnumerable<ZPatchOrderRecord> GetZPatchOrders()
+        public static IEnumerable<ZPatchOrderRecord> GetZPatchOrdersByCPatch(int cpatch_id)
         {
-            using (var reader = DBManager.ExecuteQuery(allZPatchOrders))
+            using (var reader = DBManager.ExecuteQuery(allZPatchOrders, new OracleParameter("cpatch_id", cpatch_id)))
             {
                 while (reader.Read())
                 {

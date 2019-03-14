@@ -239,15 +239,47 @@ namespace CoreApp.OraUtils
 
 
 
-        static string allZPatchesScript = $"select zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' order by zpatch_name ";
-        static string ZPatchesByCPatch = $"select zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_id = :cpatch_id order by zpatch_name ";
-        static string dependenciesTo = $"select zpatch_id, zpatch_name, zpatchstatus from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :zpatch_id order by zpatch_name ";
+        static string allZPatchesScript = 
+            $"select " +
+            $"zpatch_id, " +
+            $"max(zpatch_name), " +
+            $"max(zpatchstatus) " +
+            $"from zpatch_hdim " +
+            $"where validto = {DBManager.PlusInf} and dwsact <> 'D' " +
+            $"group by zpatch_id " +
+            $"order by max(zpatch_name) ";
+
+        static string ZPatchesByCPatch = 
+            $"select " +
+            $"zpatch_id, " +
+            $"max(zpatch_name), " +
+            $"max(zpatchstatus) " +
+            $"from zpatch_hdim " +
+            $"where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_id = :cpatch_id " +
+            $"group by zpatch_id " +
+            $"order by max(zpatch_name) ";
+
+        static string dependenciesTo = 
+            $"select " +
+            $"zpatch_id, " +
+            $"max(zpatch_name), " +
+            $"max(zpatchstatus) " +
+            $"from zpatch_hdim " +
+            $"where validto = {DBManager.PlusInf} and dwsact <>  'D' and parent_id = :zpatch_id " +
+            $"group by zpatch_id " +
+            $"order by max(zpatch_name) ";
+
         static string dependenciesFrom =
-             "select z2.zpatch_id, z2.zpatch_name, z2.zpatchstatus " +
+             "select " +
+            "z2.zpatch_id, " +
+            "max(z2.zpatch_name), " +
+            "max(z2.zpatchstatus) " +
             $"from zpatch_hdim z1 join zpatch_hdim z2 on z1.parent_id = z2.zpatch_id " +
             $"where z1.validto = {DBManager.PlusInf} and z1.dwsact <>  'D' " +
             $"and   z2.validto = {DBManager.PlusInf} and z2.dwsact <>  'D' " +
-            $"and z1.zpatch_id = :zpatch_id order by z2.zpatch_name ";
+            $"and z1.zpatch_id = :zpatch_id " +
+            $"group by z2.zpatch_id " +
+            $"order by max(z2.zpatch_name) ";
 
         public static IEnumerable<ZPatchRecord> getCPatches()
         {

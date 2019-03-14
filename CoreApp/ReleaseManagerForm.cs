@@ -57,6 +57,7 @@ namespace CoreApp
 
             GbCPatch.Visible = 
             BtCPatchGraph.Enabled = 
+            BtZPatchOrder.Enabled =
                 mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 1;
 
             GbZPatch.Visible = 
@@ -149,6 +150,11 @@ namespace CoreApp
         {
             if(mainTree.SelectedNode.Level == 0)
             {
+                if(rm.homeDir == null)
+                {
+                    MessageBox.Show("Задайте домашнюю папку перед продолжением работы", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
                 Release currRelease = getReleaseFromTree(mainTree.SelectedNode);
                 currRelease.InitCPatches();
                 mainTree.SelectedNode.Nodes.Clear();
@@ -314,6 +320,12 @@ namespace CoreApp
             Microsoft.Msagl.Drawing.Graph cpatchGraph = currCPatch.DrawGraph();
             GraphForm rgf = new GraphForm(cpatchGraph);
             rgf.ShowDialog();
+        }
+
+        private void BtZPatchOrder_Click(object sender, EventArgs e)
+        {
+            ZPatchOrderForm zpof = new ZPatchOrderForm(currCPatch);
+            zpof.ShowDialog();
         }
     }
 }

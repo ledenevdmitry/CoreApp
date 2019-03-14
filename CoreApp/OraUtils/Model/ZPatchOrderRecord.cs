@@ -8,8 +8,8 @@ namespace CoreApp.OraUtils.Model
 {
     class ZPatchOrderRecord
     {
-        int zpatchId;
-        int zpatchOrder;
+        public int zpatchId { get; private set; }
+        public int zpatchOrder { get; private set; }
 
         public ZPatchOrderRecord(int zpatchId, int zpatchOrder)
         {

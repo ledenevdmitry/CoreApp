@@ -63,6 +63,7 @@ namespace CoreApp.ReleaseObjects
             var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
 
             CPatchStatuses status;
+            EnvCodes kod_sredy;
             CPatches = new List<CPatch>();
             CPatchesDict = new Dictionary<int, CPatch>();
 
@@ -74,11 +75,16 @@ namespace CoreApp.ReleaseObjects
                     status = CPatchStatuses.UNDEFINED;
                 }
 
+                if(!Enum.TryParse(oraCPatch.Kod_Sredy, out kod_sredy))
+                {
+                    kod_sredy = EnvCodes.UNDEFINED;
+                }
+
                 CPatch cpatch = new CPatch(
                     oraCPatch.CPatchId, 
                     oraCPatch.CPatchName,
                     status, 
-                    oraCPatch.Kod_Sredy, 
+                    kod_sredy, 
                     this);                
 
                 CPatches.Add(cpatch);
