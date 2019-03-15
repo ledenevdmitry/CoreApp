@@ -1,5 +1,4 @@
 ﻿using CoreApp.Dicts;
-using CoreApp.FixpackObjects;
 using CoreApp.ReleaseObjects;
 using System;
 using System.Collections.Generic;

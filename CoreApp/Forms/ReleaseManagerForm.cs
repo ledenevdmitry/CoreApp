@@ -1,5 +1,4 @@
-﻿using CoreApp.FixpackObjects;
-using CoreApp.ReleaseObjects;
+﻿using CoreApp.ReleaseObjects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,7 +33,6 @@ namespace CoreApp
             CbZPatchStatus.DataSource = Enum.GetValues(typeof(ZPatchStatuses));
 
             rm = new ReleaseManager();
-            CbCPatchRelease.Items.AddRange(rm.releases.ToArray());
 
             CreateTree();
             Application.Idle += OnIdle;
@@ -50,7 +48,7 @@ namespace CoreApp
 
         private void OnIdle(object sender, EventArgs e)
         {
-            BtAddFixpack.Enabled = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
+            BtAddCPatch.Enabled = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
 
             BtReleaseGraph.Enabled = 
                 mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
@@ -75,7 +73,6 @@ namespace CoreApp
         private void DisplayCPatch()
         {
             CbCPatchStatus.SelectedItem = currCPatch.CPatchStatus;
-            CbCPatchRelease.SelectedItem = currCPatch.release;
 
             LboxCPatchDependenciesFrom.DataSource = currCPatch.dependenciesFrom.ToList();
             LboxCPatchDependenciesTo.DataSource = currCPatch.dependenciesTo.ToList();
@@ -109,13 +106,12 @@ namespace CoreApp
                 if (newRelease != null)
                 {
                     mainTree.Nodes.Add(newRelease.releaseId.ToString(), newRelease.releaseName);
-                    CbCPatchRelease.Items.Add(newRelease);
                 }
                 
             }
         }
 
-        private void BtAddFixpack_Click(object sender, EventArgs e)
+        private void BtAddCPatch_Click(object sender, EventArgs e)
         {
             Release currRelease = getReleaseFromTree(mainTree.SelectedNode);
             OpenFileDialog ofd = new OpenFileDialog();
@@ -158,11 +154,11 @@ namespace CoreApp
                 Release currRelease = getReleaseFromTree(mainTree.SelectedNode);
                 currRelease.InitCPatches();
                 mainTree.SelectedNode.Nodes.Clear();
-                foreach (CPatch cPatch in currRelease.CPatches)
+                foreach (CPatch cPatch in currRelease.cpatches)
                 {
                     TreeNode newNode = mainTree.SelectedNode.Nodes.Add(cPatch.CPatchId.ToString(), cPatch.CPatchName);
 
-                    foreach (ZPatch zPatch in cPatch.ZPatches)
+                    foreach (ZPatch zPatch in cPatch.zpatches)
                     {
                         newNode.Nodes.Add(zPatch.ZPatchId.ToString(), zPatch.ZPatchName);
                     }
@@ -258,36 +254,6 @@ namespace CoreApp
             }
         }
 
-        private void BtCPatchRelease_Click(object sender, EventArgs e)
-        {
-            TreeNode cpatchNodeToMove = mainTree.SelectedNode;
-
-            //удаляем старую ноду из дерева
-            mainTree.Nodes.Remove(cpatchNodeToMove);
-
-            Release newRelease = (Release)CbCPatchRelease.SelectedItem;
-            currCPatch.ChangeRelease(newRelease);
-
-            //добавляем ноду к новому релизу
-            mainTree.Nodes[newRelease.releaseId.ToString()].Nodes.Add(cpatchNodeToMove);
-            mainTree.SelectedNode = cpatchNodeToMove;
-        }
-
-        private void BtZPatchCPatch_Click(object sender, EventArgs e)
-        {
-            TreeNode zpatchNodeToMove = mainTree.SelectedNode;
-
-            //удаляем старую ноду из дерева
-            mainTree.Nodes.Remove(zpatchNodeToMove);
-
-            CPatch newCPatch = (CPatch)CbZPatchCPatch.SelectedItem;
-            currZPatch.ChangeCPatch(newCPatch);
-
-            //добавляем ноду к новому релизу
-            mainTree.Nodes[newCPatch.CPatchId.ToString()].Nodes.Add(zpatchNodeToMove);
-            mainTree.SelectedNode = zpatchNodeToMove;
-        }
-
         private void CbCPatchRelease_DrawItem(object sender, DrawItemEventArgs e)
         {
             e.DrawBackground();
@@ -331,6 +297,128 @@ namespace CoreApp
         private void BtDeleteRelease_Click(object sender, EventArgs e)
         {
             currRelease.Delete();
+            mainTree.SelectedNode.Remove();
+        }
+
+        private void BtCPatchDelete_Click(object sender, EventArgs e)
+        {
+            currCPatch.Delete();
+            mainTree.SelectedNode.Remove();
+        }
+
+        private void BtZPatchDelete_Click(object sender, EventArgs e)
+        {
+            currZPatch.Delete();
+            mainTree.SelectedNode.Remove();
+        }
+
+        private void BtMoveCPatch_Click(object sender, EventArgs e)
+        {
+            ReleasesListForm rlf = new ReleasesListForm(rm.releases);
+            if(rlf.ShowDialog() == DialogResult.OK)
+            {
+                TreeNode nodeToMove = mainTree.SelectedNode;
+                mainTree.Nodes.Remove(nodeToMove);
+
+                currCPatch.Move(rlf.release);
+
+                mainTree.Nodes[rlf.release.releaseId.ToString()].Nodes.Add(nodeToMove);
+            }
+
+        }
+
+        private void BtZPatchMove_Click(object sender, EventArgs e)
+        {
+            CPatchesListForm clf = new CPatchesListForm(currRelease.cpatches);
+            if (clf.ShowDialog() == DialogResult.OK)
+            {
+                TreeNode nodeToMove = mainTree.SelectedNode;
+                mainTree.Nodes.Remove(nodeToMove);
+
+                currZPatch.Move(clf.cpatch);
+
+                mainTree.Nodes[clf.cpatch.CPatchId.ToString()].Nodes.Add(nodeToMove);
+            }
+        }
+
+        private void BtCPatchDeleteDependenciesFrom_Click(object sender, EventArgs e)
+        {
+            CPatchesListForm clf = new CPatchesListForm(currCPatch.dependenciesFrom);
+            if(clf.ShowDialog() == DialogResult.OK)
+            {
+                currCPatch.DeleteDependencyFrom(clf.cpatch);
+                LboxCPatchDependenciesFrom.Items.Remove(clf.cpatch);
+            }
+        }
+
+        private void BtCPatchAddDependenciesFrom_Click(object sender, EventArgs e)
+        {
+            CPatchesListForm clf = new CPatchesListForm(currCPatch.dependenciesFrom);
+            if (clf.ShowDialog() == DialogResult.OK)
+            {
+                currCPatch.AddDependencyFrom(clf.cpatch);
+                LboxCPatchDependenciesFrom.Items.Add(clf.cpatch);
+            }
+        }
+
+        private void BtCPatchDeleteDependenciesTo_Click(object sender, EventArgs e)
+        {
+            CPatchesListForm clf = new CPatchesListForm(currCPatch.dependenciesTo);
+            if (clf.ShowDialog() == DialogResult.OK)
+            {
+                currCPatch.DeleteDependencyTo(clf.cpatch);
+                LboxCPatchDependenciesTo.Items.Remove(clf.cpatch);
+            }
+        }
+
+        private void BtCPatchAddDependenciesTo_Click(object sender, EventArgs e)
+        {
+            CPatchesListForm clf = new CPatchesListForm(currCPatch.dependenciesTo);
+            if (clf.ShowDialog() == DialogResult.OK)
+            {
+                currCPatch.AddDependencyTo(clf.cpatch);
+                LboxCPatchDependenciesTo.Items.Add(clf.cpatch);
+            }
+        }
+
+        private void BtZPatchDeleteDependenciesFrom_Click(object sender, EventArgs e)
+        {
+            ZPatchesListForm zlf = new ZPatchesListForm(currZPatch.dependenciesFrom);
+            if (zlf.ShowDialog() == DialogResult.OK)
+            {
+                currZPatch.DeleteDependencyFrom(zlf.zpatch);
+                LboxZPatchDependenciesFrom.Items.Remove(zlf.zpatch);
+            }
+        }
+
+        private void BtZPatchAddDependenciesFrom_Click(object sender, EventArgs e)
+        {
+            ZPatchesListForm zlf = new ZPatchesListForm(currZPatch.dependenciesFrom);
+            if (zlf.ShowDialog() == DialogResult.OK)
+            {
+                currZPatch.AddDependencyFrom(zlf.zpatch);
+                LboxZPatchDependenciesFrom.Items.Add(zlf.zpatch);
+            }
+        }
+
+        private void BtZPatchDeleteDependenciesTo_Click(object sender, EventArgs e)
+        {
+            ZPatchesListForm zlf = new ZPatchesListForm(currZPatch.dependenciesTo);
+            if (zlf.ShowDialog() == DialogResult.OK)
+            {
+                currZPatch.DeleteDependencyTo(zlf.zpatch);
+                LboxZPatchDependenciesTo.Items.Remove(zlf.zpatch);
+            }
+        }
+
+        private void BtZPatchAddDependenciesTo_Click(object sender, EventArgs e)
+        {
+            ZPatchesListForm zlf = new ZPatchesListForm(currZPatch.dependenciesTo);
+            if (zlf.ShowDialog() == DialogResult.OK)
+            {
+                currZPatch.AddDependencyTo(zlf.zpatch);
+                LboxZPatchDependenciesTo.Items.Add(zlf.zpatch);
+            }
         }
     }
 }

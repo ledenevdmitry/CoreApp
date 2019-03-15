@@ -69,11 +69,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddForm.cs">
+    <Compile Include="Forms\AddForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddForm.Designer.cs">
+    <Compile Include="Forms\AddForm.Designer.cs">
       <DependentUpon>AddForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CPatchesListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CPatchesListForm.Designer.cs">
+      <DependentUpon>CPatchesListForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CVS\CVS.cs" />
     <Compile Include="CVS\VSS.cs" />
@@ -96,25 +102,25 @@
     <Compile Include="OraUtils\Model\ReleaseRecord.cs" />
     <Compile Include="OraUtils\Model\ZPatchOrderRecord.cs" />
     <Compile Include="OraUtils\Model\ZPatchRecord.cs" />
-    <Compile Include="GraphForm.cs">
+    <Compile Include="Forms\GraphForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GraphForm.Designer.cs">
+    <Compile Include="Forms\GraphForm.Designer.cs">
       <DependentUpon>GraphForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ReleaseManagerForm.cs">
+    <Compile Include="Forms\ReleaseManagerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ReleaseManagerForm.Designer.cs">
+    <Compile Include="Forms\ReleaseManagerForm.Designer.cs">
       <DependentUpon>ReleaseManagerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="ReleaseObjects\CPatch.cs" />
     <Compile Include="ReleaseObjects\InfaSchema.cs" />
     <Compile Include="ReleaseObjects\ZPatch.cs" />
-    <Compile Include="CheckReleaseForm.cs">
+    <Compile Include="Forms\CheckReleaseForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CheckReleaseForm.Designer.cs">
+    <Compile Include="Forms\CheckReleaseForm.Designer.cs">
       <DependentUpon>CheckReleaseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FormUtils\FormUtil.cs" />
@@ -138,17 +144,32 @@
     <Compile Include="Parsers\SqlParser.cs" />
     <Compile Include="ReleaseObjects\Release.cs" />
     <Compile Include="ReleaseObjects\ReleaseManager.cs" />
-    <Compile Include="ZPatchOrderForm.cs">
+    <Compile Include="Forms\ReleasesListForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ZPatchOrderForm.Designer.cs">
+    <Compile Include="Forms\ReleasesListForm.Designer.cs">
+      <DependentUpon>ReleasesListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ZPatchesListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ZPatchesListForm.Designer.cs">
+      <DependentUpon>ZPatchesListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ZPatchOrderForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ZPatchOrderForm.Designer.cs">
       <DependentUpon>ZPatchOrderForm.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AddForm.resx">
+    <EmbeddedResource Include="Forms\AddForm.resx">
       <DependentUpon>AddForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CheckReleaseForm.resx">
+    <EmbeddedResource Include="Forms\CheckReleaseForm.resx">
       <DependentUpon>CheckReleaseForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CPatchesListForm.resx">
+      <DependentUpon>CPatchesListForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -159,13 +180,19 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="GraphForm.resx">
+    <EmbeddedResource Include="Forms\GraphForm.resx">
       <DependentUpon>GraphForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ReleaseManagerForm.resx">
+    <EmbeddedResource Include="Forms\ReleaseManagerForm.resx">
       <DependentUpon>ReleaseManagerForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ZPatchOrderForm.resx">
+    <EmbeddedResource Include="Forms\ReleasesListForm.resx">
+      <DependentUpon>ReleasesListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ZPatchesListForm.resx">
+      <DependentUpon>ZPatchesListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ZPatchOrderForm.resx">
       <DependentUpon>ZPatchOrderForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
@@ -184,5 +211,6 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

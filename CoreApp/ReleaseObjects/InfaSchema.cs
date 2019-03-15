@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CoreApp.FixpackObjects
+namespace CoreApp.ReleaseObjects
 {
     public class InfaSchema
     {

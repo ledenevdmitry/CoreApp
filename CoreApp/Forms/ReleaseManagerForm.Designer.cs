@@ -34,19 +34,22 @@
             this.BtSetHomePath = new System.Windows.Forms.ToolStripMenuItem();
             this.BtRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtAddRelease = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtDeleteRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCheckRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtReleaseGraph = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtFixpack = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtAddFixpack = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtCPatch = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtAddCPatch = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtCPatchDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtMoveCPatch = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCPatchGraph = new System.Windows.Forms.ToolStripMenuItem();
             this.BtZPatchOrder = new System.Windows.Forms.ToolStripMenuItem();
+            this.zпатчToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtZPatchDelete = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtZPatchMove = new System.Windows.Forms.ToolStripMenuItem();
             this.SCMain = new System.Windows.Forms.SplitContainer();
             this.mainTree = new System.Windows.Forms.TreeView();
             this.GbCPatch = new System.Windows.Forms.GroupBox();
             this.SCCPatch = new System.Windows.Forms.SplitContainer();
-            this.BtCPatchRelease = new System.Windows.Forms.Button();
-            this.CbCPatchRelease = new System.Windows.Forms.ComboBox();
-            this.LbCPatchRelease = new System.Windows.Forms.Label();
             this.BtCPatchStatus = new System.Windows.Forms.Button();
             this.CbCPatchStatus = new System.Windows.Forms.ComboBox();
             this.LbCPatchStatus = new System.Windows.Forms.Label();
@@ -82,7 +85,6 @@
             this.BtZPatchAddDependenciesTo = new System.Windows.Forms.Button();
             this.mainTreeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.TSMIRename = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtDeleteRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).BeginInit();
             this.SCMain.Panel1.SuspendLayout();
@@ -135,7 +137,8 @@
             this.MainMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.BtFile,
             this.BtRelease,
-            this.BtFixpack});
+            this.BtCPatch,
+            this.zпатчToolStripMenuItem});
             this.MainMenu.Location = new System.Drawing.Point(0, 0);
             this.MainMenu.Name = "MainMenu";
             this.MainMenu.Padding = new System.Windows.Forms.Padding(8, 2, 0, 2);
@@ -162,9 +165,9 @@
             // 
             this.BtRelease.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.BtAddRelease,
+            this.BtDeleteRelease,
             this.BtCheckRelease,
-            this.BtReleaseGraph,
-            this.BtDeleteRelease});
+            this.BtReleaseGraph});
             this.BtRelease.Name = "BtRelease";
             this.BtRelease.Size = new System.Drawing.Size(61, 24);
             this.BtRelease.Text = "Релиз";
@@ -172,45 +175,68 @@
             // BtAddRelease
             // 
             this.BtAddRelease.Name = "BtAddRelease";
-            this.BtAddRelease.Size = new System.Drawing.Size(216, 26);
+            this.BtAddRelease.Size = new System.Drawing.Size(195, 26);
             this.BtAddRelease.Text = "Добавить";
             this.BtAddRelease.Click += new System.EventHandler(this.BtAddRelease_Click);
+            // 
+            // BtDeleteRelease
+            // 
+            this.BtDeleteRelease.Name = "BtDeleteRelease";
+            this.BtDeleteRelease.Size = new System.Drawing.Size(195, 26);
+            this.BtDeleteRelease.Text = "Удалить";
+            this.BtDeleteRelease.Click += new System.EventHandler(this.BtDeleteRelease_Click);
             // 
             // BtCheckRelease
             // 
             this.BtCheckRelease.Name = "BtCheckRelease";
-            this.BtCheckRelease.Size = new System.Drawing.Size(216, 26);
+            this.BtCheckRelease.Size = new System.Drawing.Size(195, 26);
             this.BtCheckRelease.Text = "Проверить";
             // 
             // BtReleaseGraph
             // 
             this.BtReleaseGraph.Name = "BtReleaseGraph";
-            this.BtReleaseGraph.Size = new System.Drawing.Size(216, 26);
-            this.BtReleaseGraph.Text = "Граф";
+            this.BtReleaseGraph.Size = new System.Drawing.Size(195, 26);
+            this.BtReleaseGraph.Text = "Построить граф";
             this.BtReleaseGraph.Click += new System.EventHandler(this.BtReleaseGraph_Click);
             // 
-            // BtFixpack
+            // BtCPatch
             // 
-            this.BtFixpack.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.BtAddFixpack,
+            this.BtCPatch.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.BtAddCPatch,
+            this.BtCPatchDelete,
+            this.BtMoveCPatch,
             this.BtCPatchGraph,
             this.BtZPatchOrder});
-            this.BtFixpack.Name = "BtFixpack";
-            this.BtFixpack.Size = new System.Drawing.Size(85, 24);
-            this.BtFixpack.Text = "Поставка";
+            this.BtCPatch.Name = "BtCPatch";
+            this.BtCPatch.Size = new System.Drawing.Size(67, 24);
+            this.BtCPatch.Text = "C-патч";
             // 
-            // BtAddFixpack
+            // BtAddCPatch
             // 
-            this.BtAddFixpack.Name = "BtAddFixpack";
-            this.BtAddFixpack.Size = new System.Drawing.Size(205, 26);
-            this.BtAddFixpack.Text = "Добавить ОП/ФП";
-            this.BtAddFixpack.Click += new System.EventHandler(this.BtAddFixpack_Click);
+            this.BtAddCPatch.Name = "BtAddCPatch";
+            this.BtAddCPatch.Size = new System.Drawing.Size(205, 26);
+            this.BtAddCPatch.Text = "Добавить ОП/ФП";
+            this.BtAddCPatch.Click += new System.EventHandler(this.BtAddCPatch_Click);
+            // 
+            // BtCPatchDelete
+            // 
+            this.BtCPatchDelete.Name = "BtCPatchDelete";
+            this.BtCPatchDelete.Size = new System.Drawing.Size(205, 26);
+            this.BtCPatchDelete.Text = "Удалить";
+            this.BtCPatchDelete.Click += new System.EventHandler(this.BtCPatchDelete_Click);
+            // 
+            // BtMoveCPatch
+            // 
+            this.BtMoveCPatch.Name = "BtMoveCPatch";
+            this.BtMoveCPatch.Size = new System.Drawing.Size(205, 26);
+            this.BtMoveCPatch.Text = "Перенести";
+            this.BtMoveCPatch.Click += new System.EventHandler(this.BtMoveCPatch_Click);
             // 
             // BtCPatchGraph
             // 
             this.BtCPatchGraph.Name = "BtCPatchGraph";
             this.BtCPatchGraph.Size = new System.Drawing.Size(205, 26);
-            this.BtCPatchGraph.Text = "Граф";
+            this.BtCPatchGraph.Text = "Построить граф";
             this.BtCPatchGraph.Click += new System.EventHandler(this.BtCPatchGraph_Click);
             // 
             // BtZPatchOrder
@@ -219,6 +245,29 @@
             this.BtZPatchOrder.Size = new System.Drawing.Size(205, 26);
             this.BtZPatchOrder.Text = "Порядок патчей";
             this.BtZPatchOrder.Click += new System.EventHandler(this.BtZPatchOrder_Click);
+            // 
+            // zпатчToolStripMenuItem
+            // 
+            this.zпатчToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.BtZPatchDelete,
+            this.BtZPatchMove});
+            this.zпатчToolStripMenuItem.Name = "zпатчToolStripMenuItem";
+            this.zпатчToolStripMenuItem.Size = new System.Drawing.Size(67, 24);
+            this.zпатчToolStripMenuItem.Text = "Z-патч";
+            // 
+            // BtZPatchDelete
+            // 
+            this.BtZPatchDelete.Name = "BtZPatchDelete";
+            this.BtZPatchDelete.Size = new System.Drawing.Size(159, 26);
+            this.BtZPatchDelete.Text = "Удалить";
+            this.BtZPatchDelete.Click += new System.EventHandler(this.BtZPatchDelete_Click);
+            // 
+            // BtZPatchMove
+            // 
+            this.BtZPatchMove.Name = "BtZPatchMove";
+            this.BtZPatchMove.Size = new System.Drawing.Size(159, 26);
+            this.BtZPatchMove.Text = "Перенести";
+            this.BtZPatchMove.Click += new System.EventHandler(this.BtZPatchMove_Click);
             // 
             // SCMain
             // 
@@ -275,9 +324,6 @@
             // 
             // SCCPatch.Panel1
             // 
-            this.SCCPatch.Panel1.Controls.Add(this.BtCPatchRelease);
-            this.SCCPatch.Panel1.Controls.Add(this.CbCPatchRelease);
-            this.SCCPatch.Panel1.Controls.Add(this.LbCPatchRelease);
             this.SCCPatch.Panel1.Controls.Add(this.BtCPatchStatus);
             this.SCCPatch.Panel1.Controls.Add(this.CbCPatchStatus);
             this.SCCPatch.Panel1.Controls.Add(this.LbCPatchStatus);
@@ -288,35 +334,6 @@
             this.SCCPatch.Size = new System.Drawing.Size(395, 505);
             this.SCCPatch.SplitterDistance = 128;
             this.SCCPatch.TabIndex = 0;
-            // 
-            // BtCPatchRelease
-            // 
-            this.BtCPatchRelease.Location = new System.Drawing.Point(265, 36);
-            this.BtCPatchRelease.Name = "BtCPatchRelease";
-            this.BtCPatchRelease.Size = new System.Drawing.Size(109, 24);
-            this.BtCPatchRelease.TabIndex = 8;
-            this.BtCPatchRelease.Text = "Подтвердить";
-            this.BtCPatchRelease.UseVisualStyleBackColor = true;
-            this.BtCPatchRelease.Click += new System.EventHandler(this.BtCPatchRelease_Click);
-            // 
-            // CbCPatchRelease
-            // 
-            this.CbCPatchRelease.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.CbCPatchRelease.FormattingEnabled = true;
-            this.CbCPatchRelease.Location = new System.Drawing.Point(77, 36);
-            this.CbCPatchRelease.Name = "CbCPatchRelease";
-            this.CbCPatchRelease.Size = new System.Drawing.Size(182, 23);
-            this.CbCPatchRelease.TabIndex = 7;
-            this.CbCPatchRelease.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.CbCPatchRelease_DrawItem);
-            // 
-            // LbCPatchRelease
-            // 
-            this.LbCPatchRelease.AutoSize = true;
-            this.LbCPatchRelease.Location = new System.Drawing.Point(10, 36);
-            this.LbCPatchRelease.Name = "LbCPatchRelease";
-            this.LbCPatchRelease.Size = new System.Drawing.Size(48, 17);
-            this.LbCPatchRelease.TabIndex = 6;
-            this.LbCPatchRelease.Text = "Релиз";
             // 
             // BtCPatchStatus
             // 
@@ -412,8 +429,9 @@
             this.BtCPatchAddDependenciesFrom.Name = "BtCPatchAddDependenciesFrom";
             this.BtCPatchAddDependenciesFrom.Size = new System.Drawing.Size(178, 23);
             this.BtCPatchAddDependenciesFrom.TabIndex = 3;
-            this.BtCPatchAddDependenciesFrom.Text = "Добавить зависимости";
+            this.BtCPatchAddDependenciesFrom.Text = "Добавить зависимость";
             this.BtCPatchAddDependenciesFrom.UseVisualStyleBackColor = true;
+            this.BtCPatchAddDependenciesFrom.Click += new System.EventHandler(this.BtCPatchAddDependenciesFrom_Click);
             // 
             // BtCPatchDeleteDependenciesFrom
             // 
@@ -421,8 +439,9 @@
             this.BtCPatchDeleteDependenciesFrom.Name = "BtCPatchDeleteDependenciesFrom";
             this.BtCPatchDeleteDependenciesFrom.Size = new System.Drawing.Size(178, 23);
             this.BtCPatchDeleteDependenciesFrom.TabIndex = 2;
-            this.BtCPatchDeleteDependenciesFrom.Text = "Удалить выбранные";
+            this.BtCPatchDeleteDependenciesFrom.Text = "Удалить зависимость";
             this.BtCPatchDeleteDependenciesFrom.UseVisualStyleBackColor = true;
+            this.BtCPatchDeleteDependenciesFrom.Click += new System.EventHandler(this.BtCPatchDeleteDependenciesFrom_Click);
             // 
             // SCCPatchDependenciesTo
             // 
@@ -472,8 +491,9 @@
             this.BtCPatchAddDependenciesTo.Name = "BtCPatchAddDependenciesTo";
             this.BtCPatchAddDependenciesTo.Size = new System.Drawing.Size(178, 23);
             this.BtCPatchAddDependenciesTo.TabIndex = 3;
-            this.BtCPatchAddDependenciesTo.Text = "Добавить зависимости";
+            this.BtCPatchAddDependenciesTo.Text = "Добавить зависимость";
             this.BtCPatchAddDependenciesTo.UseVisualStyleBackColor = true;
+            this.BtCPatchAddDependenciesTo.Click += new System.EventHandler(this.BtCPatchAddDependenciesTo_Click);
             // 
             // BtCPatchDeleteDependenciesTo
             // 
@@ -481,8 +501,9 @@
             this.BtCPatchDeleteDependenciesTo.Name = "BtCPatchDeleteDependenciesTo";
             this.BtCPatchDeleteDependenciesTo.Size = new System.Drawing.Size(178, 23);
             this.BtCPatchDeleteDependenciesTo.TabIndex = 2;
-            this.BtCPatchDeleteDependenciesTo.Text = "Удалить выбранные";
+            this.BtCPatchDeleteDependenciesTo.Text = "Удалить зависимость";
             this.BtCPatchDeleteDependenciesTo.UseVisualStyleBackColor = true;
+            this.BtCPatchDeleteDependenciesTo.Click += new System.EventHandler(this.BtCPatchDeleteDependenciesTo_Click);
             // 
             // GbZPatch
             // 
@@ -642,7 +663,7 @@
             this.BtZPatchAddDependenciesFrom.Name = "BtZPatchAddDependenciesFrom";
             this.BtZPatchAddDependenciesFrom.Size = new System.Drawing.Size(178, 23);
             this.BtZPatchAddDependenciesFrom.TabIndex = 3;
-            this.BtZPatchAddDependenciesFrom.Text = "Добавить зависимости";
+            this.BtZPatchAddDependenciesFrom.Text = "Добавить зависимость";
             this.BtZPatchAddDependenciesFrom.UseVisualStyleBackColor = true;
             // 
             // BtZPatchDeleteDependenciesFrom
@@ -651,8 +672,9 @@
             this.BtZPatchDeleteDependenciesFrom.Name = "BtZPatchDeleteDependenciesFrom";
             this.BtZPatchDeleteDependenciesFrom.Size = new System.Drawing.Size(178, 23);
             this.BtZPatchDeleteDependenciesFrom.TabIndex = 2;
-            this.BtZPatchDeleteDependenciesFrom.Text = "Удалить выбранные";
+            this.BtZPatchDeleteDependenciesFrom.Text = "Удалить зависимость";
             this.BtZPatchDeleteDependenciesFrom.UseVisualStyleBackColor = true;
+            this.BtZPatchDeleteDependenciesFrom.Click += new System.EventHandler(this.BtZPatchDeleteDependenciesFrom_Click);
             // 
             // SCZPatchDependenciesTo
             // 
@@ -702,7 +724,7 @@
             this.BtZPatchDeleteDependenciesTo.Name = "BtZPatchDeleteDependenciesTo";
             this.BtZPatchDeleteDependenciesTo.Size = new System.Drawing.Size(178, 23);
             this.BtZPatchDeleteDependenciesTo.TabIndex = 3;
-            this.BtZPatchDeleteDependenciesTo.Text = "Добавить зависимости";
+            this.BtZPatchDeleteDependenciesTo.Text = "Добавить зависимость";
             this.BtZPatchDeleteDependenciesTo.UseVisualStyleBackColor = true;
             // 
             // BtZPatchAddDependenciesTo
@@ -711,7 +733,7 @@
             this.BtZPatchAddDependenciesTo.Name = "BtZPatchAddDependenciesTo";
             this.BtZPatchAddDependenciesTo.Size = new System.Drawing.Size(178, 23);
             this.BtZPatchAddDependenciesTo.TabIndex = 2;
-            this.BtZPatchAddDependenciesTo.Text = "Удалить выбранные";
+            this.BtZPatchAddDependenciesTo.Text = "Удалить зависимость";
             this.BtZPatchAddDependenciesTo.UseVisualStyleBackColor = true;
             // 
             // mainTreeContextMenu
@@ -727,13 +749,6 @@
             this.TSMIRename.Name = "TSMIRename";
             this.TSMIRename.Size = new System.Drawing.Size(190, 24);
             this.TSMIRename.Text = "Переименовать";
-            // 
-            // BtDeleteRelease
-            // 
-            this.BtDeleteRelease.Name = "BtDeleteRelease";
-            this.BtDeleteRelease.Size = new System.Drawing.Size(216, 26);
-            this.BtDeleteRelease.Text = "Удалить";
-            this.BtDeleteRelease.Click += new System.EventHandler(this.BtDeleteRelease_Click);
             // 
             // ReleaseManagerForm
             // 
@@ -802,10 +817,10 @@
 
         private System.Windows.Forms.MenuStrip MainMenu;
         private System.Windows.Forms.ToolStripMenuItem BtRelease;
-        private System.Windows.Forms.ToolStripMenuItem BtFixpack;
+        private System.Windows.Forms.ToolStripMenuItem BtCPatch;
         private System.Windows.Forms.ToolStripMenuItem BtAddRelease;
         private System.Windows.Forms.ToolStripMenuItem BtCheckRelease;
-        private System.Windows.Forms.ToolStripMenuItem BtAddFixpack;
+        private System.Windows.Forms.ToolStripMenuItem BtAddCPatch;
         private System.Windows.Forms.ToolStripMenuItem BtFile;
         private System.Windows.Forms.ToolStripMenuItem BtSetHomePath;
         private System.Windows.Forms.SplitContainer SCMain;
@@ -819,9 +834,6 @@
         private System.Windows.Forms.Button BtCPatchAddDependenciesFrom;
         private System.Windows.Forms.Button BtCPatchDeleteDependenciesFrom;
         private System.Windows.Forms.ListBox LboxCPatchDependenciesFrom;
-        private System.Windows.Forms.Button BtCPatchRelease;
-        private System.Windows.Forms.ComboBox CbCPatchRelease;
-        private System.Windows.Forms.Label LbCPatchRelease;
         private System.Windows.Forms.ContextMenuStrip mainTreeContextMenu;
         private System.Windows.Forms.ToolStripMenuItem TSMIRename;
         private System.Windows.Forms.SplitContainer SCCPatchDependenciesFrom;
@@ -854,5 +866,10 @@
         private System.Windows.Forms.GroupBox GbZPatchDependenciesTo;
         private System.Windows.Forms.ToolStripMenuItem BtZPatchOrder;
         private System.Windows.Forms.ToolStripMenuItem BtDeleteRelease;
+        private System.Windows.Forms.ToolStripMenuItem BtCPatchDelete;
+        private System.Windows.Forms.ToolStripMenuItem zпатчToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem BtZPatchDelete;
+        private System.Windows.Forms.ToolStripMenuItem BtMoveCPatch;
+        private System.Windows.Forms.ToolStripMenuItem BtZPatchMove;
     }
 }

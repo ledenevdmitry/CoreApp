@@ -1,5 +1,4 @@
-﻿using CoreApp.FixpackObjects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -41,7 +40,7 @@ namespace CoreApp.ReleaseObjects
 
         public string releaseName { get; private set; }
         public string releaseStatus { get; private set; }
-        public List<CPatch> CPatches { get; private set; } //отсортированный на DAL
+        public List<CPatch> cpatches { get; private set; } //отсортированный на DAL
         public Dictionary<int, CPatch> CPatchesDict { get; private set; } //для поиска
         public ReleaseManager rm;
 
@@ -64,7 +63,7 @@ namespace CoreApp.ReleaseObjects
 
             CPatchStatuses status;
             EnvCodes kod_sredy;
-            CPatches = new List<CPatch>();
+            cpatches = new List<CPatch>();
             CPatchesDict = new Dictionary<int, CPatch>();
 
             foreach (var oraCPatch in oraCPatches)
@@ -87,15 +86,15 @@ namespace CoreApp.ReleaseObjects
                     kod_sredy, 
                     this);                
 
-                CPatches.Add(cpatch);
+                cpatches.Add(cpatch);
                 CPatchesDict.Add(cpatch.CPatchId, cpatch);
             }
 
-            foreach (CPatch cpatch in CPatches)
+            foreach (CPatch cpatch in cpatches)
             {
                 cpatch.SetDependencies();
 
-                foreach (ZPatch zpatch in cpatch.ZPatches)
+                foreach (ZPatch zpatch in cpatch.zpatches)
                 {
                     zpatch.SetDependencies();
                 }
@@ -104,7 +103,7 @@ namespace CoreApp.ReleaseObjects
 
         private void InitFromDB(int releaseId, string releaseName)
         {
-            CPatches = new List<CPatch>();
+            cpatches = new List<CPatch>();
             CPatchesDict = new Dictionary<int, CPatch>();
             this.releaseId = releaseId;
             this.releaseName = releaseName;
@@ -126,6 +125,8 @@ namespace CoreApp.ReleaseObjects
         public void Delete()
         {
             ReleaseDAL.Delete(releaseId);
+            rm.releases.Remove(this);
+            rm.releasesDict.Remove(releaseId);
         }
 
         public void DeleteLocal()
@@ -161,7 +162,7 @@ namespace CoreApp.ReleaseObjects
         public Graph DrawGraph()
         {
             Graph graph = new Graph(); 
-            foreach(CPatch cpatch in CPatches)
+            foreach(CPatch cpatch in cpatches)
             {
                 Node node = new Node(cpatch.CPatchId.ToString());
                 node.Label.Text = cpatch.CPatchName;
@@ -169,7 +170,7 @@ namespace CoreApp.ReleaseObjects
                 graph.AddNode(node);
             }
 
-            foreach (CPatch cpatch in CPatches)
+            foreach (CPatch cpatch in cpatches)
             {
                 foreach(CPatch depFrom in cpatch.dependenciesFrom)
                 {

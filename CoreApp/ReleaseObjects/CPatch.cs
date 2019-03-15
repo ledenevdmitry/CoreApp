@@ -14,7 +14,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CoreApp.FixpackObjects
+namespace CoreApp.ReleaseObjects
 {
     public enum CPatchStatuses  { UNDEFINED, NOTREADY, READY, INSTALLED, REVISION }
     public enum EnvCodes { UNDEFINED, STAB, TEST}
@@ -32,7 +32,7 @@ namespace CoreApp.FixpackObjects
         static string regexC = @"\\(C\d+)";
         static string regexFullName = @"\\(C[^\\]+)";
         static string regexFullPath = @".*C[^\\]+";
-        public List<ZPatch> ZPatches { get; protected set; } //отсортированный на DAL
+        public List<ZPatch> zpatches { get; protected set; } //отсортированный на DAL
         public Dictionary<int, ZPatch> ZPatchesDict { get; protected set; } //для поиска
 
         public HashSet<CPatch> dependenciesFrom { get; protected set; }
@@ -57,7 +57,7 @@ namespace CoreApp.FixpackObjects
 
         public ZPatch getZPatchById(int id)
         {
-            foreach(CPatch cpatch in release.CPatches)
+            foreach(CPatch cpatch in release.cpatches)
             {
                 if (cpatch.ZPatchesDict.ContainsKey(id))
                 {
@@ -80,9 +80,63 @@ namespace CoreApp.FixpackObjects
             this.KodSredy = KodSredy;
         }
 
+        public void Delete()
+        {
+            foreach(CPatch cpatchFrom in dependenciesFrom)
+            {
+                cpatchFrom.dependenciesTo.Remove(this);
+                CPatchDAL.DeleteDependency(cpatchFrom.CPatchId, CPatchId);
+            }
+
+            foreach(CPatch cpatchTo in dependenciesTo)
+            {
+                cpatchTo.dependenciesFrom.Remove(this);
+                CPatchDAL.DeleteDependency(CPatchId, cpatchTo.CPatchId);
+            }
+
+            CPatchDAL.DeleteCPatch(CPatchId);
+            release.cpatches.Remove(this);
+            release.CPatchesDict.Remove(CPatchId);
+        }
+
+        public void DeleteDependencyFrom(CPatch cpatchFrom)
+        {
+            dependenciesFrom.Remove(cpatchFrom);
+            CPatchDAL.DeleteDependency(cpatchFrom.CPatchId, CPatchId);
+        }
+
+        public void DeleteDependencyTo(CPatch cpatchTo)
+        {
+            dependenciesTo.Remove(cpatchTo);
+            CPatchDAL.DeleteDependency(CPatchId, cpatchTo.CPatchId);
+        }
+
+        public void AddDependencyFrom(CPatch cpatchFrom)
+        {
+            dependenciesFrom.Add(cpatchFrom);
+            CPatchDAL.AddDependency(cpatchFrom.CPatchId, CPatchId);
+        }
+
+        public void AddDependencyTo(CPatch cpatchTo)
+        {
+            dependenciesTo.Add(cpatchTo);
+            CPatchDAL.AddDependency(CPatchId, cpatchTo.CPatchId);
+        }
+
+        public void Move(Release newRelease)
+        {
+            release.cpatches.Remove(this);
+            release.CPatchesDict.Remove(CPatchId);
+
+            newRelease.cpatches.Add(this);
+            newRelease.CPatchesDict.Add(CPatchId, this);
+
+            CPatchDAL.UpdateRelease(release.releaseId, newRelease.releaseId);
+        }
+
         public void InitZPatches()
         {
-            ZPatches = new List<ZPatch>();
+            zpatches = new List<ZPatch>();
             ZPatchesDict = new Dictionary<int, ZPatch>();
             var oraZPatchesRecords = ZPatchDAL.getZPatchesByCPatch(CPatchId);
 
@@ -101,7 +155,7 @@ namespace CoreApp.FixpackObjects
                     oraZPatchRecord.ZPatchId, 
                     status);
 
-                ZPatches.Add(zpatch);
+                zpatches.Add(zpatch);
                 ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
 
                 zpatch.cpatch = this;
@@ -110,7 +164,7 @@ namespace CoreApp.FixpackObjects
 
         public void ResetStatusesByLog()
         {
-            foreach(ZPatch zpatch in ZPatches)
+            foreach(ZPatch zpatch in zpatches)
             {
                 if (zpatch.ZPatchStatus != ZPatchStatuses.INSTALLED && ZPatchDAL.IsZPatchInstalled(zpatch.ZPatchName, KodSredy.ToString()))
                 {
@@ -245,7 +299,7 @@ namespace CoreApp.FixpackObjects
         private SortedList<int, ZPatch> AllDependenciesToList()
         {
             List<ZPatch> roots = new List<ZPatch>();
-            foreach (ZPatch patch in ZPatches)
+            foreach (ZPatch patch in zpatches)
             {
                 if (patch.dependenciesFrom.Count == 0)
                 {
@@ -261,7 +315,7 @@ namespace CoreApp.FixpackObjects
 
             SortedList<int, ZPatch> sourceList = new SortedList<int, ZPatch>(Comparer<int>.Create((x, y) => x < y ? -1 : 1));
 
-            foreach (ZPatch zpatch in ZPatches)
+            foreach (ZPatch zpatch in zpatches)
             {
                 sourceList.Add(zpatch.rank, zpatch);
             }
@@ -282,10 +336,10 @@ namespace CoreApp.FixpackObjects
         {
             if(release.releaseId != newRelease.releaseId)
             {
-                release.CPatches.Remove(this);
+                release.cpatches.Remove(this);
                 release.CPatchesDict.Remove(CPatchId);
 
-                newRelease.CPatches.Add(this);
+                newRelease.cpatches.Add(this);
                 newRelease.CPatchesDict.Add(CPatchId, this);
 
                 CPatchDAL.UpdateRelease(CPatchId, newRelease.releaseId);
@@ -394,7 +448,7 @@ namespace CoreApp.FixpackObjects
                 if (deletedDependency.Item2.cpatch.CPatchId != CPatchId)
                 {
                     bool canDeleteCDependency = true;
-                    foreach (ZPatch zPatch in ZPatches)
+                    foreach (ZPatch zPatch in zpatches)
                     {
                         foreach (ZPatch dependency in zPatch.dependenciesFrom)
                         {
@@ -443,7 +497,7 @@ namespace CoreApp.FixpackObjects
                 if (deletedDependency.Item2.cpatch.CPatchId != CPatchId)
                 {
                     bool canDeleteCDependency = true;
-                    foreach (ZPatch zPatch in ZPatches)
+                    foreach (ZPatch zPatch in zpatches)
                     {
                         foreach (ZPatch dependency in zPatch.dependenciesTo)
                         {
@@ -504,7 +558,7 @@ namespace CoreApp.FixpackObjects
         public static CPatch CreateNewFromExcel(Release release, FileInfo excelFile)
         {
             CPatch empty = new CPatch();
-            empty.ZPatches = new List<ZPatch>();
+            empty.zpatches = new List<ZPatch>();
             empty.ZPatchesDict = new Dictionary<int, ZPatch>();
 
             empty.dependenciesFrom = new HashSet<CPatch>();
@@ -512,7 +566,7 @@ namespace CoreApp.FixpackObjects
             empty.ZPatchOrder = new SortedList<int, ZPatch>();
             empty.release = release;
 
-            empty.release.CPatches.Add(empty);
+            empty.release.cpatches.Add(empty);
             //release.CPatchesDict.Add(-1, empty);
 
             empty.ReopenExcelColumns(excelFile);
@@ -569,11 +623,11 @@ namespace CoreApp.FixpackObjects
 
         private bool findPatchByShortName(string shortName, out ZPatch patch)
         {
-            foreach (CPatch cpatch in release.CPatches)
+            foreach (CPatch cpatch in release.cpatches)
             {
                 try
                 {
-                    patch = cpatch.ZPatches.First(x => SameEnding(x.ZPatchName, shortName));
+                    patch = cpatch.zpatches.First(x => SameEnding(x.ZPatchName, shortName));
                     return true;
                 }
                 catch { }
@@ -692,7 +746,7 @@ namespace CoreApp.FixpackObjects
             foreach(ZPatch zpatch in newPatches)
             {
                 zpatch.ZPatchId = ZPatchDAL.Insert(CPatchId, null, zpatch.ZPatchName, null);
-                ZPatches.Add(zpatch);
+                zpatches.Add(zpatch);
                 ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
             }            
         }
@@ -700,7 +754,7 @@ namespace CoreApp.FixpackObjects
         public Graph DrawGraph()
         {
             Graph graph = new Graph();
-            foreach (ZPatch zpatch in ZPatches)
+            foreach (ZPatch zpatch in zpatches)
             {
                 Microsoft.Msagl.Drawing.Node node = new Microsoft.Msagl.Drawing.Node(zpatch.ZPatchId.ToString());
                 node.Attr.FillColor = Color.LightGreen;
@@ -708,7 +762,7 @@ namespace CoreApp.FixpackObjects
                 graph.AddNode(node);
             }
 
-            foreach (ZPatch zpatch in ZPatches)
+            foreach (ZPatch zpatch in zpatches)
             {
                 foreach (ZPatch depFrom in zpatch.dependenciesFrom)
                 {
@@ -756,7 +810,7 @@ namespace CoreApp.FixpackObjects
             int linkIndex = GetLinkIndex(columns);
             if (linkIndex != -1)
             {
-                foreach(ZPatch zpatch in ZPatches)
+                foreach(ZPatch zpatch in zpatches)
                 {
                     string dependenciesCell = ((Range)columns.Cells[zpatch.excelFileRowId, linkIndex]).Value2 ?? "";
                       var dependenciesFrom = DependenciesFrom(dependenciesCell);

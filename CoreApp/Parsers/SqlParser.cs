@@ -1,5 +1,4 @@
 ﻿using CoreApp.Dicts;
-using CoreApp.FixpackObjects;
 using CoreApp.Keys;
 using CoreApp.ReleaseObjects;
 using System;
@@ -125,9 +124,9 @@ namespace CoreApp
         public void Check(bool UMEnabled)
         {
             //StartOfCheck();
-            foreach(var fp in release.CPatches)
+            foreach(var fp in release.cpatches)
             {
-                foreach(var patch in fp.ZPatches)
+                foreach(var patch in fp.zpatches)
                 {
                     foreach (FileInfo file in patch.dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {

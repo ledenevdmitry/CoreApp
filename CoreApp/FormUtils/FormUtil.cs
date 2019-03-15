@@ -1,8 +1,8 @@
 ﻿using CoreApp.Dicts;
-using CoreApp.FixpackObjects;
 using CoreApp.InfaObjects;
 using CoreApp.Keys;
 using CoreApp.Parsers;
+using CoreApp.ReleaseObjects;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

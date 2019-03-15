@@ -64,3 +64,6 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.Drawin
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.GraphViewerGdi.xml
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.GraphForm.resources
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchOrderForm.resources
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.CPatchesListForm.resources
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ReleasesListForm.resources
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchesListForm.resources

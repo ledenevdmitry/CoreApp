@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace CoreApp.FixpackObjects
+namespace CoreApp.ReleaseObjects
 {
     public enum ZPatchStatuses { UNDEFINED, OPEN, READY, INSTALLED, ERROR };
 
@@ -65,6 +65,60 @@ namespace CoreApp.FixpackObjects
             this.ZPatchId = ZPatchId;
             this.ZPatchName = ZPatchName;
             this.ZPatchStatus = ZPatchStatus;
+        }
+
+        public void Delete()
+        {
+            foreach (ZPatch zpatchFrom in dependenciesFrom)
+            {
+                zpatchFrom.dependenciesTo.Remove(this);
+                ZPatchDAL.DeleteDependency(zpatchFrom.ZPatchId, ZPatchId);
+            }
+
+            foreach (ZPatch zpatchTo in dependenciesTo)
+            {
+                zpatchTo.dependenciesFrom.Remove(this);
+                CPatchDAL.DeleteDependency(ZPatchId, zpatchTo.ZPatchId);
+            }
+
+            ZPatchDAL.DeleteZPatch(ZPatchId);
+            cpatch.zpatches.Remove(this);
+            cpatch.ZPatchesDict.Remove(ZPatchId);
+        }
+
+        public void Move(CPatch newCPatch)
+        {
+            cpatch.zpatches.Remove(this);
+            cpatch.ZPatchesDict.Remove(ZPatchId);
+
+            newCPatch.zpatches.Add(this);
+            newCPatch.ZPatchesDict.Add(ZPatchId, this);
+
+            ZPatchDAL.UpdateCPatch(cpatch.CPatchId, newCPatch.CPatchId);
+        }
+
+        public void DeleteDependencyFrom(ZPatch zpatchFrom)
+        {
+            dependenciesFrom.Remove(zpatchFrom);
+            ZPatchDAL.DeleteDependency(zpatchFrom.ZPatchId, ZPatchId);
+        }
+
+        public void DeleteDependencyTo(ZPatch zpatchTo)
+        {
+            dependenciesTo.Remove(zpatchTo);
+            ZPatchDAL.DeleteDependency(ZPatchId, zpatchTo.ZPatchId);
+        }
+
+        public void AddDependencyFrom(ZPatch zpatchFrom)
+        {
+            dependenciesFrom.Add(zpatchFrom);
+            ZPatchDAL.AddDependency(zpatchFrom.ZPatchId, ZPatchId);
+        }
+
+        public void AddDependencyTo(ZPatch zpatchTo)
+        {
+            dependenciesTo.Add(zpatchTo);
+            ZPatchDAL.AddDependency(ZPatchId, zpatchTo.ZPatchId);
         }
 
         private bool GetCVSPath(out string path)
@@ -171,10 +225,10 @@ namespace CoreApp.FixpackObjects
         {
             if (cpatch.CPatchId != newCPatch.CPatchId)
             {
-                cpatch.ZPatches.Remove(this);
+                cpatch.zpatches.Remove(this);
                 cpatch.ZPatchesDict.Remove(ZPatchId);
 
-                newCPatch.ZPatches.Add(this);
+                newCPatch.zpatches.Add(this);
                 newCPatch.ZPatchesDict.Add(ZPatchId, this);
 
                 ZPatchDAL.UpdateCPatch(ZPatchId, newCPatch.CPatchId);

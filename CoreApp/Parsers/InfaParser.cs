@@ -1,5 +1,4 @@
 ﻿using CoreApp.Dicts;
-using CoreApp.FixpackObjects;
 using CoreApp.InfaObjects;
 using CoreApp.Keys;
 using CoreApp.ReleaseObjects;
@@ -92,9 +91,9 @@ namespace CoreApp
             }
             */
             this.dict = dict;
-            foreach(CPatch fixpack in release.CPatches)
+            foreach(CPatch cpatch in release.cpatches)
             {
-                foreach(ZPatch patch in fixpack.ZPatches)
+                foreach(ZPatch patch in cpatch.zpatches)
                 {
                     foreach(FileInfo file in patch.dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
