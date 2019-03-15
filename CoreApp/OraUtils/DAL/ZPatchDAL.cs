@@ -39,7 +39,7 @@ namespace CoreApp.OraUtils
             "update zpatch_hdim " +
             "set validto = sysdate " +
             "where " +
-            $"validto = {DBManager.PlusInf} ";
+            $"validto = {DBManager.PlusInf} and dwsact <> 'D' ";
             foreach (string par in pars)
             {
                 res += $"and {par} = :{par} ";

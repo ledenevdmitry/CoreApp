@@ -17,7 +17,7 @@ namespace CoreApp.OraUtils
            $"(:zpatch_id, :zpatch_order, sysdate, {DBManager.PlusInf}, 'I') ";
 
         private static string closeOld =
-            "update zpatchorder_hdim set validto = sysdate where zpatch_id = :zpatch_id";
+            $"update zpatchorder_hdim set validto = sysdate where validto = {DBManager.PlusInf} and dwsact <> 'D' and zpatch_id = :zpatch_id ";
 
         private static string insertNew(string dmlType)
         {
@@ -88,12 +88,14 @@ namespace CoreApp.OraUtils
         static string allZPatchOrders = $"select zpatch_id, zpatch_order from zpatchorder_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' ";
         static string ZPatchOrdersByCPatch =
             "select o.zpatch_id, o.zpatch_order " +
-            "from zpatchorder_hdim o join zpatch_hdim p on o.zpatch_id = p.zpatch_id" +
-           $"where validto = {DBManager.PlusInf} and dwsact <> 'D' and z.cpatch_id = :cpatch_id";
+            "from zpatchorder_hdim o join " +
+            "(select distinct zpatch_id from zpatch_hdim z " +
+           $"where z.validto = {DBManager.PlusInf} and z.dwsact<> 'D' and z.cpatch_id = :cpatch_id) z " +
+            "on o.zpatch_id = z.zpatch_id";
 
         public static IEnumerable<ZPatchOrderRecord> GetZPatchOrdersByCPatch(int cpatch_id)
         {
-            using (var reader = DBManager.ExecuteQuery(allZPatchOrders, new OracleParameter("cpatch_id", cpatch_id)))
+            using (var reader = DBManager.ExecuteQuery(ZPatchOrdersByCPatch, new OracleParameter("cpatch_id", cpatch_id)))
             {
                 while (reader.Read())
                 {

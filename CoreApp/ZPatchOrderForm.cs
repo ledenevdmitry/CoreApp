@@ -37,8 +37,8 @@ namespace CoreApp
         {
             ZPatch currPatch = (ZPatch)LboxZPatchOrder.SelectedItem;
 
-            int selectedIndex = cpatch.ZPatchOrder.IndexOfValue(currPatch);
-            ZPatch prevPatch = cpatch.ZPatchOrder[selectedIndex - 1];
+            int currPatchIndex = LboxZPatchOrder.SelectedIndex;
+            ZPatch prevPatch = (ZPatch)LboxZPatchOrder.Items[currPatchIndex - 1];
 
             if(prevPatch.dependenciesTo.Contains(currPatch) || currPatch.dependenciesFrom.Contains(prevPatch))
             {
@@ -46,11 +46,8 @@ namespace CoreApp
                 return;
             }
 
-            cpatch.UpdateZPatchOrder(prevPatch, selectedIndex);
-            cpatch.UpdateZPatchOrder(currPatch, selectedIndex - 1);
-
-            LboxZPatchOrder.Items[LboxZPatchOrder.SelectedIndex] = prevPatch;
-            LboxZPatchOrder.Items[LboxZPatchOrder.SelectedIndex - 1] = currPatch;
+            LboxZPatchOrder.Items[currPatchIndex] = prevPatch;
+            LboxZPatchOrder.Items[currPatchIndex - 1] = currPatch;
 
             LboxZPatchOrder.SelectedIndex--;
         }
@@ -59,8 +56,8 @@ namespace CoreApp
         {
             ZPatch currPatch = (ZPatch)LboxZPatchOrder.SelectedItem;
 
-            int selectedIndex = cpatch.ZPatchOrder.IndexOfValue(currPatch);
-            ZPatch nextPatch = cpatch.ZPatchOrder[selectedIndex + 1];
+            int currPatchIndex = LboxZPatchOrder.SelectedIndex;
+            ZPatch nextPatch = (ZPatch)LboxZPatchOrder.Items[currPatchIndex + 1];
 
             if (nextPatch.dependenciesFrom.Contains(currPatch) || currPatch.dependenciesTo.Contains(nextPatch))
             {
@@ -68,13 +65,18 @@ namespace CoreApp
                 return;
             }
 
-            cpatch.UpdateZPatchOrder(nextPatch, selectedIndex);
-            cpatch.UpdateZPatchOrder(currPatch, selectedIndex + 1);
-
-            LboxZPatchOrder.Items[LboxZPatchOrder.SelectedIndex] = nextPatch;
-            LboxZPatchOrder.Items[LboxZPatchOrder.SelectedIndex + 1] = currPatch;
+            LboxZPatchOrder.Items[currPatchIndex] = nextPatch;
+            LboxZPatchOrder.Items[currPatchIndex + 1] = currPatch;
 
             LboxZPatchOrder.SelectedIndex++;
+        }
+
+        private void BtConfirm_Click(object sender, EventArgs e)
+        {
+            for(int i = 0; i < LboxZPatchOrder.Items.Count; ++i)
+            {
+                cpatch.UpdateZPatchOrder((ZPatch)LboxZPatchOrder.Items[i], i);
+            }
         }
     }
 }

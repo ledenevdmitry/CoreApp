@@ -140,9 +140,6 @@ namespace CoreApp.ReleaseObjects
         public CPatch AddCPatch(Release release, FileInfo excelFile)
         {
             CPatch newCPatch = CPatch.CreateNewFromExcel(release, excelFile);
-            CPatches.Add(newCPatch);
-            CPatchesDict.Add(newCPatch.CPatchId, newCPatch);
-            newCPatch.release = this;
 
             return newCPatch;
         }

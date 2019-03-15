@@ -200,16 +200,36 @@ namespace CoreApp.FixpackObjects
         private void AddNewDependenciesToList(List<ZPatch> newPatches)
         {
             var fullList = AllDependenciesToList();
-            int i = fullList.Count;
+            int i = fullList.Count - newPatches.Count;
 
             //иду по порядку, добавляю в конец новые патчи
             foreach(var patch in fullList.Values)
             {
                 if(newPatches.Contains(patch))
                 {
-                    ZPatchOrder.Add(i++, patch);
+                    ZPatchOrder.Add(i, patch);
                     ZPatchOrderDAL.Insert(patch.ZPatchId, i);
+
+                    i++;
                 }
+            }
+        }
+
+        private void ResetAllDependenciesToList()
+        {
+            var sourceList = AllDependenciesToList();
+
+            SortedList<int, ZPatch> list = new SortedList<int, ZPatch>();
+
+            int i = 0;
+            foreach (var item in sourceList)
+            {
+                list.Add(i++, item.Value);
+            }
+
+            foreach (var item in list)
+            {
+                ZPatchOrderDAL.Insert(item.Value.ZPatchId, item.Key);
             }
         }
 
@@ -246,21 +266,7 @@ namespace CoreApp.FixpackObjects
                 sourceList.Add(zpatch.rank, zpatch);
             }
 
-            SortedList<int, ZPatch> list = new SortedList<int, ZPatch>();
-
-            int i = 0;
-            foreach (var item in sourceList)
-            {
-                list.Add(i++, item.Value);
-            }
-            
-            foreach (var item in list)
-            {
-                ZPatchOrderDAL.Delete(item.Value.ZPatchId);
-                ZPatchOrderDAL.Insert(item.Value.ZPatchId, item.Key);
-            }
-
-            return list;
+            return sourceList;
         }
 
         public void Rename(string newName)
@@ -377,7 +383,7 @@ namespace CoreApp.FixpackObjects
             }
             else
             {
-                ZPatchOrder = AllDependenciesToList();
+                ResetAllDependenciesToList();
             }
 
             //deletedfrom
@@ -505,9 +511,12 @@ namespace CoreApp.FixpackObjects
             empty.dependenciesTo = new HashSet<CPatch>();
             empty.ZPatchOrder = new SortedList<int, ZPatch>();
             empty.release = release;
+
+            empty.release.CPatches.Add(empty);
             //release.CPatchesDict.Add(-1, empty);
 
             empty.ReopenExcelColumns(excelFile);
+            empty.release.CPatchesDict.Add(empty.CPatchId, empty);
             return empty;
         }
 
@@ -675,16 +684,16 @@ namespace CoreApp.FixpackObjects
                             zpatch.cpatch = this;
 
                             newPatches.Add(zpatch);
-                            ZPatches.Add(zpatch);
                         }
                     }
                 }
-
             }
 
             foreach(ZPatch zpatch in newPatches)
             {
                 zpatch.ZPatchId = ZPatchDAL.Insert(CPatchId, null, zpatch.ZPatchName, null);
+                ZPatches.Add(zpatch);
+                ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
             }            
         }
 

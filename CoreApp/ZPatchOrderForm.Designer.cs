@@ -32,6 +32,7 @@
             this.LboxZPatchOrder = new System.Windows.Forms.ListBox();
             this.BtDown = new System.Windows.Forms.Button();
             this.BtUp = new System.Windows.Forms.Button();
+            this.BtConfirm = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.SCMainPanel)).BeginInit();
             this.SCMainPanel.Panel1.SuspendLayout();
             this.SCMainPanel.Panel2.SuspendLayout();
@@ -51,6 +52,7 @@
             // 
             // SCMainPanel.Panel2
             // 
+            this.SCMainPanel.Panel2.Controls.Add(this.BtConfirm);
             this.SCMainPanel.Panel2.Controls.Add(this.BtDown);
             this.SCMainPanel.Panel2.Controls.Add(this.BtUp);
             this.SCMainPanel.Size = new System.Drawing.Size(800, 450);
@@ -89,6 +91,16 @@
             this.BtUp.UseVisualStyleBackColor = true;
             this.BtUp.Click += new System.EventHandler(this.BtUp_Click);
             // 
+            // BtConfirm
+            // 
+            this.BtConfirm.Location = new System.Drawing.Point(3, 373);
+            this.BtConfirm.Name = "BtConfirm";
+            this.BtConfirm.Size = new System.Drawing.Size(185, 65);
+            this.BtConfirm.TabIndex = 2;
+            this.BtConfirm.Text = "Подтвердить";
+            this.BtConfirm.UseVisualStyleBackColor = true;
+            this.BtConfirm.Click += new System.EventHandler(this.BtConfirm_Click);
+            // 
             // ZPatchOrderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -111,5 +123,6 @@
         private System.Windows.Forms.ListBox LboxZPatchOrder;
         private System.Windows.Forms.Button BtDown;
         private System.Windows.Forms.Button BtUp;
+        private System.Windows.Forms.Button BtConfirm;
     }
 }
