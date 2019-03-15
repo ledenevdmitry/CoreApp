@@ -91,7 +91,8 @@ namespace CoreApp.OraUtils
             "from zpatchorder_hdim o join " +
             "(select distinct zpatch_id from zpatch_hdim z " +
            $"where z.validto = {DBManager.PlusInf} and z.dwsact<> 'D' and z.cpatch_id = :cpatch_id) z " +
-            "on o.zpatch_id = z.zpatch_id";
+            "on o.zpatch_id = z.zpatch_id " +
+           $"where o.validto = {DBManager.PlusInf} and o.dwsact <> 'D'";
 
         public static IEnumerable<ZPatchOrderRecord> GetZPatchOrdersByCPatch(int cpatch_id)
         {

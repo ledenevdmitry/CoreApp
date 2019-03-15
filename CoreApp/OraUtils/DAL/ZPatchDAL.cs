@@ -77,26 +77,33 @@ namespace CoreApp.OraUtils
         static string updateCPatch = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "cpatch_id" }));
 
         public static string deleteByReleaseCloseOld =
-            "update zpatch_hdim z" +
+            "update zpatch_hdim z " +
             "set validto = sysdate " +
             "where " +
-            $"validto = {DBManager.PlusInf} " +
-            "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 or z1.cpatch_id = c1.cpatch_id " +
+            $"validto = {DBManager.PlusInf} and dwsact <> 'D' " +
+            "and exists (select 1 from " +
+                       $"(select zpatch_id, cpatch_id  from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D') z1 join " +
+                       $"cpatch_hdim c1 on " +
+                        "z1.cpatch_id = c1.cpatch_id " +
                         "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)";
 
         public static string deleteByReleaseInsertionsNew =
              "insert into zpatch_hdim " +
              "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
              "select " +
-             "zpatch_id, parent_id,  :new_cpatch_id,  :new_zpatch_name, :new_zpatchstatus, " +
-             "(select max(validto) from zpatch_hdim " +
-             "where zpatch_id = :zpatch_id and " +
-             "parent_id = :parent_id), " +
-            $"{DBManager.PlusInf}, 'D') " +
-             "from zpatch_hdim z" +
+             "zpatch_id, parent_id,  cpatch_id,  zpatch_name, zpatchstatus, " +
+             "validto, " +
+            $"{DBManager.PlusInf}, 'D' " +
+             "from zpatch_hdim z " +
              "where " +
-            $"validto = {DBManager.PlusInf} " +
-             "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 or z1.cpatch_id = c1.cpatch_id " +
+            $"validto = (select max(validto) from zpatch_hdim z2 " +
+            $"where z2.zpatch_id = z.zpatch_id and " +
+             "exists " +  
+                        "(select 1 from zpatch_hdim z1 join cpatch_hdim c1 on " +
+                        "z1.cpatch_id = c1.cpatch_id " +
+                        "where z1.zpatch_id = z2.zpatch_id and c1.release_id = :release_id)) " +
+            "and exists (select 1 from zpatch_hdim z1 join cpatch_hdim c1 on " +
+                        "z1.cpatch_id = c1.cpatch_id " +
                         "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)";
 
 

@@ -39,6 +39,7 @@
             this.BtFixpack = new System.Windows.Forms.ToolStripMenuItem();
             this.BtAddFixpack = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCPatchGraph = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtZPatchOrder = new System.Windows.Forms.ToolStripMenuItem();
             this.SCMain = new System.Windows.Forms.SplitContainer();
             this.mainTree = new System.Windows.Forms.TreeView();
             this.GbCPatch = new System.Windows.Forms.GroupBox();
@@ -81,7 +82,7 @@
             this.BtZPatchAddDependenciesTo = new System.Windows.Forms.Button();
             this.mainTreeContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.TSMIRename = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtZPatchOrder = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtDeleteRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).BeginInit();
             this.SCMain.Panel1.SuspendLayout();
@@ -162,7 +163,8 @@
             this.BtRelease.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.BtAddRelease,
             this.BtCheckRelease,
-            this.BtReleaseGraph});
+            this.BtReleaseGraph,
+            this.BtDeleteRelease});
             this.BtRelease.Name = "BtRelease";
             this.BtRelease.Size = new System.Drawing.Size(61, 24);
             this.BtRelease.Text = "Релиз";
@@ -170,20 +172,20 @@
             // BtAddRelease
             // 
             this.BtAddRelease.Name = "BtAddRelease";
-            this.BtAddRelease.Size = new System.Drawing.Size(161, 26);
+            this.BtAddRelease.Size = new System.Drawing.Size(216, 26);
             this.BtAddRelease.Text = "Добавить";
             this.BtAddRelease.Click += new System.EventHandler(this.BtAddRelease_Click);
             // 
             // BtCheckRelease
             // 
             this.BtCheckRelease.Name = "BtCheckRelease";
-            this.BtCheckRelease.Size = new System.Drawing.Size(161, 26);
+            this.BtCheckRelease.Size = new System.Drawing.Size(216, 26);
             this.BtCheckRelease.Text = "Проверить";
             // 
             // BtReleaseGraph
             // 
             this.BtReleaseGraph.Name = "BtReleaseGraph";
-            this.BtReleaseGraph.Size = new System.Drawing.Size(161, 26);
+            this.BtReleaseGraph.Size = new System.Drawing.Size(216, 26);
             this.BtReleaseGraph.Text = "Граф";
             this.BtReleaseGraph.Click += new System.EventHandler(this.BtReleaseGraph_Click);
             // 
@@ -200,16 +202,23 @@
             // BtAddFixpack
             // 
             this.BtAddFixpack.Name = "BtAddFixpack";
-            this.BtAddFixpack.Size = new System.Drawing.Size(216, 26);
+            this.BtAddFixpack.Size = new System.Drawing.Size(205, 26);
             this.BtAddFixpack.Text = "Добавить ОП/ФП";
             this.BtAddFixpack.Click += new System.EventHandler(this.BtAddFixpack_Click);
             // 
             // BtCPatchGraph
             // 
             this.BtCPatchGraph.Name = "BtCPatchGraph";
-            this.BtCPatchGraph.Size = new System.Drawing.Size(216, 26);
+            this.BtCPatchGraph.Size = new System.Drawing.Size(205, 26);
             this.BtCPatchGraph.Text = "Граф";
             this.BtCPatchGraph.Click += new System.EventHandler(this.BtCPatchGraph_Click);
+            // 
+            // BtZPatchOrder
+            // 
+            this.BtZPatchOrder.Name = "BtZPatchOrder";
+            this.BtZPatchOrder.Size = new System.Drawing.Size(205, 26);
+            this.BtZPatchOrder.Text = "Порядок патчей";
+            this.BtZPatchOrder.Click += new System.EventHandler(this.BtZPatchOrder_Click);
             // 
             // SCMain
             // 
@@ -719,12 +728,12 @@
             this.TSMIRename.Size = new System.Drawing.Size(190, 24);
             this.TSMIRename.Text = "Переименовать";
             // 
-            // BtZPatchOrder
+            // BtDeleteRelease
             // 
-            this.BtZPatchOrder.Name = "BtZPatchOrder";
-            this.BtZPatchOrder.Size = new System.Drawing.Size(216, 26);
-            this.BtZPatchOrder.Text = "Порядок патчей";
-            this.BtZPatchOrder.Click += new System.EventHandler(this.BtZPatchOrder_Click);
+            this.BtDeleteRelease.Name = "BtDeleteRelease";
+            this.BtDeleteRelease.Size = new System.Drawing.Size(216, 26);
+            this.BtDeleteRelease.Text = "Удалить";
+            this.BtDeleteRelease.Click += new System.EventHandler(this.BtDeleteRelease_Click);
             // 
             // ReleaseManagerForm
             // 
@@ -844,5 +853,6 @@
         private System.Windows.Forms.GroupBox GbZPatchDependenciesFrom;
         private System.Windows.Forms.GroupBox GbZPatchDependenciesTo;
         private System.Windows.Forms.ToolStripMenuItem BtZPatchOrder;
+        private System.Windows.Forms.ToolStripMenuItem BtDeleteRelease;
     }
 }

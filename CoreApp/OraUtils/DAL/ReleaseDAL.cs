@@ -10,41 +10,36 @@ namespace CoreApp.OraUtils
 {
     class ReleaseDAL
     {
-        private static string insertionsNew(char dmlType, params string[] pars)
-        {
-            string res =
+        public static string deleteScript = 
              "insert into release_hdim " +
              "( release_id,  release_name, validfrom, validto, dwsact ) " +
              "select " +
-             "release_id, :new_release_name, " +
-             "(select max(validto) from release_hdim " +
-             "where release_id = :release_id), " +
-            $"{DBManager.PlusInf}, '{dmlType}' " +
+             "release_id, release_name,  " +
+             "validto, " + 
+            $"{DBManager.PlusInf}, 'D' " +
              "from release_hdim " +
              "where " +
-            $"validto = (select max(validto) from release_hdim " +
-             "where release_id = :release_id) ";
-            foreach (string par in pars)
-            {
-                res += $"and {par} = :{par} ";
-            }
-            return res;
-        }
+             "validto = (select max(validto) from release_hdim " +
+            $"where release_id = :release_id) and release_id = :release_id";
 
-        private static string closeOld(params string[] pars)
-        {
-            string res =
-            "update release_hdim " +
-            "set validto = sysdate " +
-            "where " +
-            $"validto = {DBManager.PlusInf} ";
-            foreach (string par in pars)
-            {
-                res += $"and {par} = :{par} ";
-            }
-            return res;
-        }
+        private static string closeOld =
+             "update release_hdim " +
+             "set validto = sysdate " +
+             "where " +
+            $"validto = {DBManager.PlusInf} " +
+             "and release_id = :release_id ";
 
+        private static string updateScript  =
+             "insert into release_hdim " +
+             "( release_id,  release_name, validfrom, validto, dwsact ) " +
+             "select " +
+             "release_id, release_name,  " +
+             "validto, " +
+            $"{DBManager.PlusInf}, 'U') " +
+             "from release_hdim " +
+             "where " +
+             "validto = (select max(validto) from release_hdim " +
+            $"where release_id = :release_id) and release_id = :release_id";
 
         private static string insertScript =
             "insert into release_hdim " +
@@ -75,13 +70,13 @@ namespace CoreApp.OraUtils
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-            closeOld("release_id"),
+                closeOld,
                 transaction,
                 new OracleParameter("release_id", release_id),
                 new OracleParameter("new_release_name", new_release_name));
 
             DBManager.ExecuteNonQuery(
-                insertionsNew('U', "release_id"),
+                updateScript,
                 transaction,
                 new OracleParameter("release_id", release_id),
                 new OracleParameter("new_release_name", new_release_name));
@@ -94,12 +89,12 @@ namespace CoreApp.OraUtils
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-                closeOld("release_id"),
+                closeOld,
                 transaction,
                 new OracleParameter("release_id", release_id));
 
             DBManager.ExecuteNonQuery(
-                insertionsNew('D', "release_id"),
+                deleteScript,
                 transaction,
                 new OracleParameter("release_id", release_id));
 

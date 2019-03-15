@@ -26,7 +26,7 @@ namespace CoreApp.OraUtils
              "select " +
              "cpatch_id, parent_id,  release_id,  cpatch_name, cpatchstatus,  kod_sredy, " +
              "validto, " +
-            $"{DBManager.PlusInf}, '{dmlType}') " +
+            $"{DBManager.PlusInf}, '{dmlType}' " +
              "from cpatch_hdim " +
              "where " +
              "validto = (select max(validto) from cpatch_hdim " +

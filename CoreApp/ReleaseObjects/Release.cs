@@ -123,6 +123,11 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
+        public void Delete()
+        {
+            ReleaseDAL.Delete(releaseId);
+        }
+
         public void DeleteLocal()
         {
             if (localDir.Exists)

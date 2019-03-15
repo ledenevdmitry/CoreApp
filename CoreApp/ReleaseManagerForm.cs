@@ -327,5 +327,10 @@ namespace CoreApp
             ZPatchOrderForm zpof = new ZPatchOrderForm(currCPatch);
             zpof.ShowDialog();
         }
+
+        private void BtDeleteRelease_Click(object sender, EventArgs e)
+        {
+            currRelease.Delete();
+        }
     }
 }
