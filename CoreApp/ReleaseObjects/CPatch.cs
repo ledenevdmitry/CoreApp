@@ -99,39 +99,79 @@ namespace CoreApp.ReleaseObjects
             release.CPatchesDict.Remove(CPatchId);
         }
 
+        public static bool CanDeleteCPatchDependency(CPatch cpatchFrom, CPatch cpatchTo, out ZPatch zpatchFromDependency, out ZPatch zpatchToDependency)
+        {
+            foreach (var zpatchFrom in cpatchFrom.zpatches)
+            {
+                foreach (var zpatchTo in cpatchTo.zpatches)
+                {
+                    if (zpatchFrom.dependenciesTo.Contains(zpatchTo))
+                    {
+                        zpatchFromDependency = zpatchFrom;
+                        zpatchToDependency = zpatchTo;
+
+                        return false;
+                    }
+                }
+            }
+
+            zpatchFromDependency = zpatchToDependency = null;
+            return true;
+        }
+
         public void DeleteDependencyFrom(CPatch cpatchFrom)
         {
             dependenciesFrom.Remove(cpatchFrom);
+            cpatchFrom.dependenciesTo.Remove(this);
             CPatchDAL.DeleteDependency(cpatchFrom.CPatchId, CPatchId);
         }
 
         public void DeleteDependencyTo(CPatch cpatchTo)
         {
             dependenciesTo.Remove(cpatchTo);
+            cpatchTo.dependenciesFrom.Remove(this);
             CPatchDAL.DeleteDependency(CPatchId, cpatchTo.CPatchId);
         }
 
         public void AddDependencyFrom(CPatch cpatchFrom)
         {
             dependenciesFrom.Add(cpatchFrom);
+            cpatchFrom.dependenciesTo.Add(this);
             CPatchDAL.AddDependency(cpatchFrom.CPatchId, CPatchId);
         }
 
         public void AddDependencyTo(CPatch cpatchTo)
         {
             dependenciesTo.Add(cpatchTo);
+            cpatchTo.dependenciesFrom.Add(this);
             CPatchDAL.AddDependency(CPatchId, cpatchTo.CPatchId);
+        }
+
+        public static bool HaveTransitiveDependency(CPatch cpatchFrom, CPatch cpatchTo)
+        {
+            foreach(CPatch subPatch in cpatchFrom.dependenciesTo)
+            {
+                if (subPatch.Equals(cpatchTo))
+                    return true;
+                else
+                    return HaveTransitiveDependency(subPatch, cpatchTo);
+            }
+
+            return false;
         }
 
         public void Move(Release newRelease)
         {
-            release.cpatches.Remove(this);
-            release.CPatchesDict.Remove(CPatchId);
+            if (release != newRelease)
+            {
+                release.cpatches.Remove(this);
+                release.CPatchesDict.Remove(CPatchId);
 
-            newRelease.cpatches.Add(this);
-            newRelease.CPatchesDict.Add(CPatchId, this);
+                newRelease.cpatches.Add(this);
+                newRelease.CPatchesDict.Add(CPatchId, this);
 
-            CPatchDAL.UpdateRelease(release.releaseId, newRelease.releaseId);
+                CPatchDAL.UpdateRelease(CPatchId, newRelease.releaseId);
+            }
         }
 
         public void InitZPatches()
@@ -393,53 +433,6 @@ namespace CoreApp.ReleaseObjects
             List<Tuple<ZPatch, ZPatch>> addedDependenciesTo,
             List<ZPatch> newPatches)
         {
-            bool oldDependenciesAreCorrect = true;
-
-            //определяем, должен ли порядок быть переписан, или достаточно только добавить новые патчи в конец
-            foreach(var newDependency in addedDependenciesFrom)
-            {
-                //если появилась новая зависимость, такая, что появился новый патч, влияющий на старый
-                if(newPatches.Contains(newDependency.Item1) && !newPatches.Contains(newDependency.Item2))
-                {
-                    oldDependenciesAreCorrect = false;
-                    break;
-                }
-
-                //если появилась новая зависимость, такая, что старый порядок для старых патчей стал некорректным
-                if(ZPatchOrder.IndexOfValue(newDependency.Item1) > ZPatchOrder.IndexOfValue(newDependency.Item2))
-                {
-                    oldDependenciesAreCorrect = false;
-                    break;
-                }
-            }
-
-            if(oldDependenciesAreCorrect)
-            foreach(var newDependency in addedDependenciesTo)
-            {
-                //если появилась новая зависимость, такая, что появился новый патч, влияющий на старый
-                if (!newPatches.Contains(newDependency.Item1) && newPatches.Contains(newDependency.Item2))
-                {
-                    oldDependenciesAreCorrect = false;
-                    break;
-                }
-
-                //если появилась новая зависимость, такая, что старый порядок для старых патчей стал некорректным
-                if (ZPatchOrder.IndexOfValue(newDependency.Item1) < ZPatchOrder.IndexOfValue(newDependency.Item2))
-                {
-                    oldDependenciesAreCorrect = false;
-                    break;
-                }
-            }
-
-            if(oldDependenciesAreCorrect)
-            {
-                AddNewDependenciesToList(newPatches);
-            }
-            else
-            {
-                ResetAllDependenciesToList();
-            }
-
             //deletedfrom
             foreach (var deletedDependency in deletedDependenciesFrom)
             {
@@ -536,6 +529,65 @@ namespace CoreApp.ReleaseObjects
                         CPatchDAL.AddDependency(CPatchId, addedDependency.Item2.cpatch.CPatchId);
                     }
                 }
+            }
+
+            foreach(ZPatch z1 in zpatches)
+            {
+                foreach(ZPatch z2 in zpatches)
+                {
+                    if(ZPatch.HaveTransitiveDependency(z1, z2) &&
+                       ZPatch.HaveTransitiveDependency(z2, z1))
+                    {
+                        throw new Exception($"Одновременные зависимости {z1} -> {z2} и {z2} -> {z1}");
+                    }
+                }
+            }
+
+            bool oldDependenciesAreCorrect = true;
+
+            //определяем, должен ли порядок быть переписан, или достаточно только добавить новые патчи в конец
+            foreach (var newDependency in addedDependenciesFrom)
+            {
+                //если появилась новая зависимость, такая, что появился новый патч, влияющий на старый
+                if (newPatches.Contains(newDependency.Item1) && !newPatches.Contains(newDependency.Item2))
+                {
+                    oldDependenciesAreCorrect = false;
+                    break;
+                }
+
+                //если появилась новая зависимость, такая, что старый порядок для старых патчей стал некорректным
+                if (ZPatchOrder.IndexOfValue(newDependency.Item1) > ZPatchOrder.IndexOfValue(newDependency.Item2))
+                {
+                    oldDependenciesAreCorrect = false;
+                    break;
+                }
+            }
+
+            if (oldDependenciesAreCorrect)
+                foreach (var newDependency in addedDependenciesTo)
+                {
+                    //если появилась новая зависимость, такая, что появился новый патч, влияющий на старый
+                    if (!newPatches.Contains(newDependency.Item1) && newPatches.Contains(newDependency.Item2))
+                    {
+                        oldDependenciesAreCorrect = false;
+                        break;
+                    }
+
+                    //если появилась новая зависимость, такая, что старый порядок для старых патчей стал некорректным
+                    if (ZPatchOrder.IndexOfValue(newDependency.Item1) < ZPatchOrder.IndexOfValue(newDependency.Item2))
+                    {
+                        oldDependenciesAreCorrect = false;
+                        break;
+                    }
+                }
+
+            if (oldDependenciesAreCorrect)
+            {
+                AddNewDependenciesToList(newPatches);
+            }
+            else
+            {
+                ResetAllDependenciesToList();
             }
 
         }
@@ -677,9 +729,11 @@ namespace CoreApp.ReleaseObjects
 
         public void UpdateStatus(CPatchStatuses newStatus)
         {
-            CPatchStatus = newStatus;
-            //TODO update
-            CPatchDAL.UpdateStatus(CPatchId, newStatus.ToString());
+            if (newStatus != CPatchStatus)
+            {
+                CPatchStatus = newStatus;
+                CPatchDAL.UpdateStatus(CPatchId, newStatus.ToString());
+            }
         }
 
         private void AddNewZPatches(Range columns, out List<ZPatch> newPatches)
@@ -786,8 +840,9 @@ namespace CoreApp.ReleaseObjects
                         node.Label.FontColor = Color.White;
                         node.LabelText = $"{depTo.ZPatchName} ({depTo.cpatch.CPatchName})";
                         graph.AddNode(node);
+                        //должна быть именно здесь, чтобы не было двух дуг
+                        graph.AddEdge(zpatch.ZPatchId.ToString(), depTo.ZPatchId.ToString());
                     }
-                    graph.AddEdge(zpatch.ZPatchId.ToString(), depTo.ZPatchId.ToString());
                 }
             }
 

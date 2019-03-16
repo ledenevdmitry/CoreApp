@@ -97,7 +97,7 @@ namespace CoreApp.OraUtils
             string res = $":{ps[0]} = {ps[0]}";
             for(int i = 1; i < ps.Length; ++i)
             {
-                res += $"and :{ps[i]} = {ps[i]}";
+                res += $" and :{ps[i]} = {ps[i]}";
             }
             return res;
         }

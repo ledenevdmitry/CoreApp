@@ -88,13 +88,16 @@ namespace CoreApp.ReleaseObjects
 
         public void Move(CPatch newCPatch)
         {
-            cpatch.zpatches.Remove(this);
-            cpatch.ZPatchesDict.Remove(ZPatchId);
+            if (cpatch != newCPatch)
+            {
+                cpatch.zpatches.Remove(this);
+                cpatch.ZPatchesDict.Remove(ZPatchId);
 
-            newCPatch.zpatches.Add(this);
-            newCPatch.ZPatchesDict.Add(ZPatchId, this);
+                newCPatch.zpatches.Add(this);
+                newCPatch.ZPatchesDict.Add(ZPatchId, this);
 
-            ZPatchDAL.UpdateCPatch(cpatch.CPatchId, newCPatch.CPatchId);
+                ZPatchDAL.UpdateCPatch(cpatch.CPatchId, newCPatch.CPatchId);
+            }
         }
 
         public void DeleteDependencyFrom(ZPatch zpatchFrom)
@@ -120,6 +123,20 @@ namespace CoreApp.ReleaseObjects
             dependenciesTo.Add(zpatchTo);
             ZPatchDAL.AddDependency(ZPatchId, zpatchTo.ZPatchId);
         }
+
+        public static bool HaveTransitiveDependency(ZPatch zpatchFrom, ZPatch zpatchTo)
+        {
+            foreach (ZPatch subPatch in zpatchFrom.dependenciesTo)
+            {
+                if (subPatch.Equals(zpatchTo))
+                    return true;
+                else
+                    return HaveTransitiveDependency(subPatch, zpatchTo);
+            }
+
+            return false;
+        }
+
 
         private bool GetCVSPath(out string path)
         {
@@ -212,8 +229,11 @@ namespace CoreApp.ReleaseObjects
 
         public void UpdateStatus(ZPatchStatuses newStatus)
         {
-            ZPatchStatus = newStatus;
-            CPatchDAL.UpdateStatus(ZPatchId, newStatus.ToString());
+            if (newStatus != ZPatchStatus)
+            {
+                ZPatchStatus = newStatus;
+                CPatchDAL.UpdateStatus(ZPatchId, newStatus.ToString());
+            }
         }
 
         public override string ToString()

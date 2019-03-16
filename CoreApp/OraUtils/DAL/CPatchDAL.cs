@@ -194,13 +194,13 @@ namespace CoreApp.OraUtils
 
 
             DBManager.ExecuteNonQuery(
-                ZPatchDAL.closeOld("cpatch"),
+                ZPatchDAL.closeOld("cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
 
 
             DBManager.ExecuteNonQuery(
-                ZPatchDAL.insertionsNew('D', "cpatch"),
+                ZPatchDAL.insertionsNew('D', "cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
 

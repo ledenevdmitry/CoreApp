@@ -165,7 +165,8 @@ namespace CoreApp.ReleaseObjects
             foreach(CPatch cpatch in cpatches)
             {
                 Node node = new Node(cpatch.CPatchId.ToString());
-                node.Label.Text = cpatch.CPatchName;
+                node.Label.Text = cpatch.CPatchName.Replace(' ', '\n');
+
                 node.Attr.FillColor = Color.LightGreen;
                 graph.AddNode(node);
             }

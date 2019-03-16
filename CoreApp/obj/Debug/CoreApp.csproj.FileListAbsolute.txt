@@ -67,3 +67,14 @@ C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchOrderFor
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.CPatchesListForm.resources
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ReleasesListForm.resources
 C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchesListForm.resources
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.dll
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.Drawing.dll
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.GraphViewerGdi.dll
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.xml
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.Drawing.xml
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\bin\Debug\Microsoft.Msagl.GraphViewerGdi.xml
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.CPatchesListForm.resources
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.GraphForm.resources
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ReleasesListForm.resources
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchesListForm.resources
+C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchOrderForm.resources

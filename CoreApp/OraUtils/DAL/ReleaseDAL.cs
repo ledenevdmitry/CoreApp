@@ -33,9 +33,9 @@ namespace CoreApp.OraUtils
              "insert into release_hdim " +
              "( release_id,  release_name, validfrom, validto, dwsact ) " +
              "select " +
-             "release_id, release_name,  " +
+             "release_id, :release_name,  " +
              "validto, " +
-            $"{DBManager.PlusInf}, 'U') " +
+            $"{DBManager.PlusInf}, 'U' " +
              "from release_hdim " +
              "where " +
              "validto = (select max(validto) from release_hdim " +
@@ -72,14 +72,13 @@ namespace CoreApp.OraUtils
             DBManager.ExecuteNonQuery(
                 closeOld,
                 transaction,
-                new OracleParameter("release_id", release_id),
-                new OracleParameter("new_release_name", new_release_name));
+                new OracleParameter("release_id", release_id));
 
             DBManager.ExecuteNonQuery(
                 updateScript,
                 transaction,
                 new OracleParameter("release_id", release_id),
-                new OracleParameter("new_release_name", new_release_name));
+                new OracleParameter("release_name", new_release_name));
 
             transaction.Commit();
         }

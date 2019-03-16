@@ -18,12 +18,11 @@ namespace CoreApp
     {
         ReleaseManager rm;
 
-        Release currRelease;
-        CPatch currCPatch;
-        ZPatch currZPatch;
+        TreeNode editing;
 
-        int actualCPatchStatusIndex = -1;
-        int actualZPatchStatusIndex = -1;
+        Release currRelease { get => getReleaseFromTree(mainTree.SelectedNode); }
+        CPatch  currCPatch  { get => getCPatchFromTree (mainTree.SelectedNode); }
+        ZPatch  currZPatch  { get => getZPatchFromTree (mainTree.SelectedNode); }
 
         public ReleaseManagerForm()
         {
@@ -36,37 +35,40 @@ namespace CoreApp
 
             CreateTree();
             Application.Idle += OnIdle;
-
-            TSMIRename.Click += RenameStart;
-        }
-
-        private void RenameStart(object sender, EventArgs e)
-        {
-            mainTree.LabelEdit = true;
-            mainTree.SelectedNode.BeginEdit();
         }
 
         private void OnIdle(object sender, EventArgs e)
         {
-            BtAddCPatch.Enabled = mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
+            BtAddCPatch.Enabled = 
+                mainTree.SelectedNode != null && mainTree.SelectedNode.Level >= 0;
 
             BtReleaseGraph.Enabled = 
-                mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 0;
+            BtReleaseRename.Enabled =
+                mainTree.SelectedNode != null && mainTree.SelectedNode.Level >= 0;
 
-            GbCPatch.Visible = 
             BtCPatchGraph.Enabled = 
             BtZPatchOrder.Enabled =
+            BtCPatchRename.Enabled =
+            BtCPatchMove.Enabled =
+            BtCPatchDelete.Enabled =
+                mainTree.SelectedNode != null && mainTree.SelectedNode.Level >= 1;
+
+            GbCPatch.Visible =
                 mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 1;
 
             GbZPatch.Visible = 
+            BtZPatchRename.Enabled =
+            BtZPatchMove.Enabled =
+            BtZPatchDelete.Enabled =
                 mainTree.SelectedNode != null && mainTree.SelectedNode.Level == 2;
+
         }
 
         private void CreateTree()
         {
             foreach(Release release in rm.releases)
             {
-                var currReleaseNode = mainTree.Nodes.Add(release.releaseId.ToString(), release.releaseName);                
+                mainTree.Nodes.Add(release.releaseId.ToString(), release.releaseName);                
             }
         }
 
@@ -74,17 +76,34 @@ namespace CoreApp
         {
             CbCPatchStatus.SelectedItem = currCPatch.CPatchStatus;
 
-            LboxCPatchDependenciesFrom.DataSource = currCPatch.dependenciesFrom.ToList();
-            LboxCPatchDependenciesTo.DataSource = currCPatch.dependenciesTo.ToList();
+            LboxCPatchDependenciesFrom.Items.Clear();
+            foreach (var dep in currCPatch.dependenciesFrom)
+            {
+                LboxCPatchDependenciesFrom.Items.Add(dep);
+            }
+
+            LboxCPatchDependenciesTo.Items.Clear();
+            foreach (var dep in currCPatch.dependenciesTo)
+            {
+                LboxCPatchDependenciesTo.Items.Add(dep);
+            }
         }
 
         private void DisplayZPatch()
         {
             CbZPatchStatus.SelectedItem = currZPatch.ZPatchStatus;
-            CbZPatchCPatch.SelectedItem = currZPatch.cpatch;
 
-            LboxZPatchDependenciesFrom.DataSource = currZPatch.dependenciesFrom.ToList();
-            LboxZPatchDependenciesTo.DataSource = currZPatch.dependenciesTo.ToList();
+            LboxZPatchDependenciesFrom.Items.Clear();
+            foreach(var dep in currZPatch.dependenciesFrom)
+            {
+                LboxZPatchDependenciesFrom.Items.Add(dep);
+            }
+
+            LboxZPatchDependenciesTo.Items.Clear();
+            foreach (var dep in currZPatch.dependenciesTo)
+            {
+                LboxZPatchDependenciesTo.Items.Add(dep);
+            }
         }
 
         private void BtSetHomePath_Click(object sender, EventArgs e)
@@ -119,27 +138,64 @@ namespace CoreApp
 
             if(ofd.ShowDialog() == DialogResult.OK)
             {
-                CPatch newCpatch = currRelease.AddCPatch(currRelease, new FileInfo(ofd.FileName));
-                mainTree.SelectedNode.Nodes.Add(newCpatch.CPatchId.ToString(), newCpatch.CPatchName);
-                mainTree.SelectedNode.Expand();
+                CPatch newCPatch = currRelease.AddCPatch(currRelease, new FileInfo(ofd.FileName));
+                TreeNode cpatchNode = mainTree.SelectedNode.Nodes.Add(newCPatch.CPatchId.ToString(), newCPatch.CPatchName);
+                foreach(ZPatch zpatch in newCPatch.zpatches)
+                {
+                    cpatchNode.Nodes.Add(zpatch.ZPatchId.ToString(), zpatch.ZPatchName);
+                }
             }
+        }
+
+        private TreeNode GetReleaseNode(TreeNode node)
+        {
+            switch (node.Level)
+            {
+                case 0:
+                    return node;
+                case 1:
+                    return node.Parent;
+                case 2:
+                    return node.Parent.Parent;
+            }
+            throw new Exception("Нет такой ноды");
+        }
+
+        private TreeNode GetCPatchNode(TreeNode node)
+        {
+            switch (node.Level)
+            {
+                case 1:
+                    return node;
+                case 2:
+                    return node.Parent;
+            }
+            throw new Exception("Нет такой ноды");
+        }
+
+        private TreeNode GetZPatchNode(TreeNode node)
+        {
+            switch (node.Level)
+            {
+                case 2:
+                    return node;
+            }
+            throw new Exception("Нет такой ноды");
         }
 
         private Release getReleaseFromTree(TreeNode node)
         {
-            return rm.releasesDict[int.Parse(node.Name)];
+            return rm.releasesDict[int.Parse(GetReleaseNode(node).Name)];
         }
 
         private CPatch getCPatchFromTree(TreeNode node)
         {
-            currRelease = getReleaseFromTree(node.Parent);
-            return currRelease.CPatchesDict[int.Parse(node.Name)];
+            return getReleaseFromTree(GetReleaseNode(node)).CPatchesDict[int.Parse(GetCPatchNode(node).Name)];
         }
 
         private ZPatch getZPatchFromTree(TreeNode node)
         {
-            currCPatch = getCPatchFromTree(node.Parent);
-            return currCPatch.ZPatchesDict[int.Parse(node.Name)];
+           return getCPatchFromTree(GetCPatchNode(node)).ZPatchesDict[int.Parse(GetZPatchNode(node).Name)];
         }
 
         private void mainTree_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
@@ -151,9 +207,11 @@ namespace CoreApp
                     MessageBox.Show("Задайте домашнюю папку перед продолжением работы", "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
+
                 Release currRelease = getReleaseFromTree(mainTree.SelectedNode);
                 currRelease.InitCPatches();
                 mainTree.SelectedNode.Nodes.Clear();
+
                 foreach (CPatch cPatch in currRelease.cpatches)
                 {
                     TreeNode newNode = mainTree.SelectedNode.Nodes.Add(cPatch.CPatchId.ToString(), cPatch.CPatchName);
@@ -167,41 +225,14 @@ namespace CoreApp
             mainTree.SelectedNode.Expand();
         }
 
-        private void CbCPatchStatus_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            e.DrawBackground();
-            if (e.Index == actualCPatchStatusIndex)
-            {
-                e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
-            }
-            e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
-        }
-
-        private void CbZPatchStatus_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            e.DrawBackground();
-            if (e.Index == actualZPatchStatusIndex)
-            {
-                e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
-            }
-            e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
-        }
-
         private void mainTree_AfterSelect(object sender, TreeViewEventArgs e)
         {
             switch (mainTree.SelectedNode.Level)
             {
-                case 0:
-                    currRelease = getReleaseFromTree(mainTree.SelectedNode);
-                    break;
                 case 1:
-                    currCPatch = getCPatchFromTree(mainTree.SelectedNode);
-                    actualCPatchStatusIndex = CbCPatchStatus.Items.IndexOf(currCPatch.CPatchStatus);
                     DisplayCPatch();
                     break;
                 case 2:
-                    currZPatch = getZPatchFromTree(mainTree.SelectedNode);
-                    actualZPatchStatusIndex = CbZPatchStatus.Items.IndexOf(currZPatch.ZPatchStatus);
                     DisplayZPatch();
                     break;
             }
@@ -211,35 +242,18 @@ namespace CoreApp
         private void BtCPatchStatus_Click(object sender, EventArgs e)
         {
             CPatchStatuses newStatus = (CPatchStatuses)CbCPatchStatus.SelectedItem;
-            if (newStatus != currCPatch.CPatchStatus)
-            {
-                currCPatch.UpdateStatus(newStatus);
-                actualCPatchStatusIndex = CbCPatchStatus.Items.IndexOf(newStatus);
-            }
+            currCPatch.UpdateStatus(newStatus);
         }
 
         private void BtZPatchStatus_Click(object sender, EventArgs e)
         {
             ZPatchStatuses newStatus = (ZPatchStatuses)CbZPatchStatus.SelectedItem;
-            if (newStatus != currZPatch.ZPatchStatus)
-            {
-                currZPatch.UpdateStatus(newStatus);
-                actualZPatchStatusIndex = CbZPatchStatus.Items.IndexOf(newStatus);
-            }
-        }
-
-        private void mainTree_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            if(e.Button == MouseButtons.Right)
-            {
-                e.Node.ContextMenuStrip = mainTreeContextMenu;
-            }
+            currZPatch.UpdateStatus(newStatus);
         }
 
         private void mainTree_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-
-            switch (mainTree.SelectedNode.Level)
+            switch (editing.Level)
             {
                 case 0:
                     getReleaseFromTree(mainTree.SelectedNode).Rename(e.Label);
@@ -250,28 +264,7 @@ namespace CoreApp
                 case 2:
                     getZPatchFromTree(mainTree.SelectedNode).Rename(e.Label);
                     break;
-
             }
-        }
-
-        private void CbCPatchRelease_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            e.DrawBackground();
-            if (e.Index == ((ComboBox)sender).Items.IndexOf(currCPatch.release))
-            {
-                e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
-            }
-            e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
-        }
-
-        private void CbZPatchCPatch_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            e.DrawBackground();
-            if (e.Index == ((ComboBox)sender).Items.IndexOf(currZPatch.cpatch))
-            {
-                e.Graphics.FillRectangle(Brushes.Green, e.Bounds);
-            }
-            e.Graphics.DrawString(((ComboBox)sender).Items[e.Index].ToString(), e.Font, Brushes.Black, new PointF(e.Bounds.X, e.Bounds.Y));
         }
 
         private void BtReleaseGraph_Click(object sender, EventArgs e)
@@ -314,13 +307,17 @@ namespace CoreApp
 
         private void BtMoveCPatch_Click(object sender, EventArgs e)
         {
-            ReleasesListForm rlf = new ReleasesListForm(rm.releases);
+            ReleasesListForm rlf = new ReleasesListForm(
+                rm.releases
+                .Where(x => x != currRelease)
+                .OrderBy(x => x.releaseName));
+
             if(rlf.ShowDialog() == DialogResult.OK)
             {
                 TreeNode nodeToMove = mainTree.SelectedNode;
-                mainTree.Nodes.Remove(nodeToMove);
-
                 currCPatch.Move(rlf.release);
+
+                mainTree.Nodes.Remove(nodeToMove);
 
                 mainTree.Nodes[rlf.release.releaseId.ToString()].Nodes.Add(nodeToMove);
             }
@@ -346,18 +343,34 @@ namespace CoreApp
             CPatchesListForm clf = new CPatchesListForm(currCPatch.dependenciesFrom);
             if(clf.ShowDialog() == DialogResult.OK)
             {
-                currCPatch.DeleteDependencyFrom(clf.cpatch);
-                LboxCPatchDependenciesFrom.Items.Remove(clf.cpatch);
+                ZPatch zpatchFrom, zpatchTo;
+                if (CPatch.CanDeleteCPatchDependency(clf.cpatch, currCPatch, out zpatchFrom, out zpatchTo))
+                {
+                    currCPatch.DeleteDependencyFrom(clf.cpatch);
+                    LboxCPatchDependenciesFrom.Items.Remove(clf.cpatch);
+                }
+                else
+                {
+                    MessageBox.Show($"Существует зависимость по Z-патчам: {zpatchFrom} -> {zpatchTo}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
         private void BtCPatchAddDependenciesFrom_Click(object sender, EventArgs e)
         {
-            CPatchesListForm clf = new CPatchesListForm(currCPatch.dependenciesFrom);
+            CPatchesListForm clf = new CPatchesListForm(currRelease.cpatches.Where(x => x != currCPatch));
             if (clf.ShowDialog() == DialogResult.OK)
             {
-                currCPatch.AddDependencyFrom(clf.cpatch);
-                LboxCPatchDependenciesFrom.Items.Add(clf.cpatch);
+                //если нет обратной зависимости
+                if (!CPatch.HaveTransitiveDependency(currCPatch, clf.cpatch))
+                {
+                    currCPatch.AddDependencyFrom(clf.cpatch);
+                    LboxCPatchDependenciesFrom.Items.Add(clf.cpatch);
+                }
+                else
+                {
+                    MessageBox.Show($"Есть зависимость {currCPatch} -> {clf.cpatch} (возможно, транзитивная)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -366,18 +379,34 @@ namespace CoreApp
             CPatchesListForm clf = new CPatchesListForm(currCPatch.dependenciesTo);
             if (clf.ShowDialog() == DialogResult.OK)
             {
-                currCPatch.DeleteDependencyTo(clf.cpatch);
-                LboxCPatchDependenciesTo.Items.Remove(clf.cpatch);
+                ZPatch zpatchFrom, zpatchTo;
+                if (CPatch.CanDeleteCPatchDependency(currCPatch, clf.cpatch, out zpatchFrom, out zpatchTo))
+                {
+                    currCPatch.DeleteDependencyTo(clf.cpatch);
+                    LboxCPatchDependenciesTo.Items.Remove(clf.cpatch);
+                }
+                else
+                {
+                    MessageBox.Show($"Существует зависимость по Z-патчам: {zpatchFrom} -> {zpatchTo}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
         private void BtCPatchAddDependenciesTo_Click(object sender, EventArgs e)
         {
-            CPatchesListForm clf = new CPatchesListForm(currCPatch.dependenciesTo);
+            CPatchesListForm clf = new CPatchesListForm(currRelease.cpatches.Where(x => x != currCPatch));
             if (clf.ShowDialog() == DialogResult.OK)
             {
-                currCPatch.AddDependencyTo(clf.cpatch);
-                LboxCPatchDependenciesTo.Items.Add(clf.cpatch);
+                //если нет обратной зависимости
+                if (!CPatch.HaveTransitiveDependency(clf.cpatch, currCPatch))
+                {
+                    currCPatch.AddDependencyTo(clf.cpatch);
+                    LboxCPatchDependenciesTo.Items.Add(clf.cpatch);
+                }
+                else
+                {
+                    MessageBox.Show($"Есть зависимость {clf.cpatch} -> {currCPatch} (возможно, транзитивная)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -393,11 +422,23 @@ namespace CoreApp
 
         private void BtZPatchAddDependenciesFrom_Click(object sender, EventArgs e)
         {
-            ZPatchesListForm zlf = new ZPatchesListForm(currZPatch.dependenciesFrom);
+            ZPatchesListForm zlf = new ZPatchesListForm(
+                currRelease.cpatches
+                .SelectMany(x => x.zpatches)
+                .Where(x => x != currZPatch)
+                .OrderBy(x => x.ZPatchName));
             if (zlf.ShowDialog() == DialogResult.OK)
             {
-                currZPatch.AddDependencyFrom(zlf.zpatch);
-                LboxZPatchDependenciesFrom.Items.Add(zlf.zpatch);
+                //если нет обратной зависимости
+                if (!ZPatch.HaveTransitiveDependency(currZPatch, zlf.zpatch))
+                {
+                    currZPatch.AddDependencyFrom(zlf.zpatch);
+                    LboxZPatchDependenciesFrom.Items.Add(zlf.zpatch);
+                }
+                else
+                {
+                    MessageBox.Show($"Есть зависимость {currZPatch} -> {zlf.zpatch} (возможно, транзитивная)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -413,12 +454,46 @@ namespace CoreApp
 
         private void BtZPatchAddDependenciesTo_Click(object sender, EventArgs e)
         {
-            ZPatchesListForm zlf = new ZPatchesListForm(currZPatch.dependenciesTo);
+            ZPatchesListForm zlf = new ZPatchesListForm(
+                currRelease.cpatches
+                .SelectMany(x => x.zpatches)
+                .Where(x => x != currZPatch)
+                .OrderBy(x => x.ZPatchName));
+
             if (zlf.ShowDialog() == DialogResult.OK)
-            {
-                currZPatch.AddDependencyTo(zlf.zpatch);
-                LboxZPatchDependenciesTo.Items.Add(zlf.zpatch);
+            {                
+                //если нет обратной зависимости
+                if (!ZPatch.HaveTransitiveDependency(zlf.zpatch, currZPatch))
+                {
+                    currZPatch.AddDependencyTo(zlf.zpatch);
+                    LboxZPatchDependenciesTo.Items.Add(zlf.zpatch);
+                }
+                else
+                {
+                    MessageBox.Show($"Есть зависимость {zlf.zpatch} -> {currZPatch} (возможно, транзитивная)", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
+        }
+
+        private void BtReleaseRename_Click(object sender, EventArgs e)
+        {
+            mainTree.LabelEdit = true;
+            editing = GetReleaseNode(mainTree.SelectedNode);
+            editing.BeginEdit();
+        }
+
+        private void BtCPatchRename_Click(object sender, EventArgs e)
+        {
+            mainTree.LabelEdit = true;
+            editing = GetCPatchNode(mainTree.SelectedNode);
+            editing.BeginEdit();
+        }
+
+        private void BtZPatchRename_Click(object sender, EventArgs e)
+        {
+            mainTree.LabelEdit = true;
+            editing = GetZPatchNode(mainTree.SelectedNode);
+            editing.BeginEdit();
         }
     }
 }
