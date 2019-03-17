@@ -124,11 +124,11 @@ namespace CoreApp
         public void Check(bool UMEnabled)
         {
             //StartOfCheck();
-            foreach(var fp in release.cpatches)
+            foreach(var fp in release.CPatches)
             {
-                foreach(var patch in fp.zpatches)
+                foreach(var patch in fp.ZPatches)
                 {
-                    foreach (FileInfo file in patch.dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                    foreach (FileInfo file in patch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
                         if (file.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase) &&
                             (UMEnabled || !FileScUtils.IsUMFile(file)))

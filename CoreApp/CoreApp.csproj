@@ -90,9 +90,16 @@
     <Compile Include="Dicts\ObjectDict.cs" />
     <Compile Include="Dicts\OraObjectDict.cs" />
     <Compile Include="FileScUtils.cs" />
+    <Compile Include="Forms\ScenarioForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ScenarioForm.Designer.cs">
+      <DependentUpon>ScenarioForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="IniUtils\IniUtils.cs" />
     <Compile Include="OraUtils\DAL\CPatchDAL.cs" />
-    <Compile Include="OraUtils\DAL\CVSProjectsDAL.cs" />
+    <Compile Include="OraUtils\DAL\CPatchStateDAL.cs" />
+    <Compile Include="OraUtils\DAL\ZPatchStateDAL.cs" />
     <Compile Include="OraUtils\DBManager.cs" />
     <Compile Include="OraUtils\DAL\ReleaseDAL.cs" />
     <Compile Include="OraUtils\DAL\ZPatchDAL.cs" />
@@ -162,6 +169,7 @@
     <Compile Include="Forms\ZPatchOrderForm.Designer.cs">
       <DependentUpon>ZPatchOrderForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Scenario\Scenario.cs" />
     <EmbeddedResource Include="Forms\AddForm.resx">
       <DependentUpon>AddForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -170,6 +178,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\CPatchesListForm.resx">
       <DependentUpon>CPatchesListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ScenarioForm.resx">
+      <DependentUpon>ScenarioForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

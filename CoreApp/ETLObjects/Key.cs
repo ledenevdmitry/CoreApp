@@ -10,8 +10,8 @@ namespace CoreApp.Keys
     {
         public Key(string objName, string objType)
         {
-            this.objName = objName;
-            this.objType = objType;
+            this.ObjName = objName;
+            this.ObjType = objType;
         }
 
         public Key()
@@ -19,16 +19,16 @@ namespace CoreApp.Keys
 
         }
 
-        public string objName { get; set; }
-        public string objType { get; set; }
+        public string ObjName { get; set; }
+        public string ObjType { get; set; }
 
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
             if (obj.GetType() != this.GetType()) return false;
             Key other = (Key)obj;
-            return objName.Equals(other.objName, StringComparison.CurrentCultureIgnoreCase) &&
-                   objType.Equals(other.objType, StringComparison.CurrentCultureIgnoreCase);
+            return ObjName.Equals(other.ObjName, StringComparison.CurrentCultureIgnoreCase) &&
+                   ObjType.Equals(other.ObjType, StringComparison.CurrentCultureIgnoreCase);
 
         }
 
@@ -37,8 +37,8 @@ namespace CoreApp.Keys
             unchecked
             {
                 int hash = 17;
-                hash = hash * 23 + objName.GetHashCode();
-                hash = hash * 23 + objType.GetHashCode();
+                hash = hash * 23 + ObjName.GetHashCode();
+                hash = hash * 23 + ObjType.GetHashCode();
                 return hash;
             }
         }

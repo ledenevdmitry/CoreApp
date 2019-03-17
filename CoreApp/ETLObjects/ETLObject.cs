@@ -9,7 +9,7 @@ namespace CoreApp.Keys
 {
     public class ETLObject : Key
     {
-        public ZPatch patch { get; set; }
+        public ZPatch Patch { get; set; }
 
         public ETLObject()
         {
@@ -18,14 +18,14 @@ namespace CoreApp.Keys
 
         public ETLObject(string objName, string objType, ZPatch patch) : base(objName, objType)
         {
-            this.patch = patch;
+            this.Patch = patch;
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return base.GetHashCode() * 23 + patch.GetHashCode();
+                return base.GetHashCode() * 23 + Patch.GetHashCode();
             }
         }
 
@@ -35,7 +35,7 @@ namespace CoreApp.Keys
             if (obj.GetType() != this.GetType()) return false;
             ETLObject other = (ETLObject)obj;
 
-            return patch.ZPatchName.Equals(other.patch.ZPatchName, StringComparison.CurrentCultureIgnoreCase);
+            return Patch.ZPatchName.Equals(other.Patch.ZPatchName, StringComparison.CurrentCultureIgnoreCase);
         }
 
     }

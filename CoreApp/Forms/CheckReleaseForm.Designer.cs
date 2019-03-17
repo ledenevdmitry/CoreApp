@@ -30,6 +30,8 @@
         {
             this.dgvObjects = new System.Windows.Forms.DataGridView();
             this.MainMenu = new System.Windows.Forms.MenuStrip();
+            this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.CheckAllCPatchesInDir = new System.Windows.Forms.ToolStripMenuItem();
             this.настройкаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TSMIUmState = new System.Windows.Forms.ToolStripMenuItem();
             this.mainTabControl = new System.Windows.Forms.TabControl();
@@ -42,8 +44,6 @@
             this.dgvLostDependencies = new System.Windows.Forms.DataGridView();
             this.notFoundFiles = new System.Windows.Forms.TabPage();
             this.dgvNotFoundFiles = new System.Windows.Forms.DataGridView();
-            this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.CheckAllCPatchesInDir = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dgvObjects)).BeginInit();
             this.MainMenu.SuspendLayout();
             this.mainTabControl.SuspendLayout();
@@ -61,11 +61,12 @@
             // dgvObjects
             // 
             this.dgvObjects.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvObjects.Location = new System.Drawing.Point(0, 0);
+            this.dgvObjects.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvObjects.Location = new System.Drawing.Point(3, 3);
             this.dgvObjects.Name = "dgvObjects";
             this.dgvObjects.RowHeadersVisible = false;
             this.dgvObjects.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dgvObjects.Size = new System.Drawing.Size(626, 374);
+            this.dgvObjects.Size = new System.Drawing.Size(620, 371);
             this.dgvObjects.TabIndex = 0;
             // 
             // MainMenu
@@ -78,6 +79,21 @@
             this.MainMenu.Size = new System.Drawing.Size(634, 24);
             this.MainMenu.TabIndex = 1;
             this.MainMenu.Text = "menuStrip1";
+            // 
+            // файлToolStripMenuItem
+            // 
+            this.файлToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.CheckAllCPatchesInDir});
+            this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
+            this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
+            this.файлToolStripMenuItem.Text = "Файл";
+            // 
+            // CheckAllCPatchesInDir
+            // 
+            this.CheckAllCPatchesInDir.Name = "CheckAllCPatchesInDir";
+            this.CheckAllCPatchesInDir.Size = new System.Drawing.Size(180, 22);
+            this.CheckAllCPatchesInDir.Text = "Проверить";
+            this.CheckAllCPatchesInDir.Click += new System.EventHandler(this.CheckAllCPatchesInDir_Click);
             // 
             // настройкаToolStripMenuItem
             // 
@@ -101,12 +117,13 @@
             this.mainTabControl.Controls.Add(this.allPrereq);
             this.mainTabControl.Controls.Add(this.notFoundObjPage);
             this.mainTabControl.Controls.Add(this.notFoundFiles);
-            this.mainTabControl.Location = new System.Drawing.Point(0, 27);
+            this.mainTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainTabControl.Location = new System.Drawing.Point(0, 24);
             this.mainTabControl.Name = "mainTabControl";
             this.mainTabControl.SelectedIndex = 0;
-            this.mainTabControl.Size = new System.Drawing.Size(634, 400);
+            this.mainTabControl.Size = new System.Drawing.Size(634, 403);
             this.mainTabControl.TabIndex = 3;
-            this.mainTabControl.SelectedIndexChanged += new System.EventHandler(this.mainTabControl_SelectedIndexChanged);
+            this.mainTabControl.SelectedIndexChanged += new System.EventHandler(this.MainTabControl_SelectedIndexChanged);
             // 
             // objPage
             // 
@@ -114,7 +131,7 @@
             this.objPage.Location = new System.Drawing.Point(4, 22);
             this.objPage.Name = "objPage";
             this.objPage.Padding = new System.Windows.Forms.Padding(3);
-            this.objPage.Size = new System.Drawing.Size(626, 374);
+            this.objPage.Size = new System.Drawing.Size(626, 377);
             this.objPage.TabIndex = 0;
             this.objPage.Text = "Все объекты";
             this.objPage.UseVisualStyleBackColor = true;
@@ -125,7 +142,7 @@
             this.intersectionsPage.Location = new System.Drawing.Point(4, 22);
             this.intersectionsPage.Name = "intersectionsPage";
             this.intersectionsPage.Padding = new System.Windows.Forms.Padding(3);
-            this.intersectionsPage.Size = new System.Drawing.Size(626, 374);
+            this.intersectionsPage.Size = new System.Drawing.Size(626, 377);
             this.intersectionsPage.TabIndex = 1;
             this.intersectionsPage.Text = "Пересечения";
             this.intersectionsPage.UseVisualStyleBackColor = true;
@@ -133,11 +150,12 @@
             // dgvIntersections
             // 
             this.dgvIntersections.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvIntersections.Location = new System.Drawing.Point(0, 0);
+            this.dgvIntersections.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvIntersections.Location = new System.Drawing.Point(3, 3);
             this.dgvIntersections.Name = "dgvIntersections";
             this.dgvIntersections.RowHeadersVisible = false;
             this.dgvIntersections.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dgvIntersections.Size = new System.Drawing.Size(626, 374);
+            this.dgvIntersections.Size = new System.Drawing.Size(620, 371);
             this.dgvIntersections.TabIndex = 1;
             // 
             // allPrereq
@@ -145,7 +163,7 @@
             this.allPrereq.Controls.Add(this.dgvAllDependencies);
             this.allPrereq.Location = new System.Drawing.Point(4, 22);
             this.allPrereq.Name = "allPrereq";
-            this.allPrereq.Size = new System.Drawing.Size(626, 374);
+            this.allPrereq.Size = new System.Drawing.Size(626, 377);
             this.allPrereq.TabIndex = 2;
             this.allPrereq.Text = "Все пререквизиты";
             this.allPrereq.UseVisualStyleBackColor = true;
@@ -153,11 +171,12 @@
             // dgvAllDependencies
             // 
             this.dgvAllDependencies.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvAllDependencies.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvAllDependencies.Location = new System.Drawing.Point(0, 0);
             this.dgvAllDependencies.Name = "dgvAllDependencies";
             this.dgvAllDependencies.RowHeadersVisible = false;
             this.dgvAllDependencies.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dgvAllDependencies.Size = new System.Drawing.Size(626, 374);
+            this.dgvAllDependencies.Size = new System.Drawing.Size(626, 377);
             this.dgvAllDependencies.TabIndex = 1;
             // 
             // notFoundObjPage
@@ -165,7 +184,7 @@
             this.notFoundObjPage.Controls.Add(this.dgvLostDependencies);
             this.notFoundObjPage.Location = new System.Drawing.Point(4, 22);
             this.notFoundObjPage.Name = "notFoundObjPage";
-            this.notFoundObjPage.Size = new System.Drawing.Size(626, 374);
+            this.notFoundObjPage.Size = new System.Drawing.Size(626, 377);
             this.notFoundObjPage.TabIndex = 3;
             this.notFoundObjPage.Text = "Ненайденные пререквизиты";
             this.notFoundObjPage.UseVisualStyleBackColor = true;
@@ -185,7 +204,7 @@
             this.notFoundFiles.Controls.Add(this.dgvNotFoundFiles);
             this.notFoundFiles.Location = new System.Drawing.Point(4, 22);
             this.notFoundFiles.Name = "notFoundFiles";
-            this.notFoundFiles.Size = new System.Drawing.Size(626, 374);
+            this.notFoundFiles.Size = new System.Drawing.Size(626, 377);
             this.notFoundFiles.TabIndex = 4;
             this.notFoundFiles.Text = "Ненайденные файлы";
             this.notFoundFiles.UseVisualStyleBackColor = true;
@@ -193,27 +212,13 @@
             // dgvNotFoundFiles
             // 
             this.dgvNotFoundFiles.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvNotFoundFiles.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvNotFoundFiles.Location = new System.Drawing.Point(0, 0);
             this.dgvNotFoundFiles.Name = "dgvNotFoundFiles";
             this.dgvNotFoundFiles.RowHeadersVisible = false;
             this.dgvNotFoundFiles.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.dgvNotFoundFiles.Size = new System.Drawing.Size(626, 374);
+            this.dgvNotFoundFiles.Size = new System.Drawing.Size(626, 377);
             this.dgvNotFoundFiles.TabIndex = 2;
-            // 
-            // файлToolStripMenuItem
-            // 
-            this.файлToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.CheckAllCPatchesInDir});
-            this.файлToolStripMenuItem.Name = "файлToolStripMenuItem";
-            this.файлToolStripMenuItem.Size = new System.Drawing.Size(48, 20);
-            this.файлToolStripMenuItem.Text = "Файл";
-            // 
-            // CheckAllFixpacksInDir
-            // 
-            this.CheckAllCPatchesInDir.Name = "CheckAllFixpacksInDir";
-            this.CheckAllCPatchesInDir.Size = new System.Drawing.Size(180, 22);
-            this.CheckAllCPatchesInDir.Text = "Проверить";
-            this.CheckAllCPatchesInDir.Click += new System.EventHandler(this.CheckAllCPatchesInDir_Click);
             // 
             // CheckReleaseForm
             // 
@@ -224,8 +229,7 @@
             this.Controls.Add(this.MainMenu);
             this.MainMenuStrip = this.MainMenu;
             this.Name = "CheckReleaseForm";
-            this.Text = "Объекты поставки";
-            this.Resize += new System.EventHandler(this.Form1_Resize);
+            this.Text = "Объекты релиза";
             ((System.ComponentModel.ISupportInitialize)(this.dgvObjects)).EndInit();
             this.MainMenu.ResumeLayout(false);
             this.MainMenu.PerformLayout();

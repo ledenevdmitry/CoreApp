@@ -25,19 +25,19 @@ namespace CoreApp.Dicts
 
         public void AddObjectConsiderIntersections(ETLObject obj)
         {
-            Key key = new Key(obj.objName, obj.objType);           
+            Key key = new Key(obj.ObjName, obj.ObjType);           
 
             if (baseDict.oneToManyPairs.ContainsKey(key) && //если объект уже был в таблице
-               !baseDict.oneToManyPairs[key].ContainsValue(obj.patch)) //а добавляется из другого патча
+               !baseDict.oneToManyPairs[key].ContainsValue(obj.Patch)) //а добавляется из другого патча
             {
                 if (!intersections.oneToManyPairs.ContainsKey(key)) //если его еще нет в пересечениях, добавляем тот, с кем он пересекся
                 {
                     ETLObject oldObj = baseDict.SingleValue(key);
-                    intersections.Add(key, oldObj, oldObj.patch);
+                    intersections.Add(key, oldObj, oldObj.Patch);
                 }
-                intersections.Add(key, obj, obj.patch); //добавляем новый в пересечение
+                intersections.Add(key, obj, obj.Patch); //добавляем новый в пересечение
             }
-            baseDict.Add(key, obj, obj.patch);
+            baseDict.Add(key, obj, obj.Patch);
         }
     }
 

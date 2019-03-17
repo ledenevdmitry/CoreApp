@@ -34,7 +34,7 @@ namespace CoreApp.ReleaseObjects
 
         private void InitFromDB()
         {
-            var oraReleases = ReleaseDAL.getReleases();
+            var oraReleases = ReleaseDAL.GetReleases();
             releases = new List<Release>();
             releasesDict = new Dictionary<int, Release>();
             foreach (var oraRelease in oraReleases)
@@ -42,7 +42,7 @@ namespace CoreApp.ReleaseObjects
                 Release release = new Release(oraRelease.releaseId, oraRelease.releaseName, this);
                 release.rm = this;
                 releases.Add(release);
-                releasesDict.Add(release.releaseId, release);
+                releasesDict.Add(release.ReleaseId, release);
             }
         }
 
@@ -54,7 +54,7 @@ namespace CoreApp.ReleaseObjects
             }
             Release newRelease = new Release(ReleaseDAL.Insert(releaseName), releaseName, this);
             releases.Add(newRelease);
-            releasesDict.Add(newRelease.releaseId, newRelease);
+            releasesDict.Add(newRelease.ReleaseId, newRelease);
             return newRelease;
         }
 

@@ -10,16 +10,16 @@ namespace CoreApp.OraUtils
 {
     class ZPatchOrderDAL
     {
-        private static string insertScript = 
+        private static readonly string insertScript = 
             "insert into zpatchorder_hdim " +
             "( zpatch_id,  zpatch_order , validfrom, validto, dwsact ) " +
             "values " +
            $"(:zpatch_id, :zpatch_order, sysdate, {DBManager.PlusInf}, 'I') ";
 
-        private static string closeOld =
+        private static readonly string closeOld =
             $"update zpatchorder_hdim set validto = sysdate where validto = {DBManager.PlusInf} and dwsact <> 'D' and zpatch_id = :zpatch_id ";
 
-        private static string insertNew(string dmlType)
+        private static string InsertNew(string dmlType)
         {
             return
             "insert into zpatchorder_hdim " +
@@ -60,7 +60,7 @@ namespace CoreApp.OraUtils
                 new OracleParameter("zpatch_id", zpatch_id));
 
             DBManager.ExecuteNonQuery(
-                insertNew("U"),
+                InsertNew("U"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("zpatch_order", zpatch_order));
@@ -78,15 +78,15 @@ namespace CoreApp.OraUtils
                 new OracleParameter("zpatch_id", zpatch_id));
 
             DBManager.ExecuteNonQuery(
-                insertNew("D"),
+                InsertNew("D"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id));
 
             transaction.Commit();
         }
 
-        static string allZPatchOrders = $"select zpatch_id, zpatch_order from zpatchorder_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' ";
-        static string ZPatchOrdersByCPatch =
+        static readonly string allZPatchOrders = $"select zpatch_id, zpatch_order from zpatchorder_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' ";
+        static readonly string ZPatchOrdersByCPatch =
             "select o.zpatch_id, o.zpatch_order " +
             "from zpatchorder_hdim o join " +
             "(select distinct zpatch_id from zpatch_hdim z " +

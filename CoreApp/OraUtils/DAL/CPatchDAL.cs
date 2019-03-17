@@ -10,13 +10,13 @@ namespace CoreApp.OraUtils
 {
     class CPatchDAL
     {
-        private static string insertScript =
+        private static readonly string insertScript =
             "insert into cpatch_hdim " +
             "( cpatch_id,  parent_id,  release_id,  cpatch_name,  cpatchstatus,  kod_sredy, validfrom, validto, dwsact) " +
             "values " +
            $"(:cpatch_id, :parent_id, :release_id, :cpatch_name, :cpatchstatus, :kod_sredy, sysdate, {DBManager.PlusInf}, 'I') " ;
 
-        public static string insertionsNew(char dmlType, params string[] pars)
+        public static string InsertionsNew(char dmlType, params string[] pars)
         {
             string joinedPars = DBManager.JoinParams(pars);
 
@@ -60,11 +60,12 @@ namespace CoreApp.OraUtils
             return res;
         }
 
-        static string updateStatus = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatchstatus" }));
-        static string updateName = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatch_name" }));
-        static string updateRelease = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "release_id" }));
+        static readonly string updateStatus = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatchstatus" }));
+        static readonly string updateEnvCode = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "kod_sredy" }));
+        static readonly string updateName = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "cpatch_name" }));
+        static readonly string updateRelease = Update(new string[] { "cpatch_id" }, new HashSet<string>(new string[] { "release_id" }));
 
-        public static string closeOld(params string[] pars)
+        public static string CloseOld(params string[] pars)
         {
             string res = 
             "update cpatch_hdim " +
@@ -86,7 +87,7 @@ namespace CoreApp.OraUtils
         */
 
 
-        private static string addDependencyScript =
+        private static readonly string addDependencyScript =
         "insert into cpatch_hdim " +
         "( cpatch_id,  parent_id,  release_id,  cpatch_name,  cpatchstatus, kod_sredy, validfrom, validto, dwsact ) " +
         "select " +
@@ -128,7 +129,7 @@ namespace CoreApp.OraUtils
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-                closeOld("cpatch_id"),
+                CloseOld("cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
 
@@ -141,12 +142,30 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
+        public static void UpdateEnvCode(int cpatch_id, string kod_sredy)
+        {
+            OracleTransaction transaction = DBManager.BeginTransaction();
+
+            DBManager.ExecuteNonQuery(
+                CloseOld("cpatch_id"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id));
+
+            DBManager.ExecuteNonQuery(
+                updateEnvCode,
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id),
+                new OracleParameter("kod_sredy", kod_sredy));
+
+            transaction.Commit();
+        }
+
         public static void UpdateName(int cpatch_id, string cpatch_name)
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-                closeOld("cpatch_id"),
+                CloseOld("cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
 
@@ -164,7 +183,7 @@ namespace CoreApp.OraUtils
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-                closeOld("cpatch_id"),
+                CloseOld("cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
 
@@ -183,24 +202,24 @@ namespace CoreApp.OraUtils
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-                closeOld("cpatch_id"),
+                CloseOld("cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
 
             DBManager.ExecuteNonQuery(
-                insertionsNew('D', "cpatch_id"),
-                transaction,
-                new OracleParameter("cpatch_id", cpatch_id));
-
-
-            DBManager.ExecuteNonQuery(
-                ZPatchDAL.closeOld("cpatch_id"),
+                InsertionsNew('D', "cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
 
 
             DBManager.ExecuteNonQuery(
-                ZPatchDAL.insertionsNew('D', "cpatch_id"),
+                ZPatchDAL.CloseOld("cpatch_id"),
+                transaction,
+                new OracleParameter("cpatch_id", cpatch_id));
+
+
+            DBManager.ExecuteNonQuery(
+                ZPatchDAL.InsertionsNew('D', "cpatch_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id));
 
@@ -211,13 +230,13 @@ namespace CoreApp.OraUtils
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(                
-                closeOld("cpatch_id", "parent_id"),
+                CloseOld("cpatch_id", "parent_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id),
                 new OracleParameter("parent_id", parent_id));
 
             DBManager.ExecuteNonQuery(
-                insertionsNew('D', "cpatch_id", "parent_id"),
+                InsertionsNew('D', "cpatch_id", "parent_id"),
                 transaction,
                 new OracleParameter("cpatch_id", cpatch_id),
                 new OracleParameter("parent_id", parent_id));
@@ -225,7 +244,7 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        static string allCPatchesScript = 
+        static readonly string allCPatchesScript = 
             $"select " +
             $"cpatch_id, " +
             $"max(cpatch_name), " +
@@ -238,7 +257,7 @@ namespace CoreApp.OraUtils
             $"group by cpatch_id " +
             $"order by max(cpatch_name) ";
 
-        static string CPatchesByRelease = 
+        static readonly string CPatchesByRelease = 
             $"select " +
             $"cpatch_id, " +
             $"max(cpatch_name), " +
@@ -249,7 +268,7 @@ namespace CoreApp.OraUtils
             $"group by cpatch_id " +
             $"order by max(cpatch_name) ";
 
-        static string dependenciesTo = 
+        static readonly string dependenciesTo = 
             $"select " +
             $"cpatch_id, " +
             $"max(cpatch_name), " +
@@ -260,7 +279,7 @@ namespace CoreApp.OraUtils
             $"group by cpatch_id " +
             $"order by max(cpatch_name) ";
 
-        static string dependenciesFrom = 
+        static readonly string dependenciesFrom = 
             "select " +
             "c2.cpatch_id, " +
             "max(c2.cpatch_name), " +
@@ -274,28 +293,28 @@ namespace CoreApp.OraUtils
             $"order by max(c2.cpatch_name) ";
 
 
-        public static IEnumerable<CPatchRecord> getCPatches()
+        public static IEnumerable<CPatchRecord> GetCPatches()
         {
-            return getByScript(allCPatchesScript);
+            return GetByScript(allCPatchesScript);
         }
 
-        public static IEnumerable<CPatchRecord> getCPatchesByRelease(int release_id)
+        public static IEnumerable<CPatchRecord> GetCPatchesByRelease(int release_id)
         {
-            return getByScript(CPatchesByRelease, new OracleParameter("release_id", release_id));
+            return GetByScript(CPatchesByRelease, new OracleParameter("release_id", release_id));
         }
 
 
-        public static IEnumerable<CPatchRecord> getDependenciesFrom(int cpatch_id)
+        public static IEnumerable<CPatchRecord> GetDependenciesFrom(int cpatch_id)
         {
-            return getByScript(dependenciesFrom, new OracleParameter("cpatch_id", cpatch_id));
+            return GetByScript(dependenciesFrom, new OracleParameter("cpatch_id", cpatch_id));
         }
 
-        public static IEnumerable<CPatchRecord> getDependenciesTo(int cpatch_id)
+        public static IEnumerable<CPatchRecord> GetDependenciesTo(int cpatch_id)
         {
-            return getByScript(dependenciesTo, new OracleParameter("cpatch_id", cpatch_id));
+            return GetByScript(dependenciesTo, new OracleParameter("cpatch_id", cpatch_id));
         }
 
-        static string containsCPatch = $"select * from dual where (select 1 from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_NAME = :cpatch_name)";
+        static readonly string containsCPatch = $"select * from dual where (select 1 from cpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and cpatch_NAME = :cpatch_name)";
 
         public static bool Contains(string cpatch_name)
         {
@@ -314,7 +333,7 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static IEnumerable<CPatchRecord> getByScript(string script, params OracleParameter [] parameters)
+        public static IEnumerable<CPatchRecord> GetByScript(string script, params OracleParameter [] parameters)
         {
             using (var reader = DBManager.ExecuteQuery(script, parameters))
             {

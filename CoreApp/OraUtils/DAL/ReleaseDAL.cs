@@ -22,14 +22,14 @@ namespace CoreApp.OraUtils
              "validto = (select max(validto) from release_hdim " +
             $"where release_id = :release_id) and release_id = :release_id";
 
-        private static string closeOld =
+        private static readonly string closeOld =
              "update release_hdim " +
              "set validto = sysdate " +
              "where " +
             $"validto = {DBManager.PlusInf} " +
              "and release_id = :release_id ";
 
-        private static string updateScript  =
+        private static readonly string updateScript  =
              "insert into release_hdim " +
              "( release_id,  release_name, validfrom, validto, dwsact ) " +
              "select " +
@@ -41,7 +41,7 @@ namespace CoreApp.OraUtils
              "validto = (select max(validto) from release_hdim " +
             $"where release_id = :release_id) and release_id = :release_id";
 
-        private static string insertScript =
+        private static readonly string insertScript =
             "insert into release_hdim " +
             "( release_id,  release_name, validfrom, validto, dwsact) " +
             "values " +
@@ -98,12 +98,12 @@ namespace CoreApp.OraUtils
                 new OracleParameter("release_id", release_id));
 
             DBManager.ExecuteNonQuery(
-                CPatchDAL.closeOld("release_id"),
+                CPatchDAL.CloseOld("release_id"),
                 transaction,
                 new OracleParameter("release_id", release_id));
 
             DBManager.ExecuteNonQuery(
-                CPatchDAL.insertionsNew('D', "release_id"),
+                CPatchDAL.InsertionsNew('D', "release_id"),
                 transaction,
                 new OracleParameter("release_id", release_id));
 
@@ -120,12 +120,12 @@ namespace CoreApp.OraUtils
             transaction.Commit();
         }
 
-        public static IEnumerable<ReleaseRecord> getReleases()
+        public static IEnumerable<ReleaseRecord> GetReleases()
         {
-            return getByScript(allReleasesScript);
+            return GetByScript(allReleasesScript);
         }
 
-        static string allReleasesScript = 
+        static readonly string allReleasesScript = 
             $"select release_id, " +
             $"max(release_name) " +
             $"from release_hdim " +
@@ -133,14 +133,14 @@ namespace CoreApp.OraUtils
             $"group by release_id " +
             $"order by max(release_name) ";
 
-        static string containsRelease = $"select * from dual where exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_name = :release_name) ";
+        static readonly string containsRelease = $"select * from dual where exists (select 1 from release_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and release_name = :release_name) ";
 
         public static bool Contains(string release_name)
         {
             return DBManager.ExecuteQuery(containsRelease, new OracleParameter(":release_name", release_name)).HasRows;
         }
 
-        private static IEnumerable<ReleaseRecord> getByScript(string script, params OracleParameter [] parameters)
+        private static IEnumerable<ReleaseRecord> GetByScript(string script, params OracleParameter [] parameters)
         {
             using (var reader = DBManager.ExecuteQuery(script, parameters))
             {

@@ -10,13 +10,13 @@ namespace CoreApp.OraUtils
 {
     class ZPatchDAL
     {
-        private static string insertScript =
+        private static readonly string insertScript =
             "insert into zpatch_hdim " +
             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name, zpatchstatus, validfrom, validto, dwsact ) " +
             "values " +
            $"(:zpatch_id, :parent_id, :cpatch_id, :zpatch_name, :zpatchstatus, sysdate, {DBManager.PlusInf}, 'I') ";
 
-        public static string insertionsNew(char dmlType, params string[] pars)
+        public static string InsertionsNew(char dmlType, params string[] pars)
         {
             string joinedPars = DBManager.JoinParams(pars);
             string res =
@@ -33,7 +33,7 @@ namespace CoreApp.OraUtils
             return res;
         }
 
-        public static string closeOld(params string[] pars)
+        public static string CloseOld(params string[] pars)
         {
             string res =
             "update zpatch_hdim " +
@@ -72,9 +72,9 @@ namespace CoreApp.OraUtils
             return res;
         }
         
-        static string updateStatus = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "zpatchstatus" }));
-        static string updateName = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "zpatch_name" }));
-        static string updateCPatch = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "cpatch_id" }));
+        static readonly string updateStatus = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "zpatchstatus" }));
+        static readonly string updateName = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "zpatch_name" }));
+        static readonly string updateCPatch = Update(new string[] { "zpatch_id" }, new HashSet<string>(new string[] { "cpatch_id" }));
 
         public static string deleteByReleaseCloseOld =
             "update zpatch_hdim z " +
@@ -107,7 +107,7 @@ namespace CoreApp.OraUtils
                         "where z1.zpatch_id = z.zpatch_id and c1.release_id = :release_id)";
 
 
-        private static string addDependencyScript =
+        private static readonly string addDependencyScript =
             "insert into zpatch_hdim " +
             "( zpatch_id,  parent_id,  cpatch_id,  zpatch_name,  zpatchstatus, validfrom, validto, dwsact ) " +
             "select " +
@@ -121,7 +121,7 @@ namespace CoreApp.OraUtils
             "'I' " +
             "from zpatch_hdim where zpatch_id = :zpatch_id ";
 
-        private static string ZPatchInstalledScript =
+        private static readonly string ZPatchInstalledScript =
             "select 1 from dual " +
             "where exists (select 1 from patch_stat where command_text like '%:zpatch_name%' and status = 0) " +
             "and not exists(select 1 from patch_stat where command_text like '%:zpatch_name%' and status <> 0)";
@@ -164,7 +164,7 @@ namespace CoreApp.OraUtils
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
-                closeOld("zpatch_id"),
+                CloseOld("zpatch_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("zpatch_name", zpatch_name));
@@ -182,7 +182,7 @@ namespace CoreApp.OraUtils
         {
             OracleTransaction transaction = DBManager.BeginTransaction();
             DBManager.ExecuteNonQuery(
-                closeOld("zpatch_id"),
+                CloseOld("zpatch_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("zpatchstatus", zpatchstatus));
@@ -201,12 +201,12 @@ namespace CoreApp.OraUtils
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-                closeOld("zpatch_id"),
+                CloseOld("zpatch_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id));
 
             DBManager.ExecuteNonQuery(
-                insertionsNew('D', "zpatch_id"),
+                InsertionsNew('D', "zpatch_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id));
 
@@ -218,13 +218,13 @@ namespace CoreApp.OraUtils
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-            closeOld("zpatch_id", "parent_id"),
+            CloseOld("zpatch_id", "parent_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("parent_id", parent_id));
 
             DBManager.ExecuteNonQuery(
-                insertionsNew('D', "zpatch_id", "parent_id"),
+                InsertionsNew('D', "zpatch_id", "parent_id"),
                 transaction,
                 new OracleParameter("zpatch_id", zpatch_id),
                 new OracleParameter("parent_id", parent_id));
@@ -246,7 +246,7 @@ namespace CoreApp.OraUtils
 
 
 
-        static string allZPatchesScript = 
+        static readonly string allZPatchesScript = 
             $"select " +
             $"zpatch_id, " +
             $"max(zpatch_name), " +
@@ -256,7 +256,7 @@ namespace CoreApp.OraUtils
             $"group by zpatch_id " +
             $"order by max(zpatch_name) ";
 
-        static string ZPatchesByCPatch = 
+        static readonly string ZPatchesByCPatch = 
             $"select " +
             $"zpatch_id, " +
             $"max(zpatch_name), " +
@@ -266,7 +266,7 @@ namespace CoreApp.OraUtils
             $"group by zpatch_id " +
             $"order by max(zpatch_name) ";
 
-        static string dependenciesTo = 
+        static readonly string dependenciesTo = 
             $"select " +
             $"zpatch_id, " +
             $"max(zpatch_name), " +
@@ -276,7 +276,7 @@ namespace CoreApp.OraUtils
             $"group by zpatch_id " +
             $"order by max(zpatch_name) ";
 
-        static string dependenciesFrom =
+        static readonly string dependenciesFrom =
              "select " +
             "z2.zpatch_id, " +
             "max(z2.zpatch_name), " +
@@ -288,27 +288,27 @@ namespace CoreApp.OraUtils
             $"group by z2.zpatch_id " +
             $"order by max(z2.zpatch_name) ";
 
-        public static IEnumerable<ZPatchRecord> getCPatches()
+        public static IEnumerable<ZPatchRecord> GetCPatches()
         {
-            return getByScript(allZPatchesScript);
+            return GetByScript(allZPatchesScript);
         }
 
-        public static IEnumerable<ZPatchRecord> getZPatchesByCPatch(int cpatch_id)
+        public static IEnumerable<ZPatchRecord> GetZPatchesByCPatch(int cpatch_id)
         {
-            return getByScript(ZPatchesByCPatch, new OracleParameter("cpatch_id", cpatch_id));
+            return GetByScript(ZPatchesByCPatch, new OracleParameter("cpatch_id", cpatch_id));
         }
 
-        public static IEnumerable<ZPatchRecord> getDependenciesFrom(int zpatch_id)
+        public static IEnumerable<ZPatchRecord> GetDependenciesFrom(int zpatch_id)
         {
-            return getByScript(dependenciesFrom, new OracleParameter("zpatch_id", zpatch_id));
+            return GetByScript(dependenciesFrom, new OracleParameter("zpatch_id", zpatch_id));
         }
 
-        public static IEnumerable<ZPatchRecord> getDependenciesTo(int zpatch_id)
+        public static IEnumerable<ZPatchRecord> GetDependenciesTo(int zpatch_id)
         {
-            return getByScript(dependenciesTo, new OracleParameter("zpatch_id", zpatch_id));
+            return GetByScript(dependenciesTo, new OracleParameter("zpatch_id", zpatch_id));
         }
 
-        private static IEnumerable<ZPatchRecord> getByScript(string script, params OracleParameter[] parameters)
+        private static IEnumerable<ZPatchRecord> GetByScript(string script, params OracleParameter[] parameters)
         {
             using (var reader = DBManager.ExecuteQuery(script, parameters))
             {
@@ -322,7 +322,7 @@ namespace CoreApp.OraUtils
             }
         }
 
-        static string containsZPatch = $"select * from dual where exists (select 1 from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and zpatch_NAME = :zpatch_name)";
+        static readonly string containsZPatch = $"select * from dual where exists (select 1 from zpatch_hdim where validto = {DBManager.PlusInf} and dwsact <> 'D' and zpatch_NAME = :zpatch_name)";
 
         private static bool Contains(string zpatch_name)
         {
@@ -334,7 +334,7 @@ namespace CoreApp.OraUtils
             OracleTransaction transaction = DBManager.BeginTransaction();
 
             DBManager.ExecuteNonQuery(
-                closeOld("zpatch_id"),
+                CloseOld("zpatch_id"),
                 transaction,
                 new OracleParameter("zpatch_id", cpatch_id));
 

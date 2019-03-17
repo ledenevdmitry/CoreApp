@@ -19,34 +19,34 @@ namespace CoreApp.ReleaseObjects
 
     public class Release
     {
-        public int releaseId { get; private set; }
+        public int ReleaseId { get; private set; }
 
         public override int GetHashCode()
         {
-            return releaseId.GetHashCode();
+            return ReleaseId.GetHashCode();
         }
 
         public override string ToString()
         {
-            return releaseName;
+            return ReleaseName;
         }
 
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
             if (obj.GetType() != typeof(Release)) return false;
-            return ((Release)obj).releaseId == releaseId;
+            return ((Release)obj).ReleaseId == ReleaseId;
         }
 
-        public string releaseName { get; private set; }
-        public string releaseStatus { get; private set; }
-        public List<CPatch> cpatches { get; private set; } //отсортированный на DAL
+        public string ReleaseName { get; private set; }
+        public string ReleaseStatus { get; private set; }
+        public List<CPatch> CPatches { get; private set; } //отсортированный на DAL
         public Dictionary<int, CPatch> CPatchesDict { get; private set; } //для поиска
         public ReleaseManager rm;
 
 
 
-        public CPatch getCPatchById(int id)
+        public CPatch GetCPatchById(int id)
         {
             return CPatchesDict[id];
         }
@@ -59,42 +59,29 @@ namespace CoreApp.ReleaseObjects
 
         public void InitCPatches()
         {
-            var oraCPatches = CPatchDAL.getCPatchesByRelease(releaseId);
+            var oraCPatches = CPatchDAL.GetCPatchesByRelease(ReleaseId);
 
-            CPatchStatuses status;
-            EnvCodes kod_sredy;
-            cpatches = new List<CPatch>();
+            CPatches = new List<CPatch>();
             CPatchesDict = new Dictionary<int, CPatch>();
 
             foreach (var oraCPatch in oraCPatches)
             {
-
-                if(!Enum.TryParse(oraCPatch.CPatchStatus, out status))
-                {
-                    status = CPatchStatuses.UNDEFINED;
-                }
-
-                if(!Enum.TryParse(oraCPatch.Kod_Sredy, out kod_sredy))
-                {
-                    kod_sredy = EnvCodes.UNDEFINED;
-                }
-
                 CPatch cpatch = new CPatch(
                     oraCPatch.CPatchId, 
                     oraCPatch.CPatchName,
-                    status, 
-                    kod_sredy, 
+                    oraCPatch.CPatchStatus, 
+                    oraCPatch.Kod_Sredy, 
                     this);                
 
-                cpatches.Add(cpatch);
+                CPatches.Add(cpatch);
                 CPatchesDict.Add(cpatch.CPatchId, cpatch);
             }
 
-            foreach (CPatch cpatch in cpatches)
+            foreach (CPatch cpatch in CPatches)
             {
                 cpatch.SetDependencies();
 
-                foreach (ZPatch zpatch in cpatch.zpatches)
+                foreach (ZPatch zpatch in cpatch.ZPatches)
                 {
                     zpatch.SetDependencies();
                 }
@@ -103,39 +90,20 @@ namespace CoreApp.ReleaseObjects
 
         private void InitFromDB(int releaseId, string releaseName)
         {
-            cpatches = new List<CPatch>();
+            CPatches = new List<CPatch>();
             CPatchesDict = new Dictionary<int, CPatch>();
-            this.releaseId = releaseId;
-            this.releaseName = releaseName;
+            this.ReleaseId = releaseId;
+            this.ReleaseName = releaseName;
         }
 
         DirectoryInfo localDir;
         public static CVS.CVS cvs;
 
-        private void setAttributesNormal(DirectoryInfo dir)
-        {
-            foreach (var subDir in dir.GetDirectories())
-                setAttributesNormal(subDir);
-            foreach (var file in dir.GetFiles())
-            {
-                file.Attributes = FileAttributes.Normal;
-            }
-        }
-
         public void Delete()
         {
-            ReleaseDAL.Delete(releaseId);
+            ReleaseDAL.Delete(ReleaseId);
             rm.releases.Remove(this);
-            rm.releasesDict.Remove(releaseId);
-        }
-
-        public void DeleteLocal()
-        {
-            if (localDir.Exists)
-            {
-                setAttributesNormal(localDir);
-                localDir.Delete(true);
-            }
+            rm.releasesDict.Remove(ReleaseId);
         }
 
         public void SetLocalDir(DirectoryInfo localDir)
@@ -152,17 +120,17 @@ namespace CoreApp.ReleaseObjects
 
         public void Rename(string newName)
         {
-            if (newName != null && newName != releaseName)
+            if (newName != null && newName != ReleaseName)
             {
-                releaseName = newName;
-                ReleaseDAL.Update(releaseId, newName);
+                ReleaseName = newName;
+                ReleaseDAL.Update(ReleaseId, newName);
             }
         }
 
         public Graph DrawGraph()
         {
             Graph graph = new Graph(); 
-            foreach(CPatch cpatch in cpatches)
+            foreach(CPatch cpatch in CPatches)
             {
                 Node node = new Node(cpatch.CPatchId.ToString());
                 node.Label.Text = cpatch.CPatchName.Replace(' ', '\n');
@@ -171,9 +139,9 @@ namespace CoreApp.ReleaseObjects
                 graph.AddNode(node);
             }
 
-            foreach (CPatch cpatch in cpatches)
+            foreach (CPatch cpatch in CPatches)
             {
-                foreach(CPatch depFrom in cpatch.dependenciesFrom)
+                foreach(CPatch depFrom in cpatch.DependenciesFrom)
                 {
                     graph.AddEdge(depFrom.CPatchId.ToString(), cpatch.CPatchId.ToString());
                 }

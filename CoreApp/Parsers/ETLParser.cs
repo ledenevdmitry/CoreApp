@@ -11,44 +11,29 @@ namespace CoreApp.Parsers
 {
     class ETLParser
     {
-        public InfaParser infaParser { get; protected set; }
-        public InfaObjectDict infaObjectDict { get; protected set; }
+        public InfaParser InfaParser { get; protected set; }
+        public InfaObjectDict InfaObjectDict { get; protected set; }
 
-        public SqlParser sqlParser { get; protected set; }
-        public OraObjectDict oraObjectDict { get; protected set; }
+        public SqlParser SqlParser { get; protected set; }
+        public OraObjectDict OraObjectDict { get; protected set; }
 
-        private Release release;
-
-        /*
-        public int fileCount()
-        {
-            int res = 0;
-            foreach(Fixpack fp in fixpacks)
-            {
-                foreach(Patch p in fp.patches.Values)
-                {
-                    res += p.objs.Count;
-                }
-            }
-            return res;
-        }
-        */
+        private readonly Release release;
         
         public ETLParser(Release release)
         {
             this.release = release;
 
-            infaObjectDict = new InfaObjectDict();
-            infaParser = new InfaParser(release, infaObjectDict);
+            InfaObjectDict = new InfaObjectDict();
+            InfaParser = new InfaParser(release, InfaObjectDict);
 
-            oraObjectDict = new OraObjectDict();
-            sqlParser = new SqlParser(release, oraObjectDict);
+            OraObjectDict = new OraObjectDict();
+            SqlParser = new SqlParser(release, OraObjectDict);
         }
 
         public void Check(bool UMEnabled)
         {
-            infaParser.Check();
-            sqlParser.Check(UMEnabled);
+            InfaParser.Check();
+            SqlParser.Check(UMEnabled);
         }
 
     }

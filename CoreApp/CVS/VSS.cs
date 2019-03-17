@@ -12,9 +12,12 @@ namespace CoreApp.CVS
 {
     public class VSS : CVS
     {
-        public VSSDatabase vssDatabase { get; private set; }
+        public VSSDatabase VSSDB { get; private set; }
 
-        public VSS(string location, string login) : base(location, login) { }
+        public VSS(string location, string login) : base(location, login)
+        {
+            Connect();
+        }
 
         public VSS() : base() { }
 
@@ -22,8 +25,8 @@ namespace CoreApp.CVS
         {
             try
             {
-                vssDatabase = new VSSDatabase();
-                vssDatabase.Open(location, login, "");
+                VSSDB = new VSSDatabase();
+                VSSDB.Open(Location, Login, "");
             }
             catch (System.Runtime.InteropServices.COMException exc)
             {
@@ -44,7 +47,7 @@ namespace CoreApp.CVS
         {
             try
             {
-                vssDatabase.get_VSSItem(source, false);
+                VSSDB.get_VSSItem(source, false);
             }
             catch (System.Runtime.InteropServices.COMException exc)
             {
@@ -67,7 +70,7 @@ namespace CoreApp.CVS
         public override IEnumerable<string> AllInEntireBase(string root, List<string> matches, Regex pattern, int depth)
         {
             Queue<Tuple<VSSItem, int>> queue = new Queue<Tuple<VSSItem, int>>();
-            queue.Enqueue(new Tuple<VSSItem, int>(vssDatabase.get_VSSItem(root, false), 0));
+            queue.Enqueue(new Tuple<VSSItem, int>(VSSDB.get_VSSItem(root, false), 0));
             while (queue.Count > 0)
             {
                 Tuple<VSSItem, int> currItem = queue.Dequeue();
@@ -91,10 +94,10 @@ namespace CoreApp.CVS
             throw new ArgumentException("File Not Found");
         }
 
-        public override string FirstInEntireBase(string root, ref string match, Regex pattern, int depth)
+        public override string FirstInEntireBase(string root, out string match, Regex pattern, int depth)
         {
             Queue<Tuple<VSSItem, int>> queue = new Queue<Tuple<VSSItem, int>>();
-            queue.Enqueue(new Tuple<VSSItem, int>(vssDatabase.get_VSSItem(root, false), 0));
+            queue.Enqueue(new Tuple<VSSItem, int>(VSSDB.get_VSSItem(root, false), 0));
             while(queue.Count > 0)
             {
                 Tuple<VSSItem, int> currItem = queue.Dequeue();
@@ -133,7 +136,7 @@ namespace CoreApp.CVS
             VSSItem destFolder;
             try
             {
-                destFolder = vssDatabase.get_VSSItem(destination, false);
+                destFolder = VSSDB.get_VSSItem(destination, false);
             }
             catch (System.Runtime.InteropServices.COMException exc)
             {
@@ -151,7 +154,7 @@ namespace CoreApp.CVS
                     try
                     {
                         rwl.EnterReadLock();
-                        VSSItem movingFolder = vssDatabase.get_VSSItem(item, false);
+                        VSSItem movingFolder = VSSDB.get_VSSItem(item, false);
                         rwl.ExitReadLock();
                         movingFolder.Move(destFolder);
                         AfterMove(item, movingFolder);
@@ -174,7 +177,7 @@ namespace CoreApp.CVS
         {
             try
             {
-                VSSItem folder = vssDatabase.get_VSSItem(oldName, false);
+                VSSItem folder = VSSDB.get_VSSItem(oldName, false);
                 folder.Name = newName;
             }
             catch (System.Runtime.InteropServices.COMException exc)
@@ -187,30 +190,61 @@ namespace CoreApp.CVS
             }
         }
 
-        public override void Download(string dir, string destination)
+        private void DeleteLocalIfNotExistsInVSS(VSSItem folder, DirectoryInfo destination)
+        {
+            foreach(var subFile in destination.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
+            {
+                bool found = false;
+                foreach(VSSItem subitem in folder.Items)
+                {
+                    //1 - файл
+                    if(subitem.Type == 1 && subitem.Name.Equals(subFile.Name))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found)
+                {
+                    if (!subFile.Name.Equals("vssver2.scc", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        subFile.Delete();
+                    }
+                }
+            }
+
+            foreach(VSSItem subitem in folder.Items)
+            {
+                //0 - папка
+                if (subitem.Type == 0)
+                {
+                    DirectoryInfo subdestination = new DirectoryInfo(Path.Combine(destination.FullName, subitem.Name));
+                    DeleteLocalIfNotExistsInVSS(subitem, subdestination);
+                }
+            }
+        }
+
+        public override void Download(string dir, DirectoryInfo destination)
         {
             try
             {
-                VSSItem folder = vssDatabase.get_VSSItem(dir, false);
-                if (!Directory.Exists(destination))
+                VSSItem folder = VSSDB.get_VSSItem(dir, false);                
+                if (!destination.Exists)
                 {
-                    Directory.CreateDirectory(destination);
+                    destination.Create();
                 }
-                folder.Get(destination, (int)VSSFlags.VSSFLAG_RECURSYES);
+                folder.Get(destination.FullName, (int)(VSSFlags.VSSFLAG_RECURSYES | VSSFlags.VSSFLAG_REPREPLACE));
+                DeleteLocalIfNotExistsInVSS(folder, destination);
             }
             catch (System.Runtime.InteropServices.COMException exc)
             {
                 throw new ArgumentException(VSSErrors.GetMessageByCode(exc.ErrorCode));
             }
-            catch
-            {
-                throw new Exception("Неопознанная ошибка");
-            }
         }
 
         public override void Close()
         {
-            vssDatabase.Close();
+            VSSDB.Close();
         }
     }
 }

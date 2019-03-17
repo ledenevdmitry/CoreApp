@@ -35,12 +35,12 @@ namespace CoreApp.FormUtils
 
         public static void AddNotFoundFiles(DataGridView dictDGV, ETLParser parser)
         {
-            foreach(FileInfo file in parser.oraObjectDict.notFoundFiles)
+            foreach(FileInfo file in parser.OraObjectDict.notFoundFiles)
             {
                 dictDGV.Rows.Add(file.FullName);
             }
 
-            foreach(FileInfo file in parser.infaObjectDict.notFoundFiles)
+            foreach(FileInfo file in parser.InfaObjectDict.notFoundFiles)
             {
                 dictDGV.Rows.Add(file.FullName);
             }
@@ -49,18 +49,18 @@ namespace CoreApp.FormUtils
 
         public static void AddObjectsInDGV(DataGridView dictDGV, ETLParser parser)
         {
-            foreach(KeyValuePair<ETLObject, ZPatch> item in parser.oraObjectDict.baseDict.EnumerateObjPatchPairs())
+            foreach(KeyValuePair<ETLObject, ZPatch> item in parser.OraObjectDict.baseDict.EnumerateObjPatchPairs())
             {
                 ETLObject oraObj = item.Key;
                 ZPatch patch = item.Value;
-                dictDGV.Rows.Add(oraObj.objName, oraObj.objType, patch.ZPatchName);
+                dictDGV.Rows.Add(oraObj.ObjName, oraObj.ObjType, patch.ZPatchName);
             }
 
-            foreach (KeyValuePair<ETLObject, ZPatch> item in parser.infaObjectDict.baseDict.EnumerateObjPatchPairs())
+            foreach (KeyValuePair<ETLObject, ZPatch> item in parser.InfaObjectDict.baseDict.EnumerateObjPatchPairs())
             {
                 ETLObject infaObj = item.Key;
                 ZPatch patch = item.Value;
-                dictDGV.Rows.Add(infaObj.objName, infaObj.objType, patch.ZPatchName);
+                dictDGV.Rows.Add(infaObj.ObjName, infaObj.ObjType, patch.ZPatchName);
             }
 
             dictDGV.AutoResizeColumns(DataGridViewAutoSizeColumnsMode.AllCells);
@@ -69,7 +69,7 @@ namespace CoreApp.FormUtils
         public static void AddIntersectionsInDGV(DataGridView dictDGV, ETLParser parser)
         {
             bool colorDeterminator = false;
-            foreach (var pairs in  parser.oraObjectDict.intersections.EnumerateByDistinctKeys())
+            foreach (var pairs in  parser.OraObjectDict.intersections.EnumerateByDistinctKeys())
             {
                 foreach (var pair in pairs)
                 {
@@ -77,8 +77,8 @@ namespace CoreApp.FormUtils
                     ZPatch patch = pair.Value;
                     DataGridViewRow row = new DataGridViewRow();
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
-                    row.Cells[0].Value = oraObj.objName;
-                    row.Cells[1].Value = oraObj.objType;
+                    row.Cells[0].Value = oraObj.ObjName;
+                    row.Cells[1].Value = oraObj.ObjType;
                     row.Cells[2].Value = patch.ZPatchName;
                     row.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                     dictDGV.Rows.Add(row);                    
@@ -86,7 +86,7 @@ namespace CoreApp.FormUtils
                 colorDeterminator = !colorDeterminator;
             }
 
-            foreach (var pairs in parser.infaObjectDict.intersections.EnumerateByDistinctKeys())
+            foreach (var pairs in parser.InfaObjectDict.intersections.EnumerateByDistinctKeys())
             {
                 foreach (var pair in pairs)
                 {
@@ -94,7 +94,7 @@ namespace CoreApp.FormUtils
                     ZPatch patch = pair.Value;
                     DataGridViewRow row = new DataGridViewRow();
                     row.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
-                    row.Cells[0].Value = infaObj.objName;
+                    row.Cells[0].Value = infaObj.ObjName;
                     row.Cells[1].Value = infaObj.GetType().Name;
                     row.Cells[2].Value = patch.ZPatchName;
                     row.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
@@ -108,23 +108,23 @@ namespace CoreApp.FormUtils
         public static void AddAllDependenciesInDGV(DataGridView dictDGV, ETLParser parser)
         {
             bool colorDeterminator = false;
-            foreach (KeyValuePair<ETLObject, ETLObject> item in parser.infaObjectDict.infaDependencies.EnumeratePairs())
+            foreach (KeyValuePair<ETLObject, ETLObject> item in parser.InfaObjectDict.infaDependencies.EnumeratePairs())
             {
                 ETLObject infaObj1 = item.Key;
                 DataGridViewRow row1 = new DataGridViewRow();
                 row1.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
-                row1.Cells[0].Value = infaObj1.objName;
+                row1.Cells[0].Value = infaObj1.ObjName;
                 row1.Cells[1].Value = infaObj1.GetType().Name;
-                row1.Cells[2].Value = infaObj1.patch.ZPatchName;
+                row1.Cells[2].Value = infaObj1.Patch.ZPatchName;
                 row1.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row1);
 
                 ETLObject infaObj2 = item.Value;
                 DataGridViewRow row2 = new DataGridViewRow();
                 row2.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
-                row2.Cells[0].Value = infaObj2.objName;
+                row2.Cells[0].Value = infaObj2.ObjName;
                 row2.Cells[1].Value = infaObj2.GetType().Name;
-                row2.Cells[2].Value = infaObj2.patch.ZPatchName;
+                row2.Cells[2].Value = infaObj2.Patch.ZPatchName;
                 row2.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row2);
 
@@ -136,23 +136,23 @@ namespace CoreApp.FormUtils
         public static void AddLostDependenciesInDGV(DataGridView dictDGV, ETLParser parser)
         {
             bool colorDeterminator = false;
-            foreach (KeyValuePair<ETLObject, ETLObject> item in parser.infaObjectDict.infaLostDependencies.EnumeratePairs())
+            foreach (KeyValuePair<ETLObject, ETLObject> item in parser.InfaObjectDict.infaLostDependencies.EnumeratePairs())
             {
                 ETLObject infaObj1 = item.Key;
                 DataGridViewRow row1 = new DataGridViewRow();
                 row1.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
-                row1.Cells[0].Value = infaObj1.objName;
+                row1.Cells[0].Value = infaObj1.ObjName;
                 row1.Cells[1].Value = infaObj1.GetType().Name;
-                row1.Cells[2].Value = infaObj1.patch.ZPatchName;
+                row1.Cells[2].Value = infaObj1.Patch.ZPatchName;
                 row1.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row1);
 
                 ETLObject infaObj2 = item.Value;
                 DataGridViewRow row2 = new DataGridViewRow();
                 row2.Cells.AddRange(new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell(), new DataGridViewTextBoxCell());
-                row2.Cells[0].Value = infaObj2.objName;
+                row2.Cells[0].Value = infaObj2.ObjName;
                 row2.Cells[1].Value = infaObj2.GetType().Name;
-                row2.Cells[2].Value = infaObj2.patch.ZPatchName;
+                row2.Cells[2].Value = infaObj2.Patch.ZPatchName;
                 row2.DefaultCellStyle.BackColor = colorDeterminator ? Color.LightCyan : Color.LightYellow;
                 dictDGV.Rows.Add(row2);
 

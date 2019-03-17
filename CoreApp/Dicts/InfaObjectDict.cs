@@ -21,8 +21,6 @@ namespace CoreApp.Dicts
             infaDependencies = new ObjToParentsDict();
             infaLostDependencies = new ObjToParentsDict();
         }
-
-        //!!!!!!!!!!!!!!!!!Обязательная вторая проверка
     }
 
 

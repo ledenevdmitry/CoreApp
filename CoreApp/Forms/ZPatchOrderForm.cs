@@ -40,7 +40,7 @@ namespace CoreApp
             int currPatchIndex = LboxZPatchOrder.SelectedIndex;
             ZPatch prevPatch = (ZPatch)LboxZPatchOrder.Items[currPatchIndex - 1];
 
-            if(prevPatch.dependenciesTo.Contains(currPatch) || currPatch.dependenciesFrom.Contains(prevPatch))
+            if(prevPatch.DependenciesTo.Contains(currPatch) || currPatch.DependenciesFrom.Contains(prevPatch))
             {
                 MessageBox.Show($"Патч {prevPatch} влияет на {currPatch}, удалите зависимость и попробуйте снова", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -59,7 +59,7 @@ namespace CoreApp
             int currPatchIndex = LboxZPatchOrder.SelectedIndex;
             ZPatch nextPatch = (ZPatch)LboxZPatchOrder.Items[currPatchIndex + 1];
 
-            if (nextPatch.dependenciesFrom.Contains(currPatch) || currPatch.dependenciesTo.Contains(nextPatch))
+            if (nextPatch.DependenciesFrom.Contains(currPatch) || currPatch.DependenciesTo.Contains(nextPatch))
             {
                 MessageBox.Show($"Патч {nextPatch} зависит от {currPatch}, удалите зависимость и попробуйте снова", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
