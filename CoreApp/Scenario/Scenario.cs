@@ -25,6 +25,9 @@ namespace CoreApp.Scenario
         public IEnumerable<Tuple<LineState, string>> CreateScenarioFromZPatches()
         {
             List<Tuple<LineState, string>> scenario = new List<Tuple<LineState, string>>();
+            var cpatchTuple = new Tuple<LineState, string>(LineState.normal, cpatch.CPatchName);
+            scenario.Add(cpatchTuple);
+            scenario.Add(cpatchTuple);
 
             List<string> inScenarioFiles = new List<string>();
 
@@ -79,29 +82,36 @@ namespace CoreApp.Scenario
                             }
                             catch (ArgumentOutOfRangeException) { }
                         }
+                    }
 
-                        foreach (var file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                    foreach (var file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                    {
+                        if (IsCorrectFile(file.Name))
                         {
-                            if (IsCorrectFile(file.Name))
+                            if (!inScenarioFiles.Contains(file.FullName, StringComparer.InvariantCultureIgnoreCase))
                             {
-                                if (!inScenarioFiles.Contains(file.FullName, StringComparer.InvariantCultureIgnoreCase))
+                                string scenarioLine = ScenarioLineFromFile(zpatch, file, out int newLinePriority);
+                                int i = 0;
+                                bool inserted = false;
+                                foreach (var item in zpatchScenario)
                                 {
-                                    string scenarioLine = ScenarioLineFromFile(zpatch, file, out int newLinePriority);
-                                    int i = 0;
-                                    foreach (var item in zpatchScenario)
+                                    if (Priority(item.Item2, out string prefix) >= newLinePriority)
                                     {
-                                        if (Priority(item.Item2, out string prefix) >= newLinePriority)
-                                        {
-                                            zpatchScenario.Insert(i, new Tuple<LineState, string>(LineState.notInScenario, scenarioLine));
-                                            break;
-                                        }
-                                        ++i;
+                                        zpatchScenario.Insert(i, new Tuple<LineState, string>(LineState.notInScenario, scenarioLine));
+                                        inserted = true;
+                                        break;
                                     }
+                                    ++i;
+                                }
+                                //если нужно вставлять в конец или еще не добавляли
+                                if(!inserted || zpatchScenario.Count == 0)
+                                {
+                                    zpatchScenario.Add(new Tuple<LineState, string>(LineState.notInScenario, scenarioLine));
                                 }
                             }
                         }
-                        scenario.AddRange(zpatchScenario);
                     }
+                    scenario.AddRange(zpatchScenario);
                 }
             }
 

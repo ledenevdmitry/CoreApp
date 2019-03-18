@@ -127,6 +127,14 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
+        public void Download()
+        {
+            foreach(CPatch cpatch in CPatches)
+            {
+                cpatch.Download();
+            }
+        }
+
         public Graph DrawGraph()
         {
             Graph graph = new Graph(); 

@@ -15,7 +15,6 @@ namespace CoreApp
     class SqlParser
     {
         public static string extension { get => ".sql"; }
-        //public static readonly string[] DDLStatements = Properties.Settings.Default.DDLSTM.Split('|');
         public static readonly string RegexComment;
         public static readonly string RegexWhiteSpaces;
         public static readonly string RegexWhiteSpacesStart;
@@ -39,10 +38,10 @@ namespace CoreApp
         static SqlParser()
         {
             RegexComment = @"((--.*?\Z)|(/\*[\s\S]*?\*/))";
-            RegexWhiteSpaces = @"(\s|(\r\n))+";
+            RegexWhiteSpaces = @"\s+";
             RegexWhiteSpacesStart = @"(\A|(\s+))";
             RegexWhiteSpacesEnd = @"(\Z|(\s+))";
-            RegexIdentifier = @"(([^\s',;\(\)])+)";
+            RegexIdentifier = @"(([^\s',;\\])+)";
             IdentifierRegex = new Regex(RegexIdentifier);
             RegexIndexingTable = "INDEX" +
                 RegexWhiteSpaces +
@@ -70,13 +69,13 @@ namespace CoreApp
             //проверка всех DDL 
             foreach (string objType in OraObjectTypes)
             {
-                Regex regex = new Regex(RegexWhiteSpacesStart + objType + RegexWhiteSpacesEnd, RegexOptions.IgnoreCase);
+                Regex regex = new Regex(RegexWhiteSpacesStart + objType + RegexWhiteSpacesEnd);
                 InsertionsByRegex(script, objType, file, dict, regex, patch);
             }
 
             foreach(string sttm in DMLStatements)
             {
-                Regex regex = new Regex(RegexWhiteSpacesStart + sttm + RegexWhiteSpacesEnd, RegexOptions.IgnoreCase);
+                Regex regex = new Regex(RegexWhiteSpacesStart + sttm + RegexWhiteSpacesEnd);
                 InsertionsByRegex(script, sttm, file, dict, regex, patch);
             }
 
@@ -110,37 +109,33 @@ namespace CoreApp
             RetrieveObjectsFromSQL(script, file, dict as OraObjectDict, patch);
         }
 
-        //public delegate void ResetProgress();
-        //public event ResetProgress StartOfCheck, ProgressChanged, EndOfCheck;     
-        /*
-        public int WorkAmoumt(List<FileInfo> files)
-        {
-            return files.Count(x => x.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase));
-        }
-        */
-
-
         //TODO: проверка фигня, сейчас проверяет пересечения только внутри патча Оо
         public void Check(bool UMEnabled)
         {
             //StartOfCheck();
-            foreach(var fp in release.CPatches)
+            foreach(var cpatch in release.CPatches)
             {
-                foreach(var patch in fp.ZPatches)
+                if (cpatch.Dir != null)
                 {
-                    foreach (FileInfo file in patch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                    foreach (var zpatch in cpatch.ZPatches)
                     {
-                        if (file.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase) &&
-                            (UMEnabled || !FileScUtils.IsUMFile(file)))
+                        if (zpatch.Dir != null)
                         {
-                            if (file.Exists)
+                            foreach (FileInfo file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                             {
-                                RetrieveObjectsFromFile(file, dict, patch);
-                                //ProgressChanged();
-                            }
-                            else
-                            {
-                                dict.notFoundFiles.Add(file);
+                                if (file.Extension.Equals(extension, StringComparison.CurrentCultureIgnoreCase) &&
+                                    (UMEnabled || !FileScUtils.IsUMFile(file)))
+                                {
+                                    if (file.Exists)
+                                    {
+                                        RetrieveObjectsFromFile(file, dict, zpatch);
+                                        //ProgressChanged();
+                                    }
+                                    else
+                                    {
+                                        dict.notFoundFiles.Add(file);
+                                    }
+                                }
                             }
                         }
                     }

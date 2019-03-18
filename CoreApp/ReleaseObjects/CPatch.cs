@@ -239,32 +239,43 @@ namespace CoreApp.ReleaseObjects
             string cvsRoot = CPatchStateDAL.GetCVSPath(CPatchStatus, KodSredy);
             string shortName = Regex.Match(CPatchName, @"C\d+").Value;
 
-            string cvsForder = cvs.FirstInEntireBase(cvsRoot, out string cpatchmatch, new Regex(shortName), 2);
-
-            foreach (ZPatch zpatch in ZPatches)
+            try
             {
-                if (zpatch.ZPatchStatus != "OPEN")
+
+                string cvsForder = cvs.FirstInEntireBase(cvsRoot, out string cpatchmatch, new Regex(shortName), 2);
+
+                foreach (ZPatch zpatch in ZPatches)
                 {
-                    string patchRoot = $"{cvsRoot}/{cpatchmatch}";
-                    try
+                    if (zpatch.ZPatchStatus != "OPEN")
                     {
-                        cvs.FirstInEntireBase(patchRoot, out string zpatchmatch, new Regex(zpatch.ZPatchName), 1);
-                        zpatch.Dir = new DirectoryInfo(Path.Combine(Dir.FullName, zpatchmatch));
-                    }
-                    catch
-                    {
-                        throw new DirectoryNotFoundException($"Патч {zpatch.ZPatchName} не найден. Добавьте его в папку C-патча или переведите статус в OPEN");
+                        string patchRoot = $"{cvsRoot}/{cpatchmatch}";
+                        try
+                        {
+                            cvs.FirstInEntireBase(patchRoot, out string zpatchmatch, new Regex(zpatch.ZPatchName), 1);
+                            zpatch.Dir = new DirectoryInfo(Path.Combine(Dir.FullName, zpatchmatch));
+                        }
+                        catch
+                        {
+                            throw new DirectoryNotFoundException($"Патч {zpatch.ZPatchName} не найден. Добавьте его в папку C-патча или переведите статус в OPEN");
+                        }
                     }
                 }
+
+                return cvsForder;
+            }
+            catch (ArgumentException e)
+            {
+                throw new DirectoryNotFoundException("Папка с C-патчем не найдена. Возможно, назначен неправильный статус или среда");
             }
 
-            return cvsForder;
         }
 
-        public void Download()
+        public string Download()
         {
+            cvsPath = GetCVSPath();
             SetAttributesNormal(Dir);
-            cvs.Download(GetCVSPath(), Dir);
+            cvs.Pull(cvsPath, Dir);
+            return cvsPath;
         }
 
         private void DeleteLocal()
@@ -406,9 +417,9 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
-        public IEnumerable<Tuple<LineState, string>> CreateScenario()
+        public IEnumerable<Tuple<LineState, string>> CreateScenario(out string cvsPath)
         {
-            Download();
+            cvsPath = Download();
             Scenario.Scenario scenario = new Scenario.Scenario(this);
             return scenario.CreateScenarioFromZPatches();
         }

@@ -79,3 +79,4 @@ C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ReleasesLis
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchesListForm.resources
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.ZPatchOrderForm.resources
 C:\Users\Dmitry\YandexDisk\CoreApp\CoreApp\CoreApp\obj\Debug\CoreApp.Forms.ScenarioForm.resources
+C:\Users\Alisa\Documents\Dmitry\CoreApp\CoreApp\obj\Debug\CoreApp.Forms.ScenarioForm.resources

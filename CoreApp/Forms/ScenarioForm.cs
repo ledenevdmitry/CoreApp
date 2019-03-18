@@ -1,8 +1,10 @@
-﻿using System;
+﻿using CoreApp.ReleaseObjects;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,15 +15,23 @@ namespace CoreApp.Forms
 {
     public partial class ScenarioForm : Form
     {
+        CVS.CVS cvs;
+        string cvsPath;
+        string localPath;
         IEnumerable<Tuple<LineState, string>> scenario;
 
-        public ScenarioForm(IEnumerable<Tuple<LineState, string>> scenario)
+        public ScenarioForm(IEnumerable<Tuple<LineState, string>> scenario, CVS.CVS cvs, string localPath, string cvsPath)
         {
             InitializeComponent();
+
+            Application.Idle += OnIdle;
 
             mainColumn.Width = LViewScenarioLines.Width;
 
             this.scenario = scenario;
+            this.cvs = cvs;
+            this.cvsPath = cvsPath;
+            this.localPath = localPath;
 
             int i = 0;
             foreach(var item in scenario)
@@ -49,14 +59,109 @@ namespace CoreApp.Forms
 
         }
 
+
+        private void OnIdle(object sender, EventArgs e)
+        {
+            BtUp.Enabled = LViewScenarioLines.SelectedItems.Count > 0 && LViewScenarioLines.SelectedIndices.IndexOf(0) == -1;
+            BtDown.Enabled = LViewScenarioLines.SelectedItems.Count > 0 && LViewScenarioLines.SelectedIndices.IndexOf(LViewScenarioLines.Items.Count - 1) == -1;
+        }
+
         private void BtUp_Click(object sender, EventArgs e)
         {
+            var itemsToMove = LViewScenarioLines.SelectedItems;
+            for (int i = 0; i < itemsToMove.Count; ++i)
+            {
+                var selectedItem = itemsToMove[i];
+                int oldIndex = LViewScenarioLines.Items.IndexOf(selectedItem);
+                int newIndex = oldIndex - 1;
 
+                var curr = LViewScenarioLines.Items[oldIndex];
+                var prev = LViewScenarioLines.Items[newIndex];
+
+                LViewScenarioLines.Items.Remove(selectedItem);
+                LViewScenarioLines.Items.Insert(newIndex, selectedItem);
+                LViewScenarioLines.Items[newIndex].Selected = true;
+                LViewScenarioLines.Select();
+            }
         }
 
         private void ScenarioForm_Resize(object sender, EventArgs e)
         {
             mainColumn.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+        }
+
+        private void BtDown_Click(object sender, EventArgs e)
+        {
+            var itemsToMove = LViewScenarioLines.SelectedItems;
+            for (int i = itemsToMove.Count - 1; i >= 0; --i)
+            {
+                var selectedItem = itemsToMove[i];
+                int oldIndex = LViewScenarioLines.Items.IndexOf(selectedItem);
+                int newIndex = oldIndex + 1;
+
+                var curr = LViewScenarioLines.Items[oldIndex];
+                var prev = LViewScenarioLines.Items[newIndex];
+
+                LViewScenarioLines.Items.Remove(selectedItem);
+                LViewScenarioLines.Items.Insert(newIndex, selectedItem);
+                LViewScenarioLines.Items[newIndex].Selected = true;
+                LViewScenarioLines.Select();
+            }
+        }
+
+        private void BtDeleteLines_Click(object sender, EventArgs e)
+        {
+            var itemsToDelete = LViewScenarioLines.SelectedItems;
+            int countAtStart = itemsToDelete.Count;
+
+            for (int i = 0; i < countAtStart; ++i)
+            {
+                var selectedItem = itemsToDelete[0];
+                LViewScenarioLines.Items.Remove(selectedItem);
+            }
+        }
+
+        private string CreateFinalScenario()
+        {
+            string scenario = "";
+            foreach (var item in LViewScenarioLines.Items)
+            {
+                scenario += ((ListViewItem)item).Text + Environment.NewLine;
+            }
+            return scenario;
+        }
+
+        private void BtSave_Click(object sender, EventArgs e)
+        {
+            string scenarioText = CreateFinalScenario();
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                FileName = "file_sc.txt"
+            };
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                using (StreamWriter sw = new StreamWriter(sfd.FileName))
+                {
+                    sw.Write(scenarioText);
+                }
+            }
+        }
+
+        private void BtLoadToCVS_Click(object sender, EventArgs e)
+        {
+            string scenarioText = CreateFinalScenario();
+
+            string cvsScPath = $"{cvsPath}/file_sc.txt";
+            cvs.PrepareToPush(cvsScPath);
+
+            string localScPath = Path.Combine(localPath, "file_sc.txt");
+            using (StreamWriter sw = new StreamWriter(localScPath))
+            {
+                sw.Write(scenarioText);
+            }
+
+            cvs.Push(localScPath, cvsScPath);        
         }
     }
 }

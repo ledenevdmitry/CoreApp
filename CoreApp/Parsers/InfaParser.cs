@@ -62,27 +62,33 @@ namespace CoreApp
             this.dict = dict;
             foreach(CPatch cpatch in release.CPatches)
             {
-                foreach(ZPatch zpatch in cpatch.ZPatches)
+                if (cpatch.Dir != null)
                 {
-                    foreach(FileInfo file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                    foreach (ZPatch zpatch in cpatch.ZPatches)
                     {
-                        if (file.Extension.Equals(Extension, StringComparison.CurrentCultureIgnoreCase))
+                        if (zpatch.Dir != null)
                         {
-                            if (file.Exists)
+                            foreach (FileInfo file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                             {
-                                xDoc = new XmlDocument();
-                                xDoc.Load(file.FullName);
-                                XmlNode objNode = null;
-                                Type type = null;
-                                objNode = GetObjNode(xDoc, ref type);
-                                if (objNode == null) throw new ArgumentException("В файле " + file.FullName + " не найден тип объекта");
-                                ObjName = objNode.Attributes.GetNamedItem("NAME").Value;
-                                InfaBaseObject obj = CreateInfaObject(type, ObjName, xDoc, file, zpatch);
-                                dict.AddObjectConsiderIntersections(obj);
-                            }
-                            else
-                            {
-                                dict.notFoundFiles.Add(file);
+                                if (file.Extension.Equals(Extension, StringComparison.CurrentCultureIgnoreCase))
+                                {
+                                    if (file.Exists)
+                                    {
+                                        xDoc = new XmlDocument();
+                                        xDoc.Load(file.FullName);
+                                        XmlNode objNode = null;
+                                        Type type = null;
+                                        objNode = GetObjNode(xDoc, ref type);
+                                        if (objNode == null) throw new ArgumentException("В файле " + file.FullName + " не найден тип объекта");
+                                        ObjName = objNode.Attributes.GetNamedItem("NAME").Value;
+                                        InfaBaseObject obj = CreateInfaObject(type, ObjName, xDoc, file, zpatch);
+                                        dict.AddObjectConsiderIntersections(obj);
+                                    }
+                                    else
+                                    {
+                                        dict.notFoundFiles.Add(file);
+                                    }
+                                }
                             }
                         }
                     }

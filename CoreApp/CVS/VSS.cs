@@ -224,7 +224,7 @@ namespace CoreApp.CVS
             }
         }
 
-        public override void Download(string dir, DirectoryInfo destination)
+        public override void Pull(string dir, DirectoryInfo destination)
         {
             try
             {
@@ -235,6 +235,46 @@ namespace CoreApp.CVS
                 }
                 folder.Get(destination.FullName, (int)(VSSFlags.VSSFLAG_RECURSYES | VSSFlags.VSSFLAG_REPREPLACE));
                 DeleteLocalIfNotExistsInVSS(folder, destination);
+            }
+            catch (System.Runtime.InteropServices.COMException exc)
+            {
+                throw new ArgumentException(VSSErrors.GetMessageByCode(exc.ErrorCode));
+            }
+        }
+
+        private void Unpin(VSSItem objItem)
+        {
+            int version = 0;
+            VSSItem objOldItem = objItem.Version[version];
+            VSSItem objProject = objItem.Parent;
+
+            objProject.Share(objOldItem, "", (int)VSSFlags.VSSFLAG_GETNO);
+        }
+
+        private void Pin(VSSItem objItem, int version)
+        {
+            VSSItem objOldItem = objItem.Version[version];
+            VSSItem objProject = objItem.Parent;
+
+            objProject.Share(objOldItem, "", 0);
+        }
+
+        public override void PrepareToPush(string destination)
+        {
+            IVSSItem item = VSSDB.get_VSSItem(destination, false);
+            Unpin((VSSItem)item);
+            ((VSSItem)item).Checkout(destination, destination, (int)VSSFlags.VSSFLAG_GETNO);
+        }
+
+        public override void Push(string source, string destination)
+        {
+            try
+            {
+                IVSSItem item = VSSDB.get_VSSItem(destination, false);
+                if(item.IsPinned)
+                {
+                    item.Checkin("", source);
+                }
             }
             catch (System.Runtime.InteropServices.COMException exc)
             {

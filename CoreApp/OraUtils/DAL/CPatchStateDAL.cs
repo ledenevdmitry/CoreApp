@@ -15,10 +15,14 @@ namespace CoreApp.OraUtils.DAL
 
         public static string GetCVSPath(string cpatchstatus, string kod_sredy)
         {
-            return GetByScript(
+            var res = GetByScript(
                 getCVSPathScript,
                 new OracleParameter("cpatchstatus", cpatchstatus),
-                new OracleParameter("kod_sredy", kod_sredy)).First();
+                new OracleParameter("kod_sredy", kod_sredy));
+            if (res.Count() == 0)
+                return null;
+            else
+                return res.First();
         }
 
         public static IEnumerable<string> GetEnvCodes()

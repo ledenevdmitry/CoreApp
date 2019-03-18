@@ -28,47 +28,57 @@ namespace CoreApp
 
         private void OnIdle(object sender, EventArgs e)
         {
-            BtUp.Enabled   = LboxZPatchOrder.SelectedItem != null && LboxZPatchOrder.SelectedIndex != 0;
-            BtDown.Enabled = LboxZPatchOrder.SelectedItem != null && LboxZPatchOrder.SelectedIndex != LboxZPatchOrder.Items.Count - 1;
+            BtUp.Enabled   = LboxZPatchOrder.SelectedItem != null && LboxZPatchOrder.SelectedIndices.IndexOf(0) == -1;
+            BtDown.Enabled = LboxZPatchOrder.SelectedItem != null && LboxZPatchOrder.SelectedIndices.IndexOf(LboxZPatchOrder.Items.Count - 1) == -1;
         }
         
 
         private void BtUp_Click(object sender, EventArgs e)
         {
-            ZPatch currPatch = (ZPatch)LboxZPatchOrder.SelectedItem;
-
-            int currPatchIndex = LboxZPatchOrder.SelectedIndex;
-            ZPatch prevPatch = (ZPatch)LboxZPatchOrder.Items[currPatchIndex - 1];
-
-            if(prevPatch.DependenciesTo.Contains(currPatch) || currPatch.DependenciesFrom.Contains(prevPatch))
+            var itemsToMove = LboxZPatchOrder.SelectedItems;
+            for(int i = 0; i < itemsToMove.Count; ++i)
             {
-                MessageBox.Show($"Патч {prevPatch} влияет на {currPatch}, удалите зависимость и попробуйте снова", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                var selectedItem = itemsToMove[i];
+                int oldIndex = LboxZPatchOrder.Items.IndexOf(selectedItem);
+                int newIndex = oldIndex - 1;
+
+                ZPatch curr = (ZPatch)LboxZPatchOrder.Items[oldIndex];
+                ZPatch prev = (ZPatch)LboxZPatchOrder.Items[newIndex];
+
+                if (prev.DependenciesTo.Contains(curr) || curr.DependenciesFrom.Contains(prev))
+                {
+                    MessageBox.Show($"Патч {prev} влияет на {curr}, удалите зависимость и попробуйте снова", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                LboxZPatchOrder.Items.Remove(selectedItem);
+                LboxZPatchOrder.Items.Insert(newIndex, selectedItem);
+                LboxZPatchOrder.SetSelected(newIndex, true);
             }
-
-            LboxZPatchOrder.Items[currPatchIndex] = prevPatch;
-            LboxZPatchOrder.Items[currPatchIndex - 1] = currPatch;
-
-            LboxZPatchOrder.SelectedIndex--;
         }
 
         private void BtDown_Click(object sender, EventArgs e)
         {
-            ZPatch currPatch = (ZPatch)LboxZPatchOrder.SelectedItem;
-
-            int currPatchIndex = LboxZPatchOrder.SelectedIndex;
-            ZPatch nextPatch = (ZPatch)LboxZPatchOrder.Items[currPatchIndex + 1];
-
-            if (nextPatch.DependenciesFrom.Contains(currPatch) || currPatch.DependenciesTo.Contains(nextPatch))
+            var itemsToMove = LboxZPatchOrder.SelectedItems;
+            for (int i = itemsToMove.Count - 1; i >= 0; --i)
             {
-                MessageBox.Show($"Патч {nextPatch} зависит от {currPatch}, удалите зависимость и попробуйте снова", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                var selectedItem = itemsToMove[i];
+                int oldIndex = LboxZPatchOrder.Items.IndexOf(selectedItem);
+                int newIndex = oldIndex + 1;
+
+                ZPatch curr = (ZPatch)LboxZPatchOrder.Items[oldIndex];
+                ZPatch next = (ZPatch)LboxZPatchOrder.Items[newIndex];
+
+                if (curr.DependenciesTo.Contains(next) || next.DependenciesFrom.Contains(curr))
+                {
+                    MessageBox.Show($"Патч {curr} влияет на {next}, удалите зависимость и попробуйте снова", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                LboxZPatchOrder.Items.Remove(selectedItem);
+                LboxZPatchOrder.Items.Insert(newIndex, selectedItem);
+                LboxZPatchOrder.SetSelected(newIndex, true);
             }
-
-            LboxZPatchOrder.Items[currPatchIndex] = nextPatch;
-            LboxZPatchOrder.Items[currPatchIndex + 1] = currPatch;
-
-            LboxZPatchOrder.SelectedIndex++;
         }
 
         private void BtConfirm_Click(object sender, EventArgs e)

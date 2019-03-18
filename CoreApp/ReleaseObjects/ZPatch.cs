@@ -162,7 +162,7 @@ namespace CoreApp.ReleaseObjects
             if (GetCVSPath(out string path))
             {
                 Dir = new DirectoryInfo($"{cpatch.release.rm.homeDir}/{cpatch.release.ReleaseName}/{cpatch.CPatchName}/{ZPatchName}");
-                cvs.Download(path, Dir);
+                cvs.Pull(path, Dir);
                 return true;
             }
             return false;
