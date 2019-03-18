@@ -156,6 +156,8 @@ namespace CoreApp.Forms
             cvs.PrepareToPush(cvsScPath);
 
             string localScPath = Path.Combine(localPath, "file_sc.txt");
+            File.SetAttributes(localScPath, FileAttributes.Normal);
+
             using (StreamWriter sw = new StreamWriter(localScPath))
             {
                 sw.Write(scenarioText);

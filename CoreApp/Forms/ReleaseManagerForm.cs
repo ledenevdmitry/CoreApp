@@ -87,8 +87,6 @@ namespace CoreApp
 
         private void DisplayCPatch()
         {
-            SCCPatch.SplitterDistance = SCCPatch.Width / 2;
-
             var currCPatch = CurrCPatch;
             CbCPatchStatus.SelectedItem = currCPatch.CPatchStatus;
             CbEnvCode.SelectedItem = currCPatch.KodSredy;
@@ -108,8 +106,6 @@ namespace CoreApp
 
         private void DisplayZPatch()
         {
-            SCZPatch.SplitterDistance = SCZPatch.Width / 2;
-
             var currZPatch = CurrZPatch;
             CbZPatchStatus.SelectedItem = currZPatch.ZPatchStatus;
 

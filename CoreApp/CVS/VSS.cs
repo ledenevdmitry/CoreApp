@@ -262,8 +262,16 @@ namespace CoreApp.CVS
         public override void PrepareToPush(string destination)
         {
             IVSSItem item = VSSDB.get_VSSItem(destination, false);
-            Unpin((VSSItem)item);
-            ((VSSItem)item).Checkout(destination, destination, (int)VSSFlags.VSSFLAG_GETNO);
+            if (item.IsPinned)
+            {
+                Unpin((VSSItem)item);
+            }
+
+            //!(file is checked out to the current user)
+            if (!(item.IsCheckedOut == 2))
+            {
+                item.Checkout();
+            }
         }
 
         public override void Push(string source, string destination)
@@ -271,10 +279,8 @@ namespace CoreApp.CVS
             try
             {
                 IVSSItem item = VSSDB.get_VSSItem(destination, false);
-                if(item.IsPinned)
-                {
-                    item.Checkin("", source);
-                }
+                item.Checkin("", source);
+                Pin((VSSItem)item, item.VersionNumber);
             }
             catch (System.Runtime.InteropServices.COMException exc)
             {
