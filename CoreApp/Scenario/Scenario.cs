@@ -19,7 +19,7 @@ namespace CoreApp.Scenario
 
         public enum LineState { oldScenario, newScenarioNormal, notInScenario, notInFiles } 
 
-        public Scenario(CPatch cpatch, IEnumerable<ZPatch> zpatches)
+        public Scenario(CPatch cpatch)
         {
             this.cpatch = cpatch;
         }

@@ -15,14 +15,6 @@ namespace CoreApp
     {
         CPatch cpatch;
 
-        public IEnumerable<ZPatch> GetSelectedPatches()
-        {
-            foreach(ZPatch zpatch in LboxZPatchOrder.SelectedItems)
-            {
-                yield return zpatch;
-            }
-        }
-
         public ZPatchOrderForm(CPatch cpatch)
         {
             this.cpatch = cpatch;
