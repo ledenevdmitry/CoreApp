@@ -224,17 +224,17 @@ namespace CoreApp.CVS
             }
         }
 
-        public override void Pull(string dir, DirectoryInfo destination)
+        public override void Pull(string vssPath, DirectoryInfo localPath)
         {
             try
             {
-                VSSItem folder = VSSDB.get_VSSItem(dir, false);                
-                if (!destination.Exists)
+                VSSItem folder = VSSDB.get_VSSItem(vssPath, false);                
+                if (!localPath.Exists)
                 {
-                    destination.Create();
+                    localPath.Create();
                 }
-                folder.Get(destination.FullName, (int)(VSSFlags.VSSFLAG_RECURSYES | VSSFlags.VSSFLAG_REPREPLACE));
-                DeleteLocalIfNotExistsInVSS(folder, destination);
+                folder.Get(localPath.FullName, (int)(VSSFlags.VSSFLAG_RECURSYES | VSSFlags.VSSFLAG_REPREPLACE));
+                DeleteLocalIfNotExistsInVSS(folder, localPath);
             }
             catch (System.Runtime.InteropServices.COMException exc)
             {
@@ -259,32 +259,72 @@ namespace CoreApp.CVS
             objProject.Share(objOldItem, "", 0);
         }
 
-        public override void PrepareToPush(string destination)
+        public override void PrepareToPush(string cvsFolder, string localFileName)
         {
-            IVSSItem item = VSSDB.get_VSSItem(destination, false);
-            if (item.IsPinned)
-            {
-                Unpin((VSSItem)item);
-            }
-
-            //!(file is checked out to the current user)
-            if (!(item.IsCheckedOut == 2))
-            {
-                item.Checkout();
-            }
-        }
-
-        public override void Push(string source, string destination)
-        {
+            string fileName = $"{cvsFolder}/{localFileName}";
             try
             {
-                IVSSItem item = VSSDB.get_VSSItem(destination, false);
-                item.Checkin("", source);
-                Pin((VSSItem)item, item.VersionNumber);
+                IVSSItem item = VSSDB.get_VSSItem(fileName, false);
+
+                if (item.IsPinned)
+                {
+                    Unpin((VSSItem)item);
+                }
+
+                //!(file is checked out to the current user)
+                if (!(item.IsCheckedOut == 2))
+                {
+                    item.Checkout();
+                }
             }
             catch (System.Runtime.InteropServices.COMException exc)
             {
-                throw new ArgumentException(VSSErrors.GetMessageByCode(exc.ErrorCode));
+                //file not found
+                if(!IsFileNotFoundError(exc))
+                {
+                    throw exc;
+                }
+            }
+        }
+
+        private bool IsFileNotFoundError(System.Runtime.InteropServices.COMException exc)
+        {
+            if ((short)exc.ErrorCode == -10609 || (short)exc.ErrorCode == -10421)
+                return true;
+            return false;
+        }
+
+        public override void Push(string localFolder, string localFileName, string cvsFolder)
+        {
+            string cvsPath = $"{cvsFolder}/{localFileName}";
+            string localPath = Path.Combine(localFolder, localFileName);
+
+            try
+            {
+                IVSSItem item = VSSDB.get_VSSItem(cvsPath, false);
+                item.Checkin("", localPath);
+                Pin((VSSItem)item, item.VersionNumber);
+            }
+            catch (System.Runtime.InteropServices.COMException exc)
+            {                
+                if (!IsFileNotFoundError(exc))
+                {
+                    throw exc;
+                }
+                else
+                {
+                    IVSSItem folder = VSSDB.get_VSSItem(cvsFolder, false);
+                    folder.Add(localPath);
+
+                    foreach(IVSSItem item in folder.Items)
+                    {
+                        if(item.Name == localFileName)
+                        {
+                            Pin((VSSItem)item, item.VersionNumber);
+                            break;
+                        }
+                    }
+                }
             }
         }
 

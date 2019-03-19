@@ -14,6 +14,15 @@ namespace CoreApp
     public partial class ZPatchOrderForm : Form
     {
         CPatch cpatch;
+
+        public IEnumerable<ZPatch> GetSelectedPatches()
+        {
+            foreach(ZPatch zpatch in LboxZPatchOrder.SelectedItems)
+            {
+                yield return zpatch;
+            }
+        }
+
         public ZPatchOrderForm(CPatch cpatch)
         {
             this.cpatch = cpatch;
@@ -87,6 +96,11 @@ namespace CoreApp
             {
                 cpatch.UpdateZPatchOrder((ZPatch)LboxZPatchOrder.Items[i], i);
             }
+        }
+
+        private void BtSelect_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

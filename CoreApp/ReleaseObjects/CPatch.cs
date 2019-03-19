@@ -417,13 +417,6 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
-        public IEnumerable<Tuple<LineState, string>> CreateScenario(out string cvsPath)
-        {
-            cvsPath = Download();
-            Scenario.Scenario scenario = new Scenario.Scenario(this);
-            return scenario.CreateScenarioFromZPatches();
-        }
-
         private void SetChildrenRanks(ZPatch currPatch)
         {
             foreach (ZPatch subpatch in currPatch.DependenciesTo)

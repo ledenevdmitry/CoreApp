@@ -27,9 +27,9 @@ namespace CoreApp.CVS
         abstract public void Move(string source, string destination, IEnumerable<string> items);
         abstract public void Move(string destination, IEnumerable<string> items);
         abstract public void Rename(string oldName, string newName);
-        abstract public void Pull(string dir, DirectoryInfo destination);
-        abstract public void Push(string source, string destination);
-        abstract public void PrepareToPush(string destination);
+        abstract public void Pull(string cvsPath, DirectoryInfo localPath);
+        abstract public void Push(string localFolder, string localFileName, string cvsFolder);
+        abstract public void PrepareToPush(string cvsFolder, string localFileName);
 
         abstract public string FirstInEntireBase(string root, out string match, Regex pattern, int depth);
         abstract public IEnumerable<string> AllInEntireBase(string root, List<string> matches, Regex pattern, int depth);

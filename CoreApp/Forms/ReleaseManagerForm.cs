@@ -529,8 +529,7 @@ namespace CoreApp
             var currCPatch = CurrCPatch;
             try
             {
-                var scenario = currCPatch.CreateScenario(out string cvsPath);
-                ScenarioForm sf = new ScenarioForm(scenario, cvs, currCPatch.Dir.FullName, cvsPath);
+                ScenarioForm sf = new ScenarioForm(currCPatch, cvs);
                 sf.ShowDialog();
             }
             catch(DirectoryNotFoundException exc)

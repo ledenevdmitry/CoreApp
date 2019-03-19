@@ -18,45 +18,44 @@ namespace CoreApp.Forms
         CVS.CVS cvs;
         string cvsPath;
         string localPath;
-        IEnumerable<Tuple<LineState, string>> scenario;
+        string scenarioFilePath;
+        CPatch cpatch;
 
-        public ScenarioForm(IEnumerable<Tuple<LineState, string>> scenario, CVS.CVS cvs, string localPath, string cvsPath)
+        public ScenarioForm(CPatch cpatch, CVS.CVS cvs)
         {
             InitializeComponent();
+
+            this.cpatch = cpatch;
+            this.cvs = cvs;
+            this.cvsPath = cpatch.Download();
+            this.localPath = cpatch.Dir.FullName;
+
+            scenarioFilePath = Path.Combine(localPath, "file_sc.txt");
+
+            string oldSc = "";
+
+            if (File.Exists(scenarioFilePath))
+            {
+                using (StreamReader sr = new StreamReader(scenarioFilePath))
+                {
+                    oldSc = sr.ReadToEnd();
+                }
+            }
+
+            int i = 0;
+            foreach(string line in oldSc.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                LViewScenarioLines.Items.Add(line);
+                LViewScenarioLines.Items[i++].BackColor = Color.LightBlue;
+            }
 
             Application.Idle += OnIdle;
 
             mainColumn.Width = LViewScenarioLines.Width;
-
-            this.scenario = scenario;
-            this.cvs = cvs;
-            this.cvsPath = cvsPath;
-            this.localPath = localPath;
-
-            int i = 0;
-            foreach(var item in scenario)
-            {
-                LViewScenarioLines.Items.Add(item.Item2);
-
-                switch(item.Item1)
-                {
-                    case LineState.normal:
-                        LViewScenarioLines.Items[i++].BackColor = Color.LightGreen;
-                        break;
-                    case LineState.notInFiles:
-                        LViewScenarioLines.Items[i++].BackColor = Color.Yellow;
-                        break;
-                    case LineState.notInScenario:
-                        LViewScenarioLines.Items[i++].BackColor = Color.OrangeRed;
-                        break;
-                }
-
-            }
-
             PbNormal.BackColor = Color.LightGreen;
             PbNotInFiles.BackColor = Color.Yellow;
             PbNotInScenario.BackColor = Color.OrangeRed;
-
+            PbOldScenario.BackColor = Color.LightBlue;
         }
 
 
@@ -151,19 +150,52 @@ namespace CoreApp.Forms
         private void BtLoadToCVS_Click(object sender, EventArgs e)
         {
             string scenarioText = CreateFinalScenario();
+            
+            cvs.PrepareToPush(cvsPath, "file_sc.txt");
 
-            string cvsScPath = $"{cvsPath}/file_sc.txt";
-            cvs.PrepareToPush(cvsScPath);
+            if (File.Exists(scenarioFilePath))
+            {
+                File.SetAttributes(scenarioFilePath, FileAttributes.Normal);
+            }
 
-            string localScPath = Path.Combine(localPath, "file_sc.txt");
-            File.SetAttributes(localScPath, FileAttributes.Normal);
-
-            using (StreamWriter sw = new StreamWriter(localScPath))
+            using (StreamWriter sw = new StreamWriter(scenarioFilePath))
             {
                 sw.Write(scenarioText);
             }
 
-            cvs.Push(localScPath, cvsScPath);        
+            cvs.Push(localPath, "file_sc.txt", cvsPath);        
+        }
+
+        private void BtAppendByNewPatches_Click(object sender, EventArgs e)
+        {
+            ZPatchOrderForm zpof = new ZPatchOrderForm(cpatch);
+            zpof.ShowDialog();
+            Scenario.Scenario scenarioCreator = new Scenario.Scenario(cpatch, zpof.GetSelectedPatches());
+
+            bool newScenario = LViewScenarioLines.Items.Count == 0;
+
+            var scenario = scenarioCreator.CreateScenarioFromZPatches(newScenario);
+
+            int i = LViewScenarioLines.Items.Count;
+            foreach (var item in scenario)
+            {
+                LViewScenarioLines.Items.Add(item.Item2);
+
+                switch (item.Item1)
+                {
+                    case LineState.normal:
+                        LViewScenarioLines.Items[i++].BackColor = Color.LightGreen;
+                        break;
+                    case LineState.notInFiles:
+                        LViewScenarioLines.Items[i++].BackColor = Color.Yellow;
+                        break;
+                    case LineState.notInScenario:
+                        LViewScenarioLines.Items[i++].BackColor = Color.OrangeRed;
+                        break;
+                }
+
+            }
+
         }
     }
 }

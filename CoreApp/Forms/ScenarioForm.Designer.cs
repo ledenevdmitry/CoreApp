@@ -31,6 +31,7 @@
             this.SCMain = new System.Windows.Forms.SplitContainer();
             this.LViewScenarioLines = new System.Windows.Forms.ListView();
             this.mainColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.BtLoadToCVS = new System.Windows.Forms.Button();
             this.LbNotInScenario = new System.Windows.Forms.Label();
             this.PbNotInScenario = new System.Windows.Forms.PictureBox();
             this.LbNotInFiles = new System.Windows.Forms.Label();
@@ -41,7 +42,9 @@
             this.BtDeleteLines = new System.Windows.Forms.Button();
             this.BtDown = new System.Windows.Forms.Button();
             this.BtUp = new System.Windows.Forms.Button();
-            this.BtLoadToCVS = new System.Windows.Forms.Button();
+            this.BtAppendByNewPatches = new System.Windows.Forms.Button();
+            this.LbOldScenario = new System.Windows.Forms.Label();
+            this.PbOldScenario = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).BeginInit();
             this.SCMain.Panel1.SuspendLayout();
             this.SCMain.Panel2.SuspendLayout();
@@ -49,6 +52,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.PbNotInScenario)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PbNotInFiles)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PbNormal)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PbOldScenario)).BeginInit();
             this.SuspendLayout();
             // 
             // SCMain
@@ -56,7 +60,7 @@
             this.SCMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SCMain.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.SCMain.Location = new System.Drawing.Point(0, 0);
-            this.SCMain.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.SCMain.Margin = new System.Windows.Forms.Padding(4);
             this.SCMain.Name = "SCMain";
             // 
             // SCMain.Panel1
@@ -65,6 +69,9 @@
             // 
             // SCMain.Panel2
             // 
+            this.SCMain.Panel2.Controls.Add(this.LbOldScenario);
+            this.SCMain.Panel2.Controls.Add(this.PbOldScenario);
+            this.SCMain.Panel2.Controls.Add(this.BtAppendByNewPatches);
             this.SCMain.Panel2.Controls.Add(this.BtLoadToCVS);
             this.SCMain.Panel2.Controls.Add(this.LbNotInScenario);
             this.SCMain.Panel2.Controls.Add(this.PbNotInScenario);
@@ -77,7 +84,7 @@
             this.SCMain.Panel2.Controls.Add(this.BtDown);
             this.SCMain.Panel2.Controls.Add(this.BtUp);
             this.SCMain.Size = new System.Drawing.Size(661, 463);
-            this.SCMain.SplitterDistance = 450;
+            this.SCMain.SplitterDistance = 449;
             this.SCMain.SplitterWidth = 5;
             this.SCMain.TabIndex = 0;
             // 
@@ -90,9 +97,9 @@
             this.LViewScenarioLines.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LViewScenarioLines.HideSelection = false;
             this.LViewScenarioLines.Location = new System.Drawing.Point(0, 0);
-            this.LViewScenarioLines.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.LViewScenarioLines.Margin = new System.Windows.Forms.Padding(4);
             this.LViewScenarioLines.Name = "LViewScenarioLines";
-            this.LViewScenarioLines.Size = new System.Drawing.Size(450, 463);
+            this.LViewScenarioLines.Size = new System.Drawing.Size(449, 463);
             this.LViewScenarioLines.TabIndex = 0;
             this.LViewScenarioLines.UseCompatibleStateImageBehavior = false;
             this.LViewScenarioLines.View = System.Windows.Forms.View.Details;
@@ -101,10 +108,21 @@
             // 
             this.mainColumn.Text = "Строки сценария";
             // 
+            // BtLoadToCVS
+            // 
+            this.BtLoadToCVS.Location = new System.Drawing.Point(32, 280);
+            this.BtLoadToCVS.Margin = new System.Windows.Forms.Padding(4);
+            this.BtLoadToCVS.Name = "BtLoadToCVS";
+            this.BtLoadToCVS.Size = new System.Drawing.Size(155, 28);
+            this.BtLoadToCVS.TabIndex = 14;
+            this.BtLoadToCVS.Text = "Внести в СКВ";
+            this.BtLoadToCVS.UseVisualStyleBackColor = true;
+            this.BtLoadToCVS.Click += new System.EventHandler(this.BtLoadToCVS_Click);
+            // 
             // LbNotInScenario
             // 
             this.LbNotInScenario.AutoSize = true;
-            this.LbNotInScenario.Location = new System.Drawing.Point(41, 317);
+            this.LbNotInScenario.Location = new System.Drawing.Point(41, 380);
             this.LbNotInScenario.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LbNotInScenario.Name = "LbNotInScenario";
             this.LbNotInScenario.Size = new System.Drawing.Size(158, 17);
@@ -113,8 +131,8 @@
             // 
             // PbNotInScenario
             // 
-            this.PbNotInScenario.Location = new System.Drawing.Point(9, 317);
-            this.PbNotInScenario.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PbNotInScenario.Location = new System.Drawing.Point(9, 380);
+            this.PbNotInScenario.Margin = new System.Windows.Forms.Padding(4);
             this.PbNotInScenario.Name = "PbNotInScenario";
             this.PbNotInScenario.Size = new System.Drawing.Size(24, 16);
             this.PbNotInScenario.TabIndex = 12;
@@ -123,7 +141,7 @@
             // LbNotInFiles
             // 
             this.LbNotInFiles.AutoSize = true;
-            this.LbNotInFiles.Location = new System.Drawing.Point(41, 294);
+            this.LbNotInFiles.Location = new System.Drawing.Point(41, 357);
             this.LbNotInFiles.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LbNotInFiles.Name = "LbNotInFiles";
             this.LbNotInFiles.Size = new System.Drawing.Size(146, 17);
@@ -132,8 +150,8 @@
             // 
             // PbNotInFiles
             // 
-            this.PbNotInFiles.Location = new System.Drawing.Point(9, 294);
-            this.PbNotInFiles.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PbNotInFiles.Location = new System.Drawing.Point(9, 357);
+            this.PbNotInFiles.Margin = new System.Windows.Forms.Padding(4);
             this.PbNotInFiles.Name = "PbNotInFiles";
             this.PbNotInFiles.Size = new System.Drawing.Size(24, 16);
             this.PbNotInFiles.TabIndex = 10;
@@ -142,7 +160,7 @@
             // LbNormal
             // 
             this.LbNormal.AutoSize = true;
-            this.LbNormal.Location = new System.Drawing.Point(41, 271);
+            this.LbNormal.Location = new System.Drawing.Point(41, 334);
             this.LbNormal.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.LbNormal.Name = "LbNormal";
             this.LbNormal.Size = new System.Drawing.Size(102, 17);
@@ -151,8 +169,8 @@
             // 
             // PbNormal
             // 
-            this.PbNormal.Location = new System.Drawing.Point(9, 271);
-            this.PbNormal.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PbNormal.Location = new System.Drawing.Point(9, 334);
+            this.PbNormal.Margin = new System.Windows.Forms.Padding(4);
             this.PbNormal.Name = "PbNormal";
             this.PbNormal.Size = new System.Drawing.Size(24, 16);
             this.PbNormal.TabIndex = 8;
@@ -160,8 +178,8 @@
             // 
             // BtSave
             // 
-            this.BtSave.Location = new System.Drawing.Point(17, 192);
-            this.BtSave.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtSave.Location = new System.Drawing.Point(32, 244);
+            this.BtSave.Margin = new System.Windows.Forms.Padding(4);
             this.BtSave.Name = "BtSave";
             this.BtSave.Size = new System.Drawing.Size(155, 28);
             this.BtSave.TabIndex = 7;
@@ -171,8 +189,8 @@
             // 
             // BtDeleteLines
             // 
-            this.BtDeleteLines.Location = new System.Drawing.Point(17, 156);
-            this.BtDeleteLines.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.BtDeleteLines.Location = new System.Drawing.Point(32, 150);
+            this.BtDeleteLines.Margin = new System.Windows.Forms.Padding(4);
             this.BtDeleteLines.Name = "BtDeleteLines";
             this.BtDeleteLines.Size = new System.Drawing.Size(155, 28);
             this.BtDeleteLines.TabIndex = 6;
@@ -204,16 +222,35 @@
             this.BtUp.UseVisualStyleBackColor = true;
             this.BtUp.Click += new System.EventHandler(this.BtUp_Click);
             // 
-            // BtLoadToCVS
+            // BtAppendByNewPatches
             // 
-            this.BtLoadToCVS.Location = new System.Drawing.Point(17, 228);
-            this.BtLoadToCVS.Margin = new System.Windows.Forms.Padding(4);
-            this.BtLoadToCVS.Name = "BtLoadToCVS";
-            this.BtLoadToCVS.Size = new System.Drawing.Size(155, 28);
-            this.BtLoadToCVS.TabIndex = 14;
-            this.BtLoadToCVS.Text = "Внести в СКВ";
-            this.BtLoadToCVS.UseVisualStyleBackColor = true;
-            this.BtLoadToCVS.Click += new System.EventHandler(this.BtLoadToCVS_Click);
+            this.BtAppendByNewPatches.Location = new System.Drawing.Point(32, 186);
+            this.BtAppendByNewPatches.Margin = new System.Windows.Forms.Padding(4);
+            this.BtAppendByNewPatches.Name = "BtAppendByNewPatches";
+            this.BtAppendByNewPatches.Size = new System.Drawing.Size(155, 50);
+            this.BtAppendByNewPatches.TabIndex = 15;
+            this.BtAppendByNewPatches.Text = "Добавить в конец по другим патчам";
+            this.BtAppendByNewPatches.UseVisualStyleBackColor = true;
+            this.BtAppendByNewPatches.Click += new System.EventHandler(this.BtAppendByNewPatches_Click);
+            // 
+            // LbOldScenario
+            // 
+            this.LbOldScenario.AutoSize = true;
+            this.LbOldScenario.Location = new System.Drawing.Point(41, 404);
+            this.LbOldScenario.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.LbOldScenario.Name = "LbOldScenario";
+            this.LbOldScenario.Size = new System.Drawing.Size(125, 17);
+            this.LbOldScenario.TabIndex = 17;
+            this.LbOldScenario.Text = "Старый сценарий";
+            // 
+            // PbOldScenario
+            // 
+            this.PbOldScenario.Location = new System.Drawing.Point(9, 404);
+            this.PbOldScenario.Margin = new System.Windows.Forms.Padding(4);
+            this.PbOldScenario.Name = "PbOldScenario";
+            this.PbOldScenario.Size = new System.Drawing.Size(24, 16);
+            this.PbOldScenario.TabIndex = 16;
+            this.PbOldScenario.TabStop = false;
             // 
             // ScenarioForm
             // 
@@ -221,7 +258,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(661, 463);
             this.Controls.Add(this.SCMain);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "ScenarioForm";
             this.Text = "Сценарий";
             this.Resize += new System.EventHandler(this.ScenarioForm_Resize);
@@ -233,6 +270,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.PbNotInScenario)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PbNotInFiles)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PbNormal)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.PbOldScenario)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -253,5 +291,8 @@
         private System.Windows.Forms.Label LbNormal;
         private System.Windows.Forms.PictureBox PbNormal;
         private System.Windows.Forms.Button BtLoadToCVS;
+        private System.Windows.Forms.Button BtAppendByNewPatches;
+        private System.Windows.Forms.Label LbOldScenario;
+        private System.Windows.Forms.PictureBox PbOldScenario;
     }
 }

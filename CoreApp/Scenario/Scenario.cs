@@ -12,26 +12,33 @@ namespace CoreApp.Scenario
     public class Scenario
     {
         readonly CPatch cpatch;
+        readonly IEnumerable<ZPatch> zpathces;
+
         static string regexFileFromScLine = @"\|\|([^\|]+)";
         static string regexSchema = @"\\([^\\]+)@";
 
         public enum LineState { normal, notInScenario, notInFiles } 
 
-        public Scenario(CPatch cpatch)
+        public Scenario(CPatch cpatch, IEnumerable<ZPatch> zpatches)
         {
             this.cpatch = cpatch;
+            this.zpathces = zpatches;
         }
 
-        public IEnumerable<Tuple<LineState, string>> CreateScenarioFromZPatches()
+        public IEnumerable<Tuple<LineState, string>> CreateScenarioFromZPatches(bool newScenario)
         {
             List<Tuple<LineState, string>> scenario = new List<Tuple<LineState, string>>();
-            var cpatchTuple = new Tuple<LineState, string>(LineState.normal, cpatch.CPatchName);
-            scenario.Add(cpatchTuple);
-            scenario.Add(cpatchTuple);
+
+            if (newScenario)
+            {
+                var cpatchTuple = new Tuple<LineState, string>(LineState.normal, cpatch.CPatchName);
+                scenario.Add(cpatchTuple);
+                scenario.Add(cpatchTuple);
+            }
 
             List<string> inScenarioFiles = new List<string>();
 
-            foreach (ZPatch zpatch in cpatch.ZPatchOrder.Values)
+            foreach (ZPatch zpatch in zpathces)
             {
                 List<Tuple<LineState, string>> zpatchScenario = new List<Tuple<LineState, string>>();
                 if (zpatch.ZPatchStatus != "OPEN")

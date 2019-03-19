@@ -33,6 +33,7 @@
             this.BtConfirm = new System.Windows.Forms.Button();
             this.BtDown = new System.Windows.Forms.Button();
             this.BtUp = new System.Windows.Forms.Button();
+            this.BtSelect = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).BeginInit();
             this.SCMain.Panel1.SuspendLayout();
             this.SCMain.Panel2.SuspendLayout();
@@ -53,6 +54,7 @@
             // 
             // SCMain.Panel2
             // 
+            this.SCMain.Panel2.Controls.Add(this.BtSelect);
             this.SCMain.Panel2.Controls.Add(this.BtConfirm);
             this.SCMain.Panel2.Controls.Add(this.BtDown);
             this.SCMain.Panel2.Controls.Add(this.BtUp);
@@ -79,7 +81,7 @@
             this.BtConfirm.Name = "BtConfirm";
             this.BtConfirm.Size = new System.Drawing.Size(182, 65);
             this.BtConfirm.TabIndex = 2;
-            this.BtConfirm.Text = "Подтвердить";
+            this.BtConfirm.Text = "Подтвердить перенос";
             this.BtConfirm.UseVisualStyleBackColor = true;
             this.BtConfirm.Click += new System.EventHandler(this.BtConfirm_Click);
             // 
@@ -107,6 +109,17 @@
             this.BtUp.UseVisualStyleBackColor = true;
             this.BtUp.Click += new System.EventHandler(this.BtUp_Click);
             // 
+            // BtSelect
+            // 
+            this.BtSelect.Location = new System.Drawing.Point(5, 342);
+            this.BtSelect.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.BtSelect.Name = "BtSelect";
+            this.BtSelect.Size = new System.Drawing.Size(182, 65);
+            this.BtSelect.TabIndex = 3;
+            this.BtSelect.Text = "Выбрать";
+            this.BtSelect.UseVisualStyleBackColor = true;
+            this.BtSelect.Click += new System.EventHandler(this.BtSelect_Click);
+            // 
             // ZPatchOrderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -131,5 +144,6 @@
         private System.Windows.Forms.Button BtUp;
         private System.Windows.Forms.Button BtConfirm;
         private System.Windows.Forms.ListBox LboxZPatchOrder;
+        private System.Windows.Forms.Button BtSelect;
     }
 }
