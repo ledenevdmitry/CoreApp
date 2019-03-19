@@ -12,37 +12,143 @@ namespace CoreApp.Scenario
     public class Scenario
     {
         readonly CPatch cpatch;
-        readonly IEnumerable<ZPatch> zpathces;
 
         static string regexFileFromScLine = @"\|\|([^\|]+)";
         static string regexSchema = @"\\([^\\]+)@";
+        static string regexFolderFromScenario = @"\|\|[^\\]+\";
 
-        public enum LineState { normal, notInScenario, notInFiles } 
+        public enum LineState { oldScenario, newScenarioNormal, notInScenario, notInFiles } 
 
         public Scenario(CPatch cpatch, IEnumerable<ZPatch> zpatches)
         {
             this.cpatch = cpatch;
-            this.zpathces = zpatches;
         }
 
-        public IEnumerable<Tuple<LineState, string>> CreateScenarioFromZPatches(bool newScenario)
+
+        public IEnumerable<Tuple<LineState, string>> CreateScenarioFromZPatches()
         {
             List<Tuple<LineState, string>> scenario = new List<Tuple<LineState, string>>();
 
-            if (newScenario)
+            //часть сценария по C-патчу
+            List<Tuple<LineState, string>> cpatchScenario = new List<Tuple<LineState, string>>();
+
+            FileInfo cpatchFileScInfo = new FileInfo(Path.Combine(cpatch.Dir.FullName, "file_sc.txt"));
+            string cpatchScenarioText = "";
+
+            List<ZPatch> notInCPatchScenarioZPatches = new List<ZPatch>(cpatch.ZPatchOrder.Values);
+
+            if (cpatchFileScInfo.Exists)
             {
-                var cpatchTuple = new Tuple<LineState, string>(LineState.normal, cpatch.CPatchName);
+                using (StreamReader sr = new StreamReader(cpatchFileScInfo.FullName))
+                {
+                    cpatchScenarioText = sr.ReadToEnd();
+                }
+
+                string[] lines = cpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                List<string> fromScenarioFiles = new List<string>();
+
+                List<Tuple<DirectoryInfo, int>> dirsFromScenario = new List<Tuple<DirectoryInfo, int>>();
+                DirectoryInfo dirFromScenario;
+                DirectoryInfo prevDirFromScenario = null;
+
+                for (int i = 2; i < lines.Length; ++i)
+                {
+                    Match match = Regex.Match(lines[i], regexFolderFromScenario);
+
+                    if (match.Success)
+                    {
+                        string folderNameFromScenario = match.Value;
+                        dirFromScenario = new DirectoryInfo(Path.Combine(cpatch.FullName, folderNameFromScenario));
+
+                        if (prevDirFromScenario != null && !prevDirFromScenario.FullName.Equals(folderNameFromScenario, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            dirsFromScenario.Add(new Tuple<DirectoryInfo, int>(dirFromScenario, i));
+                            foreach(ZPatch zpatch in cpatch.ZPatches)
+                            {
+                                if(zpatch.Dir.FullName.Equals(dirFromScenario.FullName, StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    notInCPatchScenarioZPatches.Remove(zpatch);
+                                    break;
+                                }
+                            }
+
+                            prevDirFromScenario = dirFromScenario;
+                        }
+                    }
+
+                    Match ETLFileFromScMatch = Regex.Match(lines[i], regexFileFromScLine);
+
+                    if(ETLFileFromScMatch.Success)
+                    {
+                        string ETLFileFromSc = ETLFileFromScMatch.Groups[1].Value;
+                        string ETLFileFromScFullPath = Path.Combine(cpatch.Dir.FullName, ETLFileFromSc);
+                        FileInfo fromScenarioFile = new FileInfo(ETLFileFromScFullPath);
+                        fromScenarioFiles.Add(ETLFileFromScFullPath);
+
+                        if (!fromScenarioFile.Exists)
+                        {
+                            if (IsCorrectFile(ETLFileFromScFullPath))
+                            {
+                                cpatchScenario.Add(new Tuple<LineState, string>(LineState.notInFiles, lines[i]));
+                            }
+                        }
+                        else
+                        {
+                            cpatchScenario.Add(new Tuple<LineState, string>(LineState.oldScenario, lines[i]));
+                        }
+                    }
+
+                }
+
+                foreach(var lineInfo in dirsFromScenario)
+                {
+                    foreach(var subFile in lineInfo.Item1.GetFiles("*.*", SearchOption.AllDirectories))
+                    {
+                        if (IsCorrectFile(subFile.Name))
+                        {
+                            if (!fromScenarioFiles.Contains(subFile.FullName, StringComparer.InvariantCultureIgnoreCase))
+                            {
+                                string scenarioLine = ScenarioLineFromFile(cpatch.Dir, subFile, out int newLinePriority);
+
+                                bool inserted = false;
+                                //старт там, где начинался патч
+                                for (int i = lineInfo.Item2; i < cpatchScenario.Count; ++i)
+                                {
+                                    if (Priority(cpatchScenario[i].Item2, out string prefix) >= newLinePriority)
+                                    {
+                                        cpatchScenario.Insert(i, new Tuple<LineState, string>(LineState.notInScenario, scenarioLine));
+                                        inserted = true;
+                                        break;
+                                    }
+                                }
+                                //если нужно вставлять в конец или еще не добавляли
+                                if (!inserted || cpatchScenario.Count == 0)
+                                {
+                                    cpatchScenario.Add(new Tuple<LineState, string>(LineState.notInScenario, scenarioLine));
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            else
+            {
+                var cpatchTuple = new Tuple<LineState, string>(LineState.newScenarioNormal, cpatch.CPatchName);
                 scenario.Add(cpatchTuple);
                 scenario.Add(cpatchTuple);
             }
 
+
             List<string> inScenarioFiles = new List<string>();
 
-            foreach (ZPatch zpatch in zpathces)
+            foreach (ZPatch zpatch in notInCPatchScenarioZPatches)
             {
                 List<Tuple<LineState, string>> zpatchScenario = new List<Tuple<LineState, string>>();
                 if (zpatch.ZPatchStatus != "OPEN")
-                { 
+                {
                     FileInfo fileScInfo = new FileInfo(Path.Combine(zpatch.Dir.FullName, "file_sc.txt"));
 
                     if (fileScInfo.Exists)
@@ -53,8 +159,8 @@ namespace CoreApp.Scenario
                             zpatchScenarioText = sr.ReadToEnd();
                         }
 
-                        string [] lines = zpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                        
+                        string[] lines = zpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
                         //пропускаю первые 2 строчки
                         for (int i = 2; i < lines.Length; ++i)
                         {
@@ -80,7 +186,7 @@ namespace CoreApp.Scenario
                                     }
                                     else
                                     {
-                                        zpatchScenario.Add(new Tuple<LineState, string>(LineState.normal, newScenarioLine));
+                                        zpatchScenario.Add(new Tuple<LineState, string>(LineState.newScenarioNormal, newScenarioLine));
                                     }
 
                                     inScenarioFiles.Add(ETLFileFromScFullPath);
@@ -97,7 +203,7 @@ namespace CoreApp.Scenario
                         {
                             if (!inScenarioFiles.Contains(file.FullName, StringComparer.InvariantCultureIgnoreCase))
                             {
-                                string scenarioLine = ScenarioLineFromFile(zpatch, file, out int newLinePriority);
+                                string scenarioLine = ScenarioLineFromFile(zpatch.Dir, file, out int newLinePriority);
                                 int i = 0;
                                 bool inserted = false;
                                 foreach (var item in zpatchScenario)
@@ -111,7 +217,7 @@ namespace CoreApp.Scenario
                                     ++i;
                                 }
                                 //если нужно вставлять в конец или еще не добавляли
-                                if(!inserted || zpatchScenario.Count == 0)
+                                if (!inserted || zpatchScenario.Count == 0)
                                 {
                                     zpatchScenario.Add(new Tuple<LineState, string>(LineState.notInScenario, scenarioLine));
                                 }
@@ -125,9 +231,9 @@ namespace CoreApp.Scenario
             return scenario;
         }
 
-        private static string ScenarioLineFromFile(ZPatch zpatch, FileInfo file, out int priority)
+        private static string ScenarioLineFromFile(DirectoryInfo dir, FileInfo file, out int priority)
         {
-            int zpatchIndexInFileFullPath = file.FullName.IndexOf(zpatch.Dir.Name, StringComparison.InvariantCultureIgnoreCase);
+            int zpatchIndexInFileFullPath = file.FullName.IndexOf(dir.Name, StringComparison.InvariantCultureIgnoreCase);
             string FileNameFromZPatch = file.FullName.Substring(zpatchIndexInFileFullPath);
 
             priority = Priority(FileNameFromZPatch, out string prefix);
