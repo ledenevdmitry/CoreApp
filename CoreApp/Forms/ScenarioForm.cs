@@ -1,4 +1,5 @@
 ﻿using CoreApp.ReleaseObjects;
+using CoreApp.Scenario;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,30 +23,27 @@ namespace CoreApp.Forms
         string localPath;
         string scenarioFilePath;
 
-        IEnumerable<Tuple<LineState, string>> scenario;
+        Scenario.Scenario scenario;
 
-        public ScenarioForm(IEnumerable<Tuple<LineState, string>> scenario, CVS.CVS cvs, string localPath, string cvsPath)
+        public ScenarioForm(CPatch cpatch, CVS.CVS cvs)
         {
             InitializeComponent();
 
             this.cpatch = cpatch;
+            cvsPath = cpatch.Download();
+            localPath = cpatch.Dir.FullName;
             this.cvs = cvs;
-            this.cvsPath = cpatch.Download();
-            this.localPath = cpatch.Dir.FullName;
 
             scenarioFilePath = Path.Combine(localPath, "file_sc.txt");
+
+            scenario = new Scenario.Scenario(cpatch);
 
             Application.Idle += OnIdle;
 
             mainColumn.Width = LViewScenarioLines.Width;
 
-            this.scenario = scenario;
-            this.cvs = cvs;
-            this.cvsPath = cvsPath;
-            this.localPath = localPath;
-
             int i = 0;
-            foreach (var item in scenario)
+            foreach (var item in scenario.CreateScenarioFromZPatches())
             {
                 LViewScenarioLines.Items.Add(item.Item2);
 
@@ -60,15 +58,20 @@ namespace CoreApp.Forms
                     case LineState.notInFiles:
                         LViewScenarioLines.Items[i++].BackColor = Color.Yellow;
                         break;
-                    case LineState.notInScenario:
+                    case LineState.onlyInZPatchScenario:
+                        LViewScenarioLines.Items[i++].BackColor = Color.DimGray;
+                        break;
+                    case LineState.notInScenarios:
                         LViewScenarioLines.Items[i++].BackColor = Color.OrangeRed;
                         break;
                 }
 
             }
 
-            PbNormal.BackColor = Color.LightGreen;
+            PbNewScenarioNormal.BackColor = Color.LightGreen;
+            PbOldScenario.BackColor = Color.LightBlue;
             PbNotInFiles.BackColor = Color.Yellow;
+
             PbNotInScenario.BackColor = Color.OrangeRed;
 
         }
