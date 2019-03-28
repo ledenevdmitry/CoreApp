@@ -71,7 +71,7 @@ namespace CoreApp.Forms
             PbNewScenarioNormal.BackColor = Color.LightGreen;
             PbOldScenario.BackColor = Color.LightBlue;
             PbNotInFiles.BackColor = Color.Yellow;
-
+            PbOnlyInZPatchScenario.BackColor = Color.DimGray;
             PbNotInScenario.BackColor = Color.OrangeRed;
 
         }
