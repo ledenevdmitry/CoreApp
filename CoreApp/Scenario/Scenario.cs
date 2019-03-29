@@ -44,7 +44,10 @@ namespace CoreApp.Scenario
 
                         if (TryGetZPatchByFullFolderName(cpatch, fullCurrFolder, out ZPatch zpatch))
                         {
-                            pairs.Add(zpatch, new List<Tuple<LineState, string>>());
+                            if (!pairs.ContainsKey(zpatch))
+                            {
+                                pairs.Add(zpatch, new List<Tuple<LineState, string>>());
+                            }
                         }
 
                         prevfolder = currfolder;
