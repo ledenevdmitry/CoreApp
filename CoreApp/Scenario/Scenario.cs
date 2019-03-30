@@ -55,56 +55,41 @@ namespace CoreApp.Scenario
                 }
             }
 
-            for(int i = 0; i < scenarioLines.Length; ++i)
+            for(int i = scenarioLines.Length - 1; i >= 0; --i)
             {
                 Match folderMatch;
+                ZPatch currZPatch = null;
                 int j = i;
                 if (!(folderMatch = Regex.Match(scenarioLines[i], regexFolderFromScenario)).Success)
                 {
-                    while (!(folderMatch = Regex.Match(scenarioLines[j], regexFolderFromScenario)).Success)
-                    {
-                        j++;
-                    }
-
-                    if (j < scenarioLines.Length)
-                    {
-                        AddFolderNotFoundScenarioLinesToSplittedScenario(scenarioLines, i, j, pairs);
+                    if(currZPatch != null)
+                    { 
+                        pairs[currZPatch].Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
                     }
                     else
                     {
-                        AddFolderNotFoundScenarioLinesToSplittedScenario(scenarioLines, scenarioLines.Length - 1, scenarioLines.Length, pairs);
-                    }
+                        var lastPatch = cpatch.ZPatchOrder.Values.Last();
+                        if (!pairs.ContainsKey(lastPatch))
+                        {
+                            pairs.Add(lastPatch, new List<Tuple<LineState, string>>());
+                        }
 
-                    i = j;
+                        pairs[lastPatch].Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
+                    }
                 }
                 else
                 {
                     string folderName = folderMatch.Groups[1].Value;
                     string fullFolderName = Path.Combine(cpatch.Dir.FullName, folderName);
-                    if(TryGetZPatchByFullFolderName(cpatch, fullFolderName, out ZPatch zpatch))
+                    if(TryGetZPatchByFullFolderName(cpatch, fullFolderName, out currZPatch))
                     {
-                        pairs[zpatch].Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
+                        pairs[currZPatch].Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
                     }
 
                 }
             }
 
             return pairs;
-        }
-
-        private void AddFolderNotFoundScenarioLinesToSplittedScenario(string[] scenarioLines, int i, int j, Dictionary<ZPatch, List<Tuple<LineState, string>>> pairs)
-        {
-            if (TryGetFoldernameFromScenarioLine(scenarioLines[j], out string folderName))
-            {
-                string folderFullname = Path.Combine(cpatch.Dir.FullName, folderName);
-                if (TryGetZPatchByFullFolderName(cpatch, folderFullname, out ZPatch zpatch))
-                {
-                    for (int k = i; k < j; ++k)
-                    {
-                        pairs[zpatch].Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[k]));
-                    }
-                }
-            }
         }
 
         private bool TryGetZPatchByFullFolderName(CPatch cpatch, string fullFolderName, out ZPatch zpatch)
@@ -184,33 +169,6 @@ namespace CoreApp.Scenario
                 List<string> fromCPatchScenarioFiles = new List<string>();
 
                 var cpatchSplittedByZPatchScenario = SplitCPatchScenarioByZPatches(cpatch, cpatchScenarioLines);
-
-                //по сценарию c-патча определяю, все ли файлы на месте
-                foreach (ZPatch zpatch in cpatch.ZPatchOrder.Values)
-                {
-                    if (cpatchSplittedByZPatchScenario.ContainsKey(zpatch))
-                    {
-                        foreach (var scenarioInfo in cpatchSplittedByZPatchScenario[zpatch])
-                        {
-                            if (TryGetFileNameFromScenarioLine(cpatch.Dir.FullName, scenarioInfo.Item2, out string fileName, out int index))
-                            {
-                                if (File.Exists(fileName))
-                                {
-                                    cpatchScenario.Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioInfo.Item2));
-                                }
-                                else
-                                {
-                                    cpatchScenario.Add(new Tuple<LineState, string>(LineState.notInFiles, scenarioInfo.Item2));
-                                }
-                            }
-                            else
-                            {
-                                cpatchScenario.Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioInfo.Item2));
-                            }
-                        }
-                    }
-                }
-
 
                 foreach (ZPatch zpatch in cpatch.ZPatchOrder.Values)
                 {
@@ -319,8 +277,6 @@ namespace CoreApp.Scenario
                         }
                     }
                 }
-
-                scenario.AddRange(cpatchScenario);
 
                 List<string> inScenarioFiles = new List<string>();
 
