@@ -60,21 +60,22 @@ namespace CoreApp.Scenario
                 Match folderMatch;
                 ZPatch currZPatch = null;
                 int j = i;
+
                 if (!(folderMatch = Regex.Match(scenarioLines[i], regexFolderFromScenario)).Success)
                 {
                     if(currZPatch != null)
                     { 
-                        pairs[currZPatch].Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
+                        pairs[currZPatch].Insert(0, new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
                     }
                     else
                     {
-                        var lastPatch = cpatch.ZPatchOrder.Values.Last();
+                        var lastPatch = cpatch.ZPatchOrder.Values.First();
                         if (!pairs.ContainsKey(lastPatch))
                         {
                             pairs.Add(lastPatch, new List<Tuple<LineState, string>>());
                         }
 
-                        pairs[lastPatch].Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
+                        pairs[lastPatch].Insert(0, new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
                     }
                 }
                 else
@@ -83,7 +84,17 @@ namespace CoreApp.Scenario
                     string fullFolderName = Path.Combine(cpatch.Dir.FullName, folderName);
                     if(TryGetZPatchByFullFolderName(cpatch, fullFolderName, out currZPatch))
                     {
-                        pairs[currZPatch].Add(new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
+                        if (TryGetFileNameFromScenarioLine(cpatch.Dir.FullName, scenarioLines[i], out string filename, out int index))
+                        {
+                            if (File.Exists(filename))
+                            {
+                                pairs[currZPatch].Insert(0, new Tuple<LineState, string>(LineState.oldScenario, scenarioLines[i]));
+                            }
+                            else
+                            {
+                                pairs[currZPatch].Insert(0, new Tuple<LineState, string>(LineState.notInFiles, scenarioLines[i]));
+                            }
+                        }
                     }
 
                 }
@@ -163,205 +174,212 @@ namespace CoreApp.Scenario
                 {
                     cpatchScenarioText = sr.ReadToEnd();
                 }
+            }
+            else
+            {
+                scenario.Add(new Tuple<LineState, string>(LineState.newScenarioNormal, cpatch.CPatchName));
+                scenario.Add(new Tuple<LineState, string>(LineState.newScenarioNormal, cpatch.CPatchName));
+            }
 
-                string[] cpatchScenarioLines = cpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] cpatchScenarioLines = cpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-                List<string> fromCPatchScenarioFiles = new List<string>();
+            List<string> fromCPatchScenarioFiles = new List<string>();
 
-                var cpatchSplittedByZPatchScenario = SplitCPatchScenarioByZPatches(cpatch, cpatchScenarioLines);
+            var cpatchSplittedByZPatchScenario = SplitCPatchScenarioByZPatches(cpatch, cpatchScenarioLines);
 
-                foreach (ZPatch zpatch in cpatch.ZPatchOrder.Values)
+            foreach (ZPatch zpatch in cpatch.ZPatchOrder.Values)
+            {
+                if (cpatchSplittedByZPatchScenario.ContainsKey(zpatch))
                 {
-                    if (cpatchSplittedByZPatchScenario.ContainsKey(zpatch))
+                    notInCPatchScenarioZPatches.Remove(zpatch);
+
+                    SortedList<int, string> zpatchScenarioLinesForFilesNotFoundInCPatchScenario = new SortedList<int, string>();
+                    string[] zpatchScenarioLines = new string[0];
+                    foreach (FileInfo file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
-                        SortedList<int, string> zpatchScenarioLinesForFilesNotFoundInCPatchScenario = new SortedList<int, string>();
-                        string[] zpatchScenarioLines = new string[0];
-                        foreach (FileInfo file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                        if (IsCorrectFile(file.Name))
                         {
-                            if (IsCorrectFile(file.Name))
+                            bool foundInCPatchScenario = false;
+                            foreach (var scenarioInfo in cpatchSplittedByZPatchScenario[zpatch])
                             {
-                                bool foundInCPatchScenario = false;
-                                foreach (var scenarioInfo in cpatchSplittedByZPatchScenario[zpatch])
+                                if (TryGetFileNameFromScenarioLine(cpatch.Dir.FullName, scenarioInfo.Item2, out string fileName, out int index))
                                 {
-                                    if (TryGetFileNameFromScenarioLine(cpatch.Dir.FullName, scenarioInfo.Item2, out string fileName, out int index))
+                                    if (fileName.Equals(file.FullName, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        if (fileName.Equals(file.FullName, StringComparison.InvariantCultureIgnoreCase))
-                                        {
-                                            foundInCPatchScenario = true;
-                                            break;
-                                        }
+                                        foundInCPatchScenario = true;
+                                        break;
                                     }
                                 }
+                            }
 
-                                if (!foundInCPatchScenario)
+                            if (!foundInCPatchScenario)
+                            {
+                                FileInfo zpatchScenarioFile = new FileInfo(Path.Combine(zpatch.Dir.FullName, "file_sc.txt"));
+                                string zpatchScenarioText;
+
+                                if (zpatchScenarioFile.Exists)
                                 {
-                                    FileInfo zpatchScenarioFile = new FileInfo(Path.Combine(zpatch.Dir.FullName, "file_sc.txt"));
-                                    string zpatchScenarioText;
-
-                                    if (zpatchScenarioFile.Exists)
+                                    using (StreamReader sr = new StreamReader(zpatchScenarioFile.FullName))
                                     {
-                                        using (StreamReader sr = new StreamReader(zpatchScenarioFile.FullName))
-                                        {
-                                            zpatchScenarioText = sr.ReadToEnd();
-                                        }
-                                        if (zpatchScenarioLines.Length == 0)
-                                        {
-                                            zpatchScenarioLines = zpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                                        }
+                                        zpatchScenarioText = sr.ReadToEnd();
+                                    }
+                                    if (zpatchScenarioLines.Length == 0)
+                                    {
+                                        zpatchScenarioLines = zpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                                    }
 
-                                        for (int i = 0; i < zpatchScenarioLines.Length; ++i)
+                                    for (int i = 0; i < zpatchScenarioLines.Length; ++i)
+                                    {
+                                        if(TryGetFileNameFromScenarioLine(zpatch.Dir.FullName, zpatchScenarioLines[i], out string zpatchScenarioFileName, out int index))
                                         {
-                                            if(TryGetFileNameFromScenarioLine(zpatch.Dir.FullName, zpatchScenarioLines[i], out string zpatchScenarioFileName, out int index))
+                                            if(file.FullName.Equals(zpatchScenarioFileName, StringComparison.InvariantCultureIgnoreCase))
                                             {
-                                                if(file.FullName.Equals(zpatchScenarioFileName, StringComparison.InvariantCultureIgnoreCase))
-                                                {
-                                                    zpatchScenarioLinesForFilesNotFoundInCPatchScenario.Add(i, zpatchScenarioLines[i]);
-                                                }
+                                                zpatchScenarioLinesForFilesNotFoundInCPatchScenario.Add(i, zpatchScenarioLines[i]);
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                    }
                         
-                        if (zpatchScenarioLinesForFilesNotFoundInCPatchScenario.Count > 0)
+                    if (zpatchScenarioLinesForFilesNotFoundInCPatchScenario.Count > 0)
+                    {
+                        //пропускаем первые 2 строки с именем
+                        foreach(var zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord in zpatchScenarioLinesForFilesNotFoundInCPatchScenario)
                         {
-                            //пропускаем первые 2 строки с именем
-                            foreach(var zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord in zpatchScenarioLinesForFilesNotFoundInCPatchScenario)
-                            {
-                                int j = 0;
-                                bool foundPrevInZPatch = false;
+                            int j = 0;
+                            bool foundPrevInZPatch = false;
 
-                                for (j = 0; j < cpatchSplittedByZPatchScenario[zpatch].Count && !foundPrevInZPatch; ++j)
+                            for (j = 0; j < cpatchSplittedByZPatchScenario[zpatch].Count && !foundPrevInZPatch; ++j)
+                            {
+                                //ищем предыдущую соответствующую строку
+                                if (TryGetFileNameFromScenarioLine(cpatch.Dir.FullName, cpatchSplittedByZPatchScenario[zpatch][j].Item2, out string cpatchFilename, out int cprevIndex) &&
+                                    TryGetFileNameFromScenarioLine(zpatch.Dir.FullName, zpatchScenarioLines[zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Key - 1], out string zpatchFilename, out int zprevIndex))
                                 {
-                                    //ищем предыдущую соответствующую строку
-                                    if (TryGetFileNameFromScenarioLine(cpatch.Dir.FullName, cpatchSplittedByZPatchScenario[zpatch][j].Item2, out string cpatchFilename, out int cprevIndex) &&
-                                        TryGetFileNameFromScenarioLine(zpatch.Dir.FullName, zpatchScenarioLines[zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Key - 1], out string zpatchFilename, out int zprevIndex))
+                                    if (cpatchFilename.Equals(zpatchFilename, StringComparison.InvariantCultureIgnoreCase))
                                     {
-                                        if (cpatchFilename.Equals(zpatchFilename, StringComparison.InvariantCultureIgnoreCase))
-                                        {
-                                            foundPrevInZPatch = true;
-                                        }
+                                        foundPrevInZPatch = true;
                                     }
                                 }
+                            }
 
-                                if (TryGetFileNameFromScenarioLine(zpatch.Dir.FullName, zpatchScenarioLines[zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Key], out string filename, out int ZIndex))
-                                {
-                                    //цикл сделает j++, откатываем назад
-                                    if (foundPrevInZPatch)
-                                        cpatchSplittedByZPatchScenario[zpatch].Insert(j, new Tuple<LineState, string>(LineState.onlyInZPatchScenario, ZPatchScenarioLineToCPatchScenario(zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Value, zpatch, ZIndex)));
-                                    else
-                                        cpatchSplittedByZPatchScenario[zpatch].Insert(0, new Tuple<LineState, string>(LineState.onlyInZPatchScenario, ZPatchScenarioLineToCPatchScenario(zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Value, zpatch, ZIndex)));
-                                }
+                            if (TryGetFileNameFromScenarioLine(zpatch.Dir.FullName, zpatchScenarioLines[zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Key], out string filename, out int ZIndex))
+                            {
+                                //цикл сделает j++, откатываем назад
+                                if (foundPrevInZPatch)
+                                    cpatchSplittedByZPatchScenario[zpatch].Insert(j, new Tuple<LineState, string>(LineState.onlyInZPatchScenario, ZPatchScenarioLineToCPatchScenario(zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Value, zpatch, ZIndex)));
                                 else
-                                {
-                                    if (foundPrevInZPatch)
-                                        cpatchSplittedByZPatchScenario[zpatch].Insert(j, new Tuple<LineState, string>(LineState.onlyInZPatchScenario, zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Value));
-                                    else
-                                        cpatchSplittedByZPatchScenario[zpatch].Insert(0, new Tuple<LineState, string>(LineState.onlyInZPatchScenario, zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Value));
-                                }
+                                    cpatchSplittedByZPatchScenario[zpatch].Insert(0, new Tuple<LineState, string>(LineState.onlyInZPatchScenario, ZPatchScenarioLineToCPatchScenario(zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Value, zpatch, ZIndex)));
+                            }
+                            else
+                            {
+                                if (foundPrevInZPatch)
+                                    cpatchSplittedByZPatchScenario[zpatch].Insert(j, new Tuple<LineState, string>(LineState.onlyInZPatchScenario, zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Value));
+                                else
+                                    cpatchSplittedByZPatchScenario[zpatch].Insert(0, new Tuple<LineState, string>(LineState.onlyInZPatchScenario, zpatchScenarioLinesForFilesNotFoundInCPatchScenarioRecord.Value));
                             }
                         }
                     }
                 }
+            }
 
 
 
-                foreach(ZPatch zpatchFromOrder in cpatch.ZPatchOrder.Values)
+            foreach(ZPatch zpatchFromOrder in cpatch.ZPatchOrder.Values)
+            {
+                foreach(var zpatchScenarioInfo in cpatchSplittedByZPatchScenario)
                 {
-                    foreach(var zpatchScenarioInfo in cpatchSplittedByZPatchScenario)
+                    if(zpatchScenarioInfo.Key.Equals(zpatchFromOrder))
                     {
-                        if(zpatchScenarioInfo.Key.Equals(zpatchFromOrder))
-                        {
-                            scenario.AddRange(zpatchScenarioInfo.Value);
-                        }
+                        scenario.AddRange(zpatchScenarioInfo.Value);
                     }
                 }
+            }
 
-                List<string> inScenarioFiles = new List<string>();
+            List<string> inScenarioFiles = new List<string>();
 
-                foreach (ZPatch zpatch in notInCPatchScenarioZPatches)
+            foreach (ZPatch zpatch in notInCPatchScenarioZPatches)
+            {
+                List<Tuple<LineState, string>> zpatchScenario = new List<Tuple<LineState, string>>();
+                if (zpatch.ZPatchStatus != "OPEN")
                 {
-                    List<Tuple<LineState, string>> zpatchScenario = new List<Tuple<LineState, string>>();
-                    if (zpatch.ZPatchStatus != "OPEN")
+                    FileInfo fileScInfo = new FileInfo(Path.Combine(zpatch.Dir.FullName, "file_sc.txt"));
+
+                    if (fileScInfo.Exists)
                     {
-                        FileInfo fileScInfo = new FileInfo(Path.Combine(zpatch.Dir.FullName, "file_sc.txt"));
-
-                        if (fileScInfo.Exists)
+                        string zpatchScenarioText;
+                        using (StreamReader sr = new StreamReader(fileScInfo.FullName))
                         {
-                            string zpatchScenarioText;
-                            using (StreamReader sr = new StreamReader(fileScInfo.FullName))
-                            {
-                                zpatchScenarioText = sr.ReadToEnd();
-                            }
+                            zpatchScenarioText = sr.ReadToEnd();
+                        }
 
-                            string[] lines = zpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] lines = zpatchScenarioText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
-                            //пропускаю первые 2 строчки
-                            for (int i = 2; i < lines.Length; ++i)
+                        //пропускаю первые 2 строчки
+                        for (int i = 2; i < lines.Length; ++i)
+                        {
+                            try
                             {
+                                Match ETLFileFromScMatch = Regex.Match(lines[i], regexFileFromScLine);
+                                string ETLFileFromSc = ETLFileFromScMatch.Groups[1].Value;
+                                string newScenarioLine =
+                                    lines[i].Substring(0, ETLFileFromScMatch.Groups[1].Index) +  //часть с префиксом
+                                    zpatch.Dir.Name + @"\" + //название папки
+                                    lines[i].Substring(ETLFileFromScMatch.Groups[1].Index); //остальная часть
                                 try
                                 {
-                                    Match ETLFileFromScMatch = Regex.Match(lines[i], regexFileFromScLine);
-                                    string ETLFileFromSc = ETLFileFromScMatch.Groups[1].Value;
-                                    string newScenarioLine =
-                                        lines[i].Substring(0, ETLFileFromScMatch.Groups[1].Index) +  //часть с префиксом
-                                        zpatch.Dir.Name + @"\" + //название папки
-                                        lines[i].Substring(ETLFileFromScMatch.Groups[1].Index); //остальная часть
-                                    try
+                                    string ETLFileFromScFullPath = Path.Combine(zpatch.Dir.FullName, ETLFileFromSc);
+
+                                    //если файл из сценария не нашелся
+                                    if (!(new FileInfo(ETLFileFromScFullPath).Exists))
                                     {
-                                        string ETLFileFromScFullPath = Path.Combine(zpatch.Dir.FullName, ETLFileFromSc);
-
-                                        //если файл из сценария не нашелся
-                                        if (!(new FileInfo(ETLFileFromScFullPath).Exists))
+                                        if (IsCorrectFile(ETLFileFromScFullPath))
                                         {
-                                            if (IsCorrectFile(ETLFileFromScFullPath))
-                                            {
-                                                zpatchScenario.Add(new Tuple<LineState, string>(LineState.notInFiles, newScenarioLine));
-                                            }
+                                            zpatchScenario.Add(new Tuple<LineState, string>(LineState.notInFiles, newScenarioLine));
                                         }
-                                        else
-                                        {
-                                            zpatchScenario.Add(new Tuple<LineState, string>(LineState.newScenarioNormal, newScenarioLine));
-                                        }
-
-                                        inScenarioFiles.Add(ETLFileFromScFullPath);
                                     }
-                                    catch (ArgumentException) { }
+                                    else
+                                    {
+                                        zpatchScenario.Add(new Tuple<LineState, string>(LineState.newScenarioNormal, newScenarioLine));
+                                    }
+
+                                    inScenarioFiles.Add(ETLFileFromScFullPath);
                                 }
-                                catch (ArgumentOutOfRangeException) { }
+                                catch (ArgumentException) { }
                             }
+                            catch (ArgumentOutOfRangeException) { }
                         }
-
-                        foreach (var file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
-                        {
-                            if (IsCorrectFile(file.Name))
-                            {
-                                if (!inScenarioFiles.Contains(file.FullName, StringComparer.InvariantCultureIgnoreCase))
-                                {
-                                    string scenarioLine = ScenarioLineFromFile(zpatch.Dir, file, out int newLinePriority);
-                                    int i = 0;
-                                    bool inserted = false;
-                                    foreach (var item in zpatchScenario)
-                                    {
-                                        if (Priority(item.Item2, out string prefix) >= newLinePriority)
-                                        {
-                                            zpatchScenario.Insert(i, new Tuple<LineState, string>(LineState.notInScenarios, scenarioLine));
-                                            inserted = true;
-                                            break;
-                                        }
-                                        ++i;
-                                    }
-                                    //если нужно вставлять в конец или еще не добавляли
-                                    if (!inserted || zpatchScenario.Count == 0)
-                                    {
-                                        zpatchScenario.Add(new Tuple<LineState, string>(LineState.notInScenarios, scenarioLine));
-                                    }
-                                }
-                            }
-                        }
-                        scenario.AddRange(zpatchScenario);
                     }
+
+                    foreach (var file in zpatch.Dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                    {
+                        if (IsCorrectFile(file.Name))
+                        {
+                            if (!inScenarioFiles.Contains(file.FullName, StringComparer.InvariantCultureIgnoreCase))
+                            {
+                                string scenarioLine = ScenarioLineFromFile(zpatch.Dir, file, out int newLinePriority);
+                                int i = 0;
+                                bool inserted = false;
+                                foreach (var item in zpatchScenario)
+                                {
+                                    if (Priority(item.Item2, out string prefix) >= newLinePriority)
+                                    {
+                                        zpatchScenario.Insert(i, new Tuple<LineState, string>(LineState.notInScenarios, scenarioLine));
+                                        inserted = true;
+                                        break;
+                                    }
+                                    ++i;
+                                }
+                                //если нужно вставлять в конец или еще не добавляли
+                                if (!inserted || zpatchScenario.Count == 0)
+                                {
+                                    zpatchScenario.Add(new Tuple<LineState, string>(LineState.notInScenarios, scenarioLine));
+                                }
+                            }
+                        }
+                    }
+                    scenario.AddRange(zpatchScenario);
                 }
             }
 
