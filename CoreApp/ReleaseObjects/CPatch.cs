@@ -322,15 +322,15 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
-        private void AddNewDependenciesToList(List<ZPatch> newPatches)
+        private void AddNewDependenciesToList(List<ZPatch> addedPatches)
         {
             var fullList = AllDependenciesToList();
-            int i = fullList.Count - newPatches.Count;
+            int i = fullList.Count - addedPatches.Count;
 
             //иду по порядку, добавляю в конец новые патчи
             foreach(var patch in fullList.Values)
             {
-                if(newPatches.Contains(patch))
+                if(addedPatches.Contains(patch))
                 {
                     ZPatchOrder.Add(i, patch);
                     ZPatchOrderDAL.Insert(patch.ZPatchId, i);
@@ -427,15 +427,15 @@ namespace CoreApp.ReleaseObjects
         }
 
 
-        private void ReopenExcelColumns(FileInfo excelFile)
+        public void ReopenExcelColumns(FileInfo excelFile)
         {
             Workbook wb = ReleaseManager.excelApp.Workbooks.Open(excelFile.FullName);
             Worksheet ws = wb.Sheets[1];
             Range res = ws.UsedRange;
 
 
-            AddNewZPatches(res, out List<ZPatch> newPatches);
-            CreateCPatchDelta(
+            CreateCPatchDelta(res, out List<ZPatch> addedPatches);
+            CreateCPatchDependenciesDelta(
                 res,
                 out List<Tuple<ZPatch, ZPatch>> deletedDependenciesFrom,
                 out List<Tuple<ZPatch, ZPatch>> addedDependenciesFrom,
@@ -447,7 +447,7 @@ namespace CoreApp.ReleaseObjects
                 addedDependenciesFrom,
                 deletedDependenciesTo,
                 addedDependenciesTo,
-                newPatches);
+                addedPatches);
 
             ExcelCleanup(wb, ws);
         }
@@ -457,7 +457,7 @@ namespace CoreApp.ReleaseObjects
             List<Tuple<ZPatch, ZPatch>> addedDependenciesFrom,
             List<Tuple<ZPatch, ZPatch>> deletedDependenciesTo,
             List<Tuple<ZPatch, ZPatch>> addedDependenciesTo,
-            List<ZPatch> newPatches)
+            List<ZPatch> addedPatches)
         {
             //deletedfrom
             foreach (var deletedDependency in deletedDependenciesFrom)
@@ -575,7 +575,7 @@ namespace CoreApp.ReleaseObjects
             foreach (var newDependency in addedDependenciesFrom)
             {
                 //если появилась новая зависимость, такая, что появился новый патч, влияющий на старый
-                if (newPatches.Contains(newDependency.Item1) && !newPatches.Contains(newDependency.Item2))
+                if (addedPatches.Contains(newDependency.Item1) && !addedPatches.Contains(newDependency.Item2))
                 {
                     oldDependenciesAreCorrect = false;
                     break;
@@ -593,7 +593,7 @@ namespace CoreApp.ReleaseObjects
                 foreach (var newDependency in addedDependenciesTo)
                 {
                     //если появилась новая зависимость, такая, что появился новый патч, влияющий на старый
-                    if (!newPatches.Contains(newDependency.Item1) && newPatches.Contains(newDependency.Item2))
+                    if (!addedPatches.Contains(newDependency.Item1) && addedPatches.Contains(newDependency.Item2))
                     {
                         oldDependenciesAreCorrect = false;
                         break;
@@ -609,7 +609,7 @@ namespace CoreApp.ReleaseObjects
 
             if (oldDependenciesAreCorrect)
             {
-                AddNewDependenciesToList(newPatches);
+                AddNewDependenciesToList(addedPatches);
             }
             else
             {
@@ -770,15 +770,20 @@ namespace CoreApp.ReleaseObjects
             }
         }
 
-        private void AddNewZPatches(Range columns, out List<ZPatch> newPatches)
+        private void CreateCPatchDelta(Range columns, out List<ZPatch> addedPatches)
         {
-            newPatches = new List<ZPatch>();
+            addedPatches = new List<ZPatch>();
+            HashSet<ZPatch> deletedPatches = new HashSet<ZPatch>(ZPatches);
 
             int patchNameIndex = GetPatchNameIndex(columns);
             int patchStatusIndex = GetPatchStatusIndex(columns);
 
-            CPatchName = "NOT DEFINED";
-            CPatchId = CPatchDAL.Insert(release.ReleaseId, null, CPatchName, null, null);
+            //если еще не создавался в базе
+            if (CPatchId == 0)
+            {
+                CPatchName = "NOT DEFINED";
+                CPatchId = CPatchDAL.Insert(release.ReleaseId, null, CPatchName, null, null);
+            }
 
             for (int i = 2; i <= columns.Rows.Count; ++i)
             {
@@ -821,22 +826,34 @@ namespace CoreApp.ReleaseObjects
                                 new HashSet<ZPatch>(),
                                 ZPatchStatus)
                             {
-                                excelFileRowId = i,
                                 cpatch = this
                             };
 
-                            newPatches.Add(zpatch);
+                            addedPatches.Add(zpatch);
+                            zpatch.excelFileRowId = i;
                         }
+                    }
+                    else
+                    {
+                        deletedPatches.Remove(currPatch);
+                        currPatch.excelFileRowId = i;
                     }
                 }
             }
 
-            foreach(ZPatch zpatch in newPatches)
+            foreach(ZPatch zpatch in addedPatches)
             {
                 zpatch.ZPatchId = ZPatchDAL.Insert(CPatchId, null, zpatch.ZPatchName, null);
                 ZPatches.Add(zpatch);
                 ZPatchesDict.Add(zpatch.ZPatchId, zpatch);
-            }            
+            }   
+            
+            foreach(ZPatch zpatch in deletedPatches)
+            {
+                ZPatchDAL.DeleteZPatch(zpatch.ZPatchId);
+                ZPatches.Remove(zpatch);
+                ZPatchesDict.Remove(zpatch.ZPatchId);
+            }
         }
 
         public Graph DrawGraph()
@@ -883,7 +900,7 @@ namespace CoreApp.ReleaseObjects
             return graph;
         }        
 
-        private void CreateCPatchDelta(
+        private void CreateCPatchDependenciesDelta(
             Range columns,
             out List<Tuple<ZPatch, ZPatch>> deletedDependenciesFrom,
             out List<Tuple<ZPatch, ZPatch>> addedDependenciesFrom,

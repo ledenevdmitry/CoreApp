@@ -33,12 +33,12 @@
             this.BtSetHomePath = new System.Windows.Forms.ToolStripMenuItem();
             this.BtRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtAddRelease = new System.Windows.Forms.ToolStripMenuItem();
+            this.BtAddCPatch = new System.Windows.Forms.ToolStripMenuItem();
             this.BtDeleteRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtReleaseRename = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCheckRelease = new System.Windows.Forms.ToolStripMenuItem();
             this.BtReleaseGraph = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCPatch = new System.Windows.Forms.ToolStripMenuItem();
-            this.BtAddCPatch = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCPatchDelete = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCPatchRename = new System.Windows.Forms.ToolStripMenuItem();
             this.BtCPatchMove = new System.Windows.Forms.ToolStripMenuItem();
@@ -86,6 +86,7 @@
             this.LboxCPatchDependenciesTo = new System.Windows.Forms.ListBox();
             this.BtCPatchAddDependenciesTo = new System.Windows.Forms.Button();
             this.BtCPatchDeleteDependenciesTo = new System.Windows.Forms.Button();
+            this.BtCPatchUpdate = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).BeginInit();
             this.SCMain.Panel1.SuspendLayout();
@@ -158,6 +159,7 @@
             // 
             this.BtRelease.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.BtAddRelease,
+            this.BtAddCPatch,
             this.BtDeleteRelease,
             this.BtReleaseRename,
             this.BtCheckRelease,
@@ -169,98 +171,98 @@
             // BtAddRelease
             // 
             this.BtAddRelease.Name = "BtAddRelease";
-            this.BtAddRelease.Size = new System.Drawing.Size(163, 22);
-            this.BtAddRelease.Text = "Добавить";
+            this.BtAddRelease.Size = new System.Drawing.Size(211, 22);
+            this.BtAddRelease.Text = "Добавить релиз";
             this.BtAddRelease.Click += new System.EventHandler(this.BtAddRelease_Click);
+            // 
+            // BtAddCPatch
+            // 
+            this.BtAddCPatch.Name = "BtAddCPatch";
+            this.BtAddCPatch.Size = new System.Drawing.Size(211, 22);
+            this.BtAddCPatch.Text = "Добавить C-патч в релиз";
+            this.BtAddCPatch.Click += new System.EventHandler(this.BtAddCPatch_Click);
             // 
             // BtDeleteRelease
             // 
             this.BtDeleteRelease.Name = "BtDeleteRelease";
-            this.BtDeleteRelease.Size = new System.Drawing.Size(163, 22);
+            this.BtDeleteRelease.Size = new System.Drawing.Size(211, 22);
             this.BtDeleteRelease.Text = "Удалить";
             this.BtDeleteRelease.Click += new System.EventHandler(this.BtDeleteRelease_Click);
             // 
             // BtReleaseRename
             // 
             this.BtReleaseRename.Name = "BtReleaseRename";
-            this.BtReleaseRename.Size = new System.Drawing.Size(163, 22);
+            this.BtReleaseRename.Size = new System.Drawing.Size(211, 22);
             this.BtReleaseRename.Text = "Переименовать";
             this.BtReleaseRename.Click += new System.EventHandler(this.BtReleaseRename_Click);
             // 
             // BtCheckRelease
             // 
             this.BtCheckRelease.Name = "BtCheckRelease";
-            this.BtCheckRelease.Size = new System.Drawing.Size(163, 22);
+            this.BtCheckRelease.Size = new System.Drawing.Size(211, 22);
             this.BtCheckRelease.Text = "Проверить";
             this.BtCheckRelease.Click += new System.EventHandler(this.BtCheckRelease_Click);
             // 
             // BtReleaseGraph
             // 
             this.BtReleaseGraph.Name = "BtReleaseGraph";
-            this.BtReleaseGraph.Size = new System.Drawing.Size(163, 22);
+            this.BtReleaseGraph.Size = new System.Drawing.Size(211, 22);
             this.BtReleaseGraph.Text = "Построить граф";
             this.BtReleaseGraph.Click += new System.EventHandler(this.BtReleaseGraph_Click);
             // 
             // BtCPatch
             // 
             this.BtCPatch.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.BtAddCPatch,
             this.BtCPatchDelete,
             this.BtCPatchRename,
             this.BtCPatchMove,
             this.BtCPatchGraph,
             this.BtZPatchOrder,
-            this.BtCPatchCreateScenario});
+            this.BtCPatchCreateScenario,
+            this.BtCPatchUpdate});
             this.BtCPatch.Name = "BtCPatch";
             this.BtCPatch.Size = new System.Drawing.Size(57, 20);
             this.BtCPatch.Text = "C-патч";
             // 
-            // BtAddCPatch
-            // 
-            this.BtAddCPatch.Name = "BtAddCPatch";
-            this.BtAddCPatch.Size = new System.Drawing.Size(173, 22);
-            this.BtAddCPatch.Text = "Добавить ОП/ФП";
-            this.BtAddCPatch.Click += new System.EventHandler(this.BtAddCPatch_Click);
-            // 
             // BtCPatchDelete
             // 
             this.BtCPatchDelete.Name = "BtCPatchDelete";
-            this.BtCPatchDelete.Size = new System.Drawing.Size(173, 22);
+            this.BtCPatchDelete.Size = new System.Drawing.Size(180, 22);
             this.BtCPatchDelete.Text = "Удалить";
             this.BtCPatchDelete.Click += new System.EventHandler(this.BtCPatchDelete_Click);
             // 
             // BtCPatchRename
             // 
             this.BtCPatchRename.Name = "BtCPatchRename";
-            this.BtCPatchRename.Size = new System.Drawing.Size(173, 22);
+            this.BtCPatchRename.Size = new System.Drawing.Size(180, 22);
             this.BtCPatchRename.Text = "Переименовать";
             this.BtCPatchRename.Click += new System.EventHandler(this.BtCPatchRename_Click);
             // 
             // BtCPatchMove
             // 
             this.BtCPatchMove.Name = "BtCPatchMove";
-            this.BtCPatchMove.Size = new System.Drawing.Size(173, 22);
+            this.BtCPatchMove.Size = new System.Drawing.Size(180, 22);
             this.BtCPatchMove.Text = "Перенести";
-            this.BtCPatchMove.Click += new System.EventHandler(this.BtMoveCPatch_Click);
+            this.BtCPatchMove.Click += new System.EventHandler(this.BtCPatchMove_Click);
             // 
             // BtCPatchGraph
             // 
             this.BtCPatchGraph.Name = "BtCPatchGraph";
-            this.BtCPatchGraph.Size = new System.Drawing.Size(173, 22);
+            this.BtCPatchGraph.Size = new System.Drawing.Size(180, 22);
             this.BtCPatchGraph.Text = "Построить граф";
             this.BtCPatchGraph.Click += new System.EventHandler(this.BtCPatchGraph_Click);
             // 
             // BtZPatchOrder
             // 
             this.BtZPatchOrder.Name = "BtZPatchOrder";
-            this.BtZPatchOrder.Size = new System.Drawing.Size(173, 22);
+            this.BtZPatchOrder.Size = new System.Drawing.Size(180, 22);
             this.BtZPatchOrder.Text = "Порядок патчей";
             this.BtZPatchOrder.Click += new System.EventHandler(this.BtZPatchOrder_Click);
             // 
             // BtCPatchCreateScenario
             // 
             this.BtCPatchCreateScenario.Name = "BtCPatchCreateScenario";
-            this.BtCPatchCreateScenario.Size = new System.Drawing.Size(173, 22);
+            this.BtCPatchCreateScenario.Size = new System.Drawing.Size(180, 22);
             this.BtCPatchCreateScenario.Text = "Создать сценарий";
             this.BtCPatchCreateScenario.Click += new System.EventHandler(this.BtCreateScenario_Click);
             // 
@@ -403,7 +405,7 @@
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 282F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 309F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(414, 309);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
@@ -426,7 +428,7 @@
             this.SCZPatchDependenciesFrom.Panel2.Controls.Add(this.BtZPatchAddDependenciesFrom);
             this.SCZPatchDependenciesFrom.Panel2.Controls.Add(this.BtZPatchDeleteDependenciesFrom);
             this.SCZPatchDependenciesFrom.Size = new System.Drawing.Size(203, 305);
-            this.SCZPatchDependenciesFrom.SplitterDistance = 228;
+            this.SCZPatchDependenciesFrom.SplitterDistance = 229;
             this.SCZPatchDependenciesFrom.SplitterWidth = 3;
             this.SCZPatchDependenciesFrom.TabIndex = 4;
             // 
@@ -438,7 +440,7 @@
             this.GbZPatchDependenciesFrom.Margin = new System.Windows.Forms.Padding(2);
             this.GbZPatchDependenciesFrom.Name = "GbZPatchDependenciesFrom";
             this.GbZPatchDependenciesFrom.Padding = new System.Windows.Forms.Padding(2);
-            this.GbZPatchDependenciesFrom.Size = new System.Drawing.Size(203, 228);
+            this.GbZPatchDependenciesFrom.Size = new System.Drawing.Size(203, 229);
             this.GbZPatchDependenciesFrom.TabIndex = 1;
             this.GbZPatchDependenciesFrom.TabStop = false;
             this.GbZPatchDependenciesFrom.Text = "Зависит от";
@@ -450,7 +452,7 @@
             this.LboxZPatchDependenciesFrom.Location = new System.Drawing.Point(2, 15);
             this.LboxZPatchDependenciesFrom.Margin = new System.Windows.Forms.Padding(2);
             this.LboxZPatchDependenciesFrom.Name = "LboxZPatchDependenciesFrom";
-            this.LboxZPatchDependenciesFrom.Size = new System.Drawing.Size(199, 211);
+            this.LboxZPatchDependenciesFrom.Size = new System.Drawing.Size(199, 212);
             this.LboxZPatchDependenciesFrom.TabIndex = 0;
             // 
             // BtZPatchAddDependenciesFrom
@@ -494,7 +496,7 @@
             this.SCZPatchDependenciesTo.Panel2.Controls.Add(this.BtZPatchAddDependenciesTo);
             this.SCZPatchDependenciesTo.Panel2.Controls.Add(this.BtZPatchDeleteDependenciesTo);
             this.SCZPatchDependenciesTo.Size = new System.Drawing.Size(203, 305);
-            this.SCZPatchDependenciesTo.SplitterDistance = 228;
+            this.SCZPatchDependenciesTo.SplitterDistance = 229;
             this.SCZPatchDependenciesTo.SplitterWidth = 3;
             this.SCZPatchDependenciesTo.TabIndex = 5;
             // 
@@ -506,7 +508,7 @@
             this.GbZPatchDependenciesTo.Margin = new System.Windows.Forms.Padding(2);
             this.GbZPatchDependenciesTo.Name = "GbZPatchDependenciesTo";
             this.GbZPatchDependenciesTo.Padding = new System.Windows.Forms.Padding(2);
-            this.GbZPatchDependenciesTo.Size = new System.Drawing.Size(203, 228);
+            this.GbZPatchDependenciesTo.Size = new System.Drawing.Size(203, 229);
             this.GbZPatchDependenciesTo.TabIndex = 1;
             this.GbZPatchDependenciesTo.TabStop = false;
             this.GbZPatchDependenciesTo.Text = "Влияет на";
@@ -518,7 +520,7 @@
             this.LboxZPatchDependenciesTo.Location = new System.Drawing.Point(2, 15);
             this.LboxZPatchDependenciesTo.Margin = new System.Windows.Forms.Padding(2);
             this.LboxZPatchDependenciesTo.Name = "LboxZPatchDependenciesTo";
-            this.LboxZPatchDependenciesTo.Size = new System.Drawing.Size(199, 211);
+            this.LboxZPatchDependenciesTo.Size = new System.Drawing.Size(199, 212);
             this.LboxZPatchDependenciesTo.TabIndex = 0;
             // 
             // BtZPatchAddDependenciesTo
@@ -655,9 +657,9 @@
             this.TPCPatchDependencies.Name = "TPCPatchDependencies";
             this.TPCPatchDependencies.RowCount = 1;
             this.TPCPatchDependencies.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 0F));
-            this.TPCPatchDependencies.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 278F));
-            this.TPCPatchDependencies.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 278F));
-            this.TPCPatchDependencies.Size = new System.Drawing.Size(414, 261);
+            this.TPCPatchDependencies.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 309F));
+            this.TPCPatchDependencies.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 309F));
+            this.TPCPatchDependencies.Size = new System.Drawing.Size(414, 309);
             this.TPCPatchDependencies.TabIndex = 0;
             // 
             // SCCPatchDependenciesFrom
@@ -678,8 +680,8 @@
             // 
             this.SCCPatchDependenciesFrom.Panel2.Controls.Add(this.BtCPatchAddDependenciesFrom);
             this.SCCPatchDependenciesFrom.Panel2.Controls.Add(this.BtCPatchDeleteDependenciesFrom);
-            this.SCCPatchDependenciesFrom.Size = new System.Drawing.Size(203, 274);
-            this.SCCPatchDependenciesFrom.SplitterDistance = 201;
+            this.SCCPatchDependenciesFrom.Size = new System.Drawing.Size(203, 305);
+            this.SCCPatchDependenciesFrom.SplitterDistance = 233;
             this.SCCPatchDependenciesFrom.SplitterWidth = 3;
             this.SCCPatchDependenciesFrom.TabIndex = 4;
             // 
@@ -691,7 +693,7 @@
             this.GbCPatchDependenciesFrom.Margin = new System.Windows.Forms.Padding(2);
             this.GbCPatchDependenciesFrom.Name = "GbCPatchDependenciesFrom";
             this.GbCPatchDependenciesFrom.Padding = new System.Windows.Forms.Padding(2);
-            this.GbCPatchDependenciesFrom.Size = new System.Drawing.Size(203, 201);
+            this.GbCPatchDependenciesFrom.Size = new System.Drawing.Size(203, 233);
             this.GbCPatchDependenciesFrom.TabIndex = 1;
             this.GbCPatchDependenciesFrom.TabStop = false;
             this.GbCPatchDependenciesFrom.Text = "Зависит от";
@@ -703,7 +705,7 @@
             this.LboxCPatchDependenciesFrom.Location = new System.Drawing.Point(2, 15);
             this.LboxCPatchDependenciesFrom.Margin = new System.Windows.Forms.Padding(2);
             this.LboxCPatchDependenciesFrom.Name = "LboxCPatchDependenciesFrom";
-            this.LboxCPatchDependenciesFrom.Size = new System.Drawing.Size(199, 184);
+            this.LboxCPatchDependenciesFrom.Size = new System.Drawing.Size(199, 216);
             this.LboxCPatchDependenciesFrom.TabIndex = 0;
             // 
             // BtCPatchAddDependenciesFrom
@@ -746,8 +748,8 @@
             // 
             this.SCCPatchDependenciesTo.Panel2.Controls.Add(this.BtCPatchAddDependenciesTo);
             this.SCCPatchDependenciesTo.Panel2.Controls.Add(this.BtCPatchDeleteDependenciesTo);
-            this.SCCPatchDependenciesTo.Size = new System.Drawing.Size(203, 274);
-            this.SCCPatchDependenciesTo.SplitterDistance = 201;
+            this.SCCPatchDependenciesTo.Size = new System.Drawing.Size(203, 305);
+            this.SCCPatchDependenciesTo.SplitterDistance = 233;
             this.SCCPatchDependenciesTo.SplitterWidth = 3;
             this.SCCPatchDependenciesTo.TabIndex = 5;
             // 
@@ -759,7 +761,7 @@
             this.GbCPatchDependenciesTo.Margin = new System.Windows.Forms.Padding(2);
             this.GbCPatchDependenciesTo.Name = "GbCPatchDependenciesTo";
             this.GbCPatchDependenciesTo.Padding = new System.Windows.Forms.Padding(2);
-            this.GbCPatchDependenciesTo.Size = new System.Drawing.Size(203, 201);
+            this.GbCPatchDependenciesTo.Size = new System.Drawing.Size(203, 233);
             this.GbCPatchDependenciesTo.TabIndex = 1;
             this.GbCPatchDependenciesTo.TabStop = false;
             this.GbCPatchDependenciesTo.Text = "Влияет на";
@@ -771,7 +773,7 @@
             this.LboxCPatchDependenciesTo.Location = new System.Drawing.Point(2, 15);
             this.LboxCPatchDependenciesTo.Margin = new System.Windows.Forms.Padding(2);
             this.LboxCPatchDependenciesTo.Name = "LboxCPatchDependenciesTo";
-            this.LboxCPatchDependenciesTo.Size = new System.Drawing.Size(199, 184);
+            this.LboxCPatchDependenciesTo.Size = new System.Drawing.Size(199, 216);
             this.LboxCPatchDependenciesTo.TabIndex = 0;
             // 
             // BtCPatchAddDependenciesTo
@@ -795,6 +797,13 @@
             this.BtCPatchDeleteDependenciesTo.Text = "Удалить зависимость";
             this.BtCPatchDeleteDependenciesTo.UseVisualStyleBackColor = true;
             this.BtCPatchDeleteDependenciesTo.Click += new System.EventHandler(this.BtCPatchDeleteDependenciesTo_Click);
+            // 
+            // BtCPatchUpdate
+            // 
+            this.BtCPatchUpdate.Name = "BtCPatchUpdate";
+            this.BtCPatchUpdate.Size = new System.Drawing.Size(180, 22);
+            this.BtCPatchUpdate.Text = "Обновить";
+            this.BtCPatchUpdate.Click += new System.EventHandler(this.BtCPatchUpdate_Click);
             // 
             // ReleaseManagerForm
             // 
@@ -911,5 +920,6 @@
         private System.Windows.Forms.Label LbEnvCode;
         private System.Windows.Forms.TableLayoutPanel TPCPatchDependencies;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.ToolStripMenuItem BtCPatchUpdate;
     }
 }

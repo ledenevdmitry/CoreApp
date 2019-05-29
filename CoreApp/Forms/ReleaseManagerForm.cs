@@ -64,6 +64,7 @@ namespace CoreApp
             BtCPatchMove.Enabled =
             BtCPatchDelete.Enabled =
             BtCPatchCreateScenario.Enabled =
+            BtCPatchUpdate.Enabled =
                 mainTree.SelectedNode != null && mainTree.SelectedNode.Level >= 1;
 
             GbCPatch.Visible =
@@ -326,7 +327,7 @@ namespace CoreApp
             mainTree.SelectedNode.Remove();
         }
 
-        private void BtMoveCPatch_Click(object sender, EventArgs e)
+        private void BtCPatchMove_Click(object sender, EventArgs e)
         {
             ReleasesListForm rlf = new ReleasesListForm(
                 rm.releases
@@ -555,9 +556,40 @@ namespace CoreApp
         private void BtCheckRelease_Click(object sender, EventArgs e)
         {
             var currRelease = CurrRelease;
-            currRelease.Download();
+
+            try
+            {
+                currRelease.Download();
+            }
+            catch(DirectoryNotFoundException exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+
             CheckReleaseForm crf = new CheckReleaseForm(currRelease);
             crf.ShowDialog();
+        }
+
+        private void BtCPatchUpdate_Click(object sender, EventArgs e)
+        {
+            var currCPatch = CurrCPatch;
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                Filter = "Файлы Excel|*.xls;*.xlsx;*.xlsm"
+            };
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                currCPatch.ReopenExcelColumns(new FileInfo(ofd.FileName));
+
+                var cpatchNode = GetCPatchNode(mainTree.SelectedNode);
+                cpatchNode.Nodes.Clear();
+                foreach (ZPatch zpatch in currCPatch.ZPatches)
+                {
+                    cpatchNode.Nodes.Add(zpatch.ZPatchId.ToString(), zpatch.ZPatchName);
+                }
+            }
+
         }
     }
 }
