@@ -251,12 +251,12 @@ namespace CoreApp.ReleaseObjects
                         string patchRoot = $"{cvsRoot}/{cpatchmatch}";
                         try
                         {
-                            cvs.FirstInEntireBase(patchRoot, out string zpatchmatch, new Regex(zpatch.ZPatchName), 1);
+                            cvs.FirstInEntireBase(patchRoot, out string zpatchmatch, new Regex(".*" + zpatch.ZPatchName), 1);
                             zpatch.Dir = new DirectoryInfo(Path.Combine(Dir.FullName, zpatchmatch));
                         }
                         catch
                         {
-                            throw new DirectoryNotFoundException($"Патч {zpatch.ZPatchName} не найден. Добавьте его в папку C-патча или переведите статус в OPEN");
+                            throw new DirectoryNotFoundException($"Патч {zpatch.ZPatchName} не найден. Добавьте его в папку поставки или переведите статус в OPEN");
                         }
                     }
                 }
@@ -265,7 +265,7 @@ namespace CoreApp.ReleaseObjects
             }
             catch (ArgumentException e)
             {
-                throw new DirectoryNotFoundException("Папка с C-патчем не найдена. Возможно, назначен неправильный статус или среда");
+                throw new DirectoryNotFoundException("Папка с поставкой не найдена. Возможно, назначен неправильный статус или среда");
             }
 
         }

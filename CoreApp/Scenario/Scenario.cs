@@ -160,7 +160,7 @@ namespace CoreApp.Scenario
         {
             List<Tuple<LineState, string>> scenario = new List<Tuple<LineState, string>>();
 
-            //часть сценария по C-патчу
+            //часть сценария по Поставкау
             List<Tuple<LineState, string>> cpatchScenario = new List<Tuple<LineState, string>>();
 
             FileInfo cpatchFileScInfo = new FileInfo(Path.Combine(cpatch.Dir.FullName, "file_sc.txt"));

@@ -24,7 +24,7 @@ namespace CoreApp.InfaObjects
         }        
 
         public HashSet<ETLObject> Parents { get; set; }
-        public HashSet<string> infaParentTypes;
+        public HashSet<string> infaPossibleParentTypes;
         public FileInfo File { get; set; }
         public XmlNode ObjNode { get; set; }
 
@@ -42,7 +42,7 @@ namespace CoreApp.InfaObjects
                 {
                     foreach(XmlAttribute attr in subNode.Attributes)
                     {
-                        if(attr.Name == "TYPE" && infaParentTypes.Contains(attr.Value))
+                        if(attr.Name == "TYPE" && infaPossibleParentTypes.Contains(attr.Value))
                         {
                             ETLObject parentPattern = InfaParser.CreateInfaObject(subNode.Attributes.GetNamedItem("TYPE").Value, subNode.Attributes.GetNamedItem("NAME").Value, subNode, null, null);
                             Key key = new Key(parentPattern.ObjName, parentPattern.ObjType);

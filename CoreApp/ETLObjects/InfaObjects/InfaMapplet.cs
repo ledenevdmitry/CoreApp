@@ -10,14 +10,14 @@ namespace CoreApp.InfaObjects
     {
         public InfaMapplet(string objName) : base(objName)
         {
-            infaParentTypes = infaStaticParentTypes;
+            infaPossibleParentTypes = infaStaticParentTypes;
         }
 
         public static HashSet<string> infaStaticParentTypes = new HashSet<string>(new string[] { "CONFIG", "TRANSFORMATION", "SOURCE", "TARGET"} );
 
         public InfaMapplet() : base()
         {
-            infaParentTypes = infaStaticParentTypes;
+            infaPossibleParentTypes = infaStaticParentTypes;
         }
     }
 }

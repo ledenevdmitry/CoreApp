@@ -47,8 +47,9 @@
             this.gViewer.InsertingEdge = false;
             this.gViewer.LayoutAlgorithmSettingsButtonVisible = true;
             this.gViewer.LayoutEditingEnabled = true;
-            this.gViewer.Location = new System.Drawing.Point(12, 12);
+            this.gViewer.Location = new System.Drawing.Point(9, 10);
             this.gViewer.LooseOffsetForRouting = 0.25D;
+            this.gViewer.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.gViewer.MouseHitDistance = 0.05D;
             this.gViewer.Name = "gViewer";
             this.gViewer.NavigationVisible = true;
@@ -61,7 +62,7 @@
             this.gViewer.SaveButtonVisible = true;
             this.gViewer.SaveGraphButtonVisible = true;
             this.gViewer.SaveInVectorFormatEnabled = true;
-            this.gViewer.Size = new System.Drawing.Size(776, 426);
+            this.gViewer.Size = new System.Drawing.Size(582, 346);
             this.gViewer.TabIndex = 0;
             this.gViewer.TightOffsetForRouting = 0.125D;
             this.gViewer.ToolBarIsVisible = true;
@@ -73,12 +74,13 @@
             // 
             // GraphForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(600, 366);
             this.Controls.Add(this.gViewer);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "GraphForm";
-            this.Text = "ReleaseGraphForm";
+            this.Text = "Граф зависимостей";
             this.Resize += new System.EventHandler(this.GraphForm_Resize);
             this.ResumeLayout(false);
 

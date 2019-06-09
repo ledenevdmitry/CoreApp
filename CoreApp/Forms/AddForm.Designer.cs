@@ -69,7 +69,7 @@
             this.Controls.Add(this.TbReleaseName);
             this.Controls.Add(this.lbName);
             this.Name = "AddForm";
-            this.Text = "Add";
+            this.Text = "Добавить";
             this.ResumeLayout(false);
             this.PerformLayout();
 

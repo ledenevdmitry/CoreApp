@@ -374,7 +374,7 @@ namespace CoreApp
                 }
                 else
                 {
-                    MessageBox.Show($"Существует зависимость по Z-патчам: {zpatchFrom} -> {zpatchTo}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Существует зависимость по Патчам: {zpatchFrom} -> {zpatchTo}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -411,7 +411,7 @@ namespace CoreApp
                 }
                 else
                 {
-                    MessageBox.Show($"Существует зависимость по Z-патчам: {zpatchFrom} -> {zpatchTo}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Существует зависимость по Патчам: {zpatchFrom} -> {zpatchTo}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

@@ -264,7 +264,7 @@
             this.LbOnlyInZPatchScenario.Name = "LbOnlyInZPatchScenario";
             this.LbOnlyInZPatchScenario.Size = new System.Drawing.Size(190, 17);
             this.LbOnlyInZPatchScenario.TabIndex = 19;
-            this.LbOnlyInZPatchScenario.Text = "Только в сценарии Z-патча";
+            this.LbOnlyInZPatchScenario.Text = "Только в сценарии Патча";
             // 
             // PbOnlyInZPatchScenario
             // 

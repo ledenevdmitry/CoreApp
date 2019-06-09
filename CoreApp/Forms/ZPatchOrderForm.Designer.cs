@@ -44,7 +44,7 @@
             this.SCMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SCMain.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.SCMain.Location = new System.Drawing.Point(0, 0);
-            this.SCMain.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.SCMain.Margin = new System.Windows.Forms.Padding(2);
             this.SCMain.Name = "SCMain";
             // 
             // SCMain.Panel1
@@ -57,7 +57,7 @@
             this.SCMain.Panel2.Controls.Add(this.BtDown);
             this.SCMain.Panel2.Controls.Add(this.BtUp);
             this.SCMain.Size = new System.Drawing.Size(603, 366);
-            this.SCMain.SplitterDistance = 400;
+            this.SCMain.SplitterDistance = 401;
             this.SCMain.SplitterWidth = 3;
             this.SCMain.TabIndex = 0;
             // 
@@ -66,16 +66,16 @@
             this.LboxZPatchOrder.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LboxZPatchOrder.FormattingEnabled = true;
             this.LboxZPatchOrder.Location = new System.Drawing.Point(0, 0);
-            this.LboxZPatchOrder.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.LboxZPatchOrder.Margin = new System.Windows.Forms.Padding(2);
             this.LboxZPatchOrder.Name = "LboxZPatchOrder";
             this.LboxZPatchOrder.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.LboxZPatchOrder.Size = new System.Drawing.Size(400, 366);
+            this.LboxZPatchOrder.Size = new System.Drawing.Size(401, 366);
             this.LboxZPatchOrder.TabIndex = 0;
             // 
             // BtConfirm
             // 
             this.BtConfirm.Location = new System.Drawing.Point(4, 222);
-            this.BtConfirm.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BtConfirm.Margin = new System.Windows.Forms.Padding(2);
             this.BtConfirm.Name = "BtConfirm";
             this.BtConfirm.Size = new System.Drawing.Size(136, 53);
             this.BtConfirm.TabIndex = 2;
@@ -87,7 +87,7 @@
             // 
             this.BtDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.BtDown.Location = new System.Drawing.Point(45, 97);
-            this.BtDown.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BtDown.Margin = new System.Windows.Forms.Padding(2);
             this.BtDown.Name = "BtDown";
             this.BtDown.Size = new System.Drawing.Size(51, 44);
             this.BtDown.TabIndex = 1;
@@ -99,7 +99,7 @@
             // 
             this.BtUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.BtUp.Location = new System.Drawing.Point(45, 48);
-            this.BtUp.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BtUp.Margin = new System.Windows.Forms.Padding(2);
             this.BtUp.Name = "BtUp";
             this.BtUp.Size = new System.Drawing.Size(51, 44);
             this.BtUp.TabIndex = 0;
@@ -113,9 +113,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(603, 366);
             this.Controls.Add(this.SCMain);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ZPatchOrderForm";
-            this.Text = "ZPatchOrderForm";
+            this.Text = "Порядок патчей";
             this.SCMain.Panel1.ResumeLayout(false);
             this.SCMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.SCMain)).EndInit();
